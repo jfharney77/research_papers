@@ -1,0 +1,107 @@
+% =============================================================================
+% ACM Conference Paper Template
+% Document class: acmart (sigconf mode -- two-column conference proceedings)
+%
+% The acmart class is included in TeX Live and MiKTeX -- no separate download
+% required. If it is missing, install via:
+%   Ubuntu/Debian: sudo apt install texlive-publishers
+%   MiKTeX:        automatic on first compile
+%
+% Compilation:
+%   pdflatex main.tex
+%   bibtex main
+%   pdflatex main.tex
+%   pdflatex main.tex
+%
+% Structure:
+%   main.tex              -- root document (this file)
+%   sections/abstract.tex
+%   sections/introduction.tex
+%   sections/related_work.tex
+%   sections/conclusion.tex
+%   references.bib        -- bibliography entries
+%
+% Common acmart class options:
+%   sigconf   -- ACM conference proceedings (two-column, most common)
+%   manuscript -- single-column manuscript / review mode
+%   anonymous  -- anonymise for double-blind review (add to options list)
+% =============================================================================
+
+\documentclass[sigconf]{acmart}
+
+% ---------------- Packages ----------------
+% acmart loads many packages internally; add only what it does not provide.
+\usepackage{booktabs}   % professional-quality tables (\toprule, \midrule, etc.)
+\usepackage{graphicx}
+% ------------------------------------------
+
+% --- ACM conference metadata (update for your target venue) ---
+\acmConference[RecSys '25]{ACM Conference on Recommender Systems}
+              {September 22--26, 2025}{Prague, Czech Republic}
+\acmYear{2025}
+\acmISBN{}       % leave empty for submission
+\acmDOI{}        % leave empty for submission
+
+% --- Copyright block (choose one; leave as-is for submission) ---
+% \setcopyright{acmcopyright}
+% \setcopyright{acmlicensed}
+% \setcopyright{rightsretained}
+\setcopyright{none}   % use for preprints / submissions
+
+% ------------------------------------------
+
+\begin{document}
+
+\title{Paper Title Goes Here}
+
+% --- Authors ---
+% For double-blind submission, comment out all \author blocks and
+% add 'anonymous' to the \documentclass options instead.
+\author{First Author}
+\affiliation{%
+  \institution{University Name}
+  \department{Department of Computer Science}
+  \city{City}
+  \country{Country}
+}
+\email{first.author@university.edu}
+
+\author{Second Author}
+\affiliation{%
+  \institution{University Name}
+  \department{Department of Electrical Engineering}
+  \city{City}
+  \country{Country}
+}
+\email{second.author@university.edu}
+
+% --- CCS concepts (generate at https://dl.acm.org/ccs) ---
+\begin{CCSXML}
+<ccs2012>
+  <concept>
+    <concept_id>10010147.10010257</concept_id>
+    <concept_desc>Computing methodologies~Machine learning</concept_desc>
+    <concept_significance>500</concept_significance>
+  </concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Computing methodologies~Machine learning}
+
+\keywords{keyword one, keyword two, keyword three}
+
+% --- Abstract (must come before \maketitle in acmart) ---
+\input{sections/abstract}
+
+\maketitle   % NOTE: in acmart, \maketitle comes AFTER \begin{abstract}
+
+% ---------------- Body sections ----------------
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/figures}
+\input{sections/conclusion}
+
+% ---------------- References ----------------
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

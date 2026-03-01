@@ -1,0 +1,39 @@
+hi, I want to use this project as a way of building latex templates and sample documents
+for conference submissions
+
+starting small, I was wondering if you can use the latex/ieee 
+directory to build a latex document in the ieee style.  
+
+Can you begin by building a document in that style with an abstract, introduction section,
+related work section and conclusion section?  Put in a filler for each section just as a testing
+
+Ideally I would like each section to be in its own latex file so that it can be imported into the main 
+latex file so that different people can work on different sections of the document in parallel. (if you have a better way please let me know)
+
+---
+
+Great!  Can you create a script directory called "script" and create a "latex" directory inside of "script"
+Inside "latex" directory create a directory called "ieee".
+
+Inside the ieee directory, can you write a script in windows batch that can run the latex
+process, run the bibliograph process, and create a pdf?  Also include how to run this script in the README.md file
+
+---
+
+Great
+
+can you create the same script in case I want to use wsl to generate the latex/pdf?
+
+also change the readme to accomodate the new script
+
+---
+
+Great!
+
+Can you do the equivalent for the neurips conference and put it in the neurips directory?
+
+Also include a separate script for that (for both windows and bash) and add to README?
+
+---
+
+is the style download a step that you can add in the script?

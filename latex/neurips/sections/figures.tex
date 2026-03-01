@@ -1,0 +1,28 @@
+% =============================================================================
+% Figures
+% Images are stored in assets/figures/ at the repository root.
+% Path is relative to latex/neurips/ (the compilation working directory).
+% LaTeX numbers figures automatically via \caption -- do not hardcode numbers.
+% NeurIPS uses single-column layout so plain figure environment is correct.
+% =============================================================================
+\section{Figures}
+\label{sec:figures}
+
+Figure~\ref{fig:ai_arch} shows a generic deep learning architecture, illustrating
+the flow of data through embedding, encoder, attention, and decoder stages.
+Figure~\ref{fig:ai_arch2} presents an alternative view of the same architecture.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../../assets/figures/ai_architecture.png}
+  \caption{AI Architecture --- a generic deep learning pipeline showing the
+           encoder--decoder structure with multi-head attention.}
+  \label{fig:ai_arch}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{../../assets/figures/ai_architecture2.png}
+  \caption{AI Architecture 2 --- an alternative view of the deep learning pipeline.}
+  \label{fig:ai_arch2}
+\end{figure}
