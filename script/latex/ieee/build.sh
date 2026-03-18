@@ -15,8 +15,7 @@
 #
 # Requirements:
 #   - pdflatex and bibtex in your PATH
-#   - Ubuntu/Debian (WSL):  sudo apt install texlive-full
-#   - Minimal install:      sudo apt install texlive texlive-publishers
+#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended texlive-science
 # =============================================================================
 
 set -euo pipefail
@@ -56,7 +55,7 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 
     echo "[INFO] Installing texlive-latex-base via apt-get (requires sudo) ..."
     sudo apt-get update -qq
-    sudo apt-get install -y texlive-latex-base texlive-publishers texlive-science
+    sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended texlive-science
 
     # Re-check after install
     if ! command -v pdflatex &>/dev/null || ! command -v bibtex &>/dev/null; then

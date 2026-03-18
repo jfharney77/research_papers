@@ -15,7 +15,7 @@
 #
 # Requirements:
 #   - pdflatex and bibtex in your PATH
-#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-publishers
+#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended
 #   - unzip (or python3) for style file extraction
 #
 # Style files:
@@ -78,7 +78,7 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 
     echo "[INFO] Installing texlive packages via apt-get (requires sudo) ..."
     sudo apt-get update -qq
-    sudo apt-get install -y texlive-latex-base texlive-publishers texlive-latex-extra
+    sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended
 
     if ! command -v pdflatex &>/dev/null || ! command -v bibtex &>/dev/null; then
         echo "[ERROR] Installation completed but pdflatex/bibtex still not found."

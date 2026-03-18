@@ -15,7 +15,7 @@
 #
 # Requirements:
 #   - pdflatex and bibtex in your PATH
-#   - Ubuntu/Debian (WSL):  sudo apt install texlive-latex-base texlive-science texlive-latex-extra
+#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended texlive-science
 #   - curl and unzip for automatic style file download
 # =============================================================================
 
@@ -117,7 +117,7 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 
     echo "[INFO] Installing texlive packages via apt-get (requires sudo) ..."
     sudo apt-get update -qq
-    sudo apt-get install -y texlive-latex-base texlive-science texlive-latex-extra
+    sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended texlive-science
 
     # Re-check after install
     if ! command -v pdflatex &>/dev/null || ! command -v bibtex &>/dev/null; then
