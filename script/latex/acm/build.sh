@@ -15,7 +15,7 @@
 #
 # Requirements:
 #   - pdflatex and bibtex in your PATH
-#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-publishers
+#   - Ubuntu/Debian (WSL): sudo apt install texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended
 #   - acmart.cls -- committed locally in latex/acm/ (v2.03, Feb 2024)
 #     To update: replace acmart.cls and the acm*.bbx/cbx/dbx files in latex/acm/
 #     with newer versions from https://ctan.org/pkg/acmart
@@ -66,7 +66,7 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 
     echo "[INFO] Installing texlive packages via apt-get (requires sudo) ..."
     sudo apt-get update -qq
-    sudo apt-get install -y texlive-latex-base texlive-publishers texlive-latex-extra
+    sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-publishers texlive-latex-extra texlive-fonts-recommended
 
     # Re-check after install
     if ! command -v pdflatex &>/dev/null || ! command -v bibtex &>/dev/null; then
