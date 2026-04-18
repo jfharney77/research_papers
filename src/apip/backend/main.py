@@ -12,7 +12,7 @@ from .agents.aria import aria
 from .agents.base_agent import BaseAgent, PerformanceSnapshot
 from .apip.lifecycle import APIPLifecycle
 from .apip.schema import APIP, FailureMode, InterventionPlan, InterventionStep, InterventionTier
-from .mesh.mesh import mesh
+from .mesh.mesh import AgentMesh, MeshDisruptionScenario, mesh
 from .simulation.degradation import DegradationEngine, DegradationMode
 from .simulation.scenarios import ALL_SCENARIOS
 
@@ -54,13 +54,23 @@ async def _simulation_loop() -> None:
 
 def _build_metrics_payload() -> dict:
     payload: dict[str, Any] = {"timestamp": datetime.utcnow().isoformat(), "agents": []}
+    mesh_by_id = {a["agent_id"]: a for a in mesh.status()["agents"]}
     for agent in _agents.values():
         snap = agent.latest_snapshot()
+        mesh_info = mesh_by_id.get(agent.agent_id, {})
         payload["agents"].append({
             "agent_id": agent.agent_id,
             "agent_name": agent.agent_name,
+            "role": agent.role,
             "health": agent.get_health_status(),
             "metrics": snap.to_metrics() if snap else {},
+            "context_weight": mesh_info.get("context_weight", 0.0),
+            "baseline_weight": mesh_info.get("baseline_weight", 0.0),
+            "crowding_effect": mesh_info.get("crowding_effect", 1.0),
+            "active_apip": next(
+                (a.apip_id for a in _active_apips.values() if a.agent_id == agent.agent_id),
+                None,
+            ),
         })
     return payload
 
@@ -289,6 +299,7 @@ class AddAgentRequest(BaseModel):
     agent_id: str
     agent_name: str
     role: str
+    initial_weight: float | None = None
 
 
 @app.get("/mesh/status")
@@ -299,14 +310,12 @@ def mesh_status():
 @app.post("/mesh/add-agent")
 def mesh_add_agent(body: AddAgentRequest):
     from .agents.base_agent import BehavioralContract
-    from datetime import datetime as dt
 
     existing = _agents.get(body.agent_id)
     if existing:
-        mesh.add_agent(existing)
-        return {"status": "added_existing", "agent_id": body.agent_id}
+        mesh.add_agent(existing, initial_weight=body.initial_weight)
+        return {"status": "added_existing", "agent_id": body.agent_id, "mesh": mesh.status()}
 
-    # Create a stub agent with the same contract structure as aria for demo purposes
     new_agent = BaseAgent(
         agent_id=body.agent_id,
         agent_name=body.agent_name,
@@ -315,8 +324,32 @@ def mesh_add_agent(body: AddAgentRequest):
     )
     _agents[new_agent.agent_id] = new_agent
     _engines[new_agent.agent_id] = DegradationEngine(new_agent)
-    mesh.add_agent(new_agent)
+    mesh.add_agent(new_agent, initial_weight=body.initial_weight)
     return {"status": "added", "agent_id": new_agent.agent_id, "mesh": mesh.status()}
+
+
+@app.post("/mesh/disruption-scenario")
+def run_disruption_scenario():
+    """
+    Runs the Section 7.3 mesh disruption scenario in an isolated context and
+    registers scenario agents into the live simulation so they appear on the
+    mesh view and WebSocket stream.
+    """
+    scenario_mesh, report = MeshDisruptionScenario.run()
+
+    # Register scenario agents in global state so they show up in /agents and WS
+    for agent_id, agent in scenario_mesh.agents.items():
+        if agent_id not in _agents:
+            _agents[agent_id] = agent
+            _engines[agent_id] = DegradationEngine(agent)
+        if agent_id not in mesh.agents:
+            w = scenario_mesh.context_weights.get(agent_id)
+            mesh.add_agent(agent, initial_weight=w)
+            mesh.baseline_weights[agent_id] = scenario_mesh.baseline_weights.get(
+                agent_id, w or 0.0
+            )
+
+    return report
 
 
 # ---------------------------------------------------------------------------

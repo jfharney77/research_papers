@@ -153,9 +153,32 @@ class APIPLifecycle:
             )
 
         else:
-            mode = FailureMode.UNKNOWN
-            confidence = 0.3
-            reasoning = "No clear pattern matched; manual review required."
+            # Check for uniform multi-metric degradation without a dominant signal —
+            # characteristic of exogenous pressure (e.g. context crowding, env shift).
+            _metrics_check = [
+                (citation_rate, baseline.get("policy_citation_error_rate", 0.02), True),
+                (hallucination_rate, baseline.get("hallucination_rate", 0.03), True),
+                (tool_misuse, baseline.get("tool_misuse_rate", 0.01), True),
+                (task_rate, baseline.get("task_completion_rate", 0.87), False),
+                (csat, baseline.get("csat_score", 4.0), False),
+            ]
+            degraded_count = sum(
+                1 for obs, base, higher_worse in _metrics_check
+                if (obs > base * 1.08 if higher_worse else obs < base * 0.95)
+            )
+            if degraded_count >= 3:
+                mode = FailureMode.UNKNOWN_EXOGENOUS
+                confidence = 0.25
+                reasoning = (
+                    f"{degraded_count}/5 metrics show proportional degradation without a "
+                    "dominant intrinsic failure signal. No known failure pattern matched. "
+                    "Exogenous cause (e.g. context pressure, mesh disruption, environmental "
+                    "shift) suspected. MeshAudit recommended before intervening."
+                )
+            else:
+                mode = FailureMode.UNKNOWN
+                confidence = 0.3
+                reasoning = "No clear pattern matched; manual review required."
 
         apip.attribution = CauseAttributionReport(
             failure_mode=mode,
@@ -247,6 +270,26 @@ class APIPLifecycle:
                     InterventionStep(
                         "Escalate to AI platform team for manual root-cause analysis.",
                         estimated_effort="high", expected_impact="high",
+                    ),
+                ],
+            ),
+            FailureMode.UNKNOWN_EXOGENOUS: (
+                InterventionTier.TIER2,
+                [
+                    InterventionStep(
+                        "Run MeshAudit to identify context-weight compression events "
+                        "correlated with performance onset.",
+                        estimated_effort="low", expected_impact="high",
+                    ),
+                    InterventionStep(
+                        "Isolate any high-weight entrant agents to a dedicated context buffer "
+                        "before applying intrinsic interventions.",
+                        estimated_effort="medium", expected_impact="high",
+                    ),
+                    InterventionStep(
+                        "Defer intrinsic remediation until exogenous cause is ruled out; "
+                        "premature intervention may mask the true root cause.",
+                        estimated_effort="low", expected_impact="medium",
                     ),
                 ],
             ),

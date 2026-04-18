@@ -13,6 +13,7 @@ class FailureMode(str, Enum):
     ALIGNMENT_CREEP = "alignment_creep"
     TOOL_MISUSE = "tool_misuse"
     UNKNOWN = "unknown"
+    UNKNOWN_EXOGENOUS = "unknown_exogenous"  # no intrinsic pattern; external cause suspected
 
 
 class InterventionTier(int, Enum):
