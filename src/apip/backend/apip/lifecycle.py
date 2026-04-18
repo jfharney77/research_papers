@@ -113,8 +113,8 @@ class APIPLifecycle:
         # Check trigger events for disaggregation hint
         trigger_metrics = {e["metric_name"] for e in apip.trigger_events}
 
-        if citation_rate > baseline.get("policy_citation_error_rate", 0) * 1.5 \
-                and hallucination_rate > baseline.get("hallucination_rate", 0) * 1.5:
+        if citation_rate > baseline.get("policy_citation_error_rate", 0) * 1.2 \
+                and hallucination_rate > baseline.get("hallucination_rate", 0) * 1.2:
             mode = FailureMode.BEHAVIORAL_DRIFT
             confidence = min(0.95, 0.6 + (citation_rate + hallucination_rate) * 2)
             reasoning = (
@@ -123,24 +123,26 @@ class APIPLifecycle:
                 f"1.5× baseline, consistent with a stale RAG index."
             )
 
+        elif csat_trend < -0.04 and csat > agent.contract.thresholds.get("csat_score", 3.8) \
+                and tool_misuse < baseline.get("tool_misuse_rate", 0) * 2:
+            # Check ALIGNMENT_CREEP before INPUT_BRITTLENESS: drifting CSAT with no tool/error signal
+            mode = FailureMode.ALIGNMENT_CREEP
+            confidence = min(0.9, 0.55 + abs(csat_trend) * 5)
+            reasoning = (
+                f"CSAT has drifted {csat_trend:.3f} over the last {len(csat_values)} ticks "
+                f"while remaining above absolute threshold — classic early-stage alignment creep."
+            )
+
         elif task_rate >= agent.contract.thresholds.get("task_completion_rate", 0) \
                 and "task_completion_rate" not in trigger_metrics \
+                and csat_trend >= -0.04 \
                 and tool_misuse < baseline.get("tool_misuse_rate", 0) * 2:
-            # Overall task ok but something else triggered — suggest hidden category failure
+            # CSAT stable → not alignment creep; overall task OK → suggest hidden category failure
             mode = FailureMode.INPUT_BRITTLENESS
             confidence = 0.65
             reasoning = (
                 "Overall task_completion_rate appears healthy but other signals suggest "
                 "a subcategory may be failing silently. Disaggregated metric review recommended."
-            )
-
-        elif csat_trend < -0.2 and csat > agent.contract.thresholds.get("csat_score", 3.8) \
-                and tool_misuse < baseline.get("tool_misuse_rate", 0) * 2:
-            mode = FailureMode.ALIGNMENT_CREEP
-            confidence = min(0.9, 0.55 + abs(csat_trend) * 0.5)
-            reasoning = (
-                f"CSAT has drifted {csat_trend:.3f} over the last {len(csat_values)} ticks "
-                f"while remaining above absolute threshold — classic early-stage alignment creep."
             )
 
         elif tool_misuse > baseline.get("tool_misuse_rate", 0) * 2 \

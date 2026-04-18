@@ -12,6 +12,7 @@ from .agents.aria import aria
 from .agents.base_agent import BaseAgent, PerformanceSnapshot
 from .apip.lifecycle import APIPLifecycle
 from .apip.schema import APIP, FailureMode, InterventionPlan, InterventionStep, InterventionTier
+from .demo.full_scenario import FullDemoScenario
 from .mesh.mesh import AgentMesh, MeshDisruptionScenario, mesh
 from .simulation.degradation import DegradationEngine, DegradationMode
 from .simulation.scenarios import ALL_SCENARIOS
@@ -350,6 +351,47 @@ def run_disruption_scenario():
             )
 
     return report
+
+
+# ---------------------------------------------------------------------------
+# Demo
+# ---------------------------------------------------------------------------
+
+@app.post("/demo/run-full-scenario")
+def run_full_scenario():
+    """
+    Executes the scripted 37-tick walkthrough covering all paper sections:
+      - Section 4: APIP trigger and attribution (BEHAVIORAL_DRIFT on Aria)
+      - Section 5: Intervention, check-in, and exit lifecycle
+      - Section 6: Drift-only trigger (ALIGNMENT_CREEP)
+      - Section 7.3: Causal attribution failure via mesh context crowding
+      - Section 7.4: MeshAudit and context scoping recovery
+
+    Runs in an isolated context; registers scenario agents into the live
+    simulation at completion so they appear on the mesh view.
+    """
+    result = FullDemoScenario.run()
+
+    # Register agents that appeared in the demo into the live simulation so
+    # they show up on the mesh view and WebSocket stream.
+    for mesh_agent in result["final_mesh"]["agents"]:
+        aid = mesh_agent["agent_id"]
+        if aid not in _agents:
+            stub = BaseAgent(
+                agent_id=aid,
+                agent_name=mesh_agent.get("agent_name", aid),
+                role="demo",
+                contract=aria.contract,
+            )
+            _agents[aid] = stub
+            _engines[aid] = DegradationEngine(stub)
+        if aid not in mesh.agents:
+            mesh.add_agent(
+                _agents[aid],
+                initial_weight=mesh_agent.get("context_weight"),
+            )
+
+    return result
 
 
 # ---------------------------------------------------------------------------

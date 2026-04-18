@@ -1,0 +1,28 @@
+In backend/agents/mesh.py, implement an AgentMesh class:
+
+- Maintains a registry of agents and their shared context buffers
+- Each agent has a context_weight: float representing how much of the
+  shared context space it currently occupies (all weights sum to 1.0)
+- When a new agent is added via add_agent(agent, initial_weight),
+  redistribute context weights among all agents proportionally
+- Implement context_crowding_effect(agent): returns a performance penalty
+  multiplier (0.85 to 1.0) based on how much the agent's context weight
+  has been compressed since baseline
+
+- Add a MeshDisruptionScenario that:
+    1. Starts with Aria + 2 peer agents (BillingAgent, EscalationAgent)
+       each healthy with equal context weights (~0.33)
+    2. Introduces AgentN (high performer, gets 0.40 context weight)
+    3. Compresses peer agents to ~0.20 each
+    4. Applies context_crowding_effect to their performance snapshots
+    5. Their metrics degrade — APIPs trigger on BillingAgent and EscalationAgent
+    6. Cause attribution fails to find intrinsic failure mode (returns
+       UNKNOWN_EXOGENOUS with low confidence)
+    7. A MeshAudit is triggered: detects the context weight compression event
+       correlated with AgentN's introduction
+    8. Recommends context scoping intervention: isolate AgentN's context
+       contributions to a separate buffer
+
+This should visually demonstrate the "causal attribution failure" described
+in Section 7.3 of the paper — the APIP fires but can't explain itself
+until the mesh audit runs.

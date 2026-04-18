@@ -1,0 +1,348 @@
+{
+  "81fcdcc3-d396-4e65-93cd-b1dee63078be": {
+    "apip_id": "81fcdcc3-d396-4e65-93cd-b1dee63078be",
+    "agent_id": "billing-001",
+    "phase": "attribution",
+    "trigger_events": [
+      {
+        "metric_name": "task_completion_rate",
+        "observed_value": 0.6458,
+        "threshold_value": 0.82,
+        "trigger_type": "absolute"
+      },
+      {
+        "metric_name": "csat_score",
+        "observed_value": 3.0824,
+        "threshold_value": 3.8,
+        "trigger_type": "absolute"
+      },
+      {
+        "metric_name": "policy_citation_error_rate",
+        "observed_value": 0.0273,
+        "threshold_value": 0.05,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "tool_misuse_rate",
+        "observed_value": 0.0136,
+        "threshold_value": 0.04,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "hallucination_rate",
+        "observed_value": 0.0409,
+        "threshold_value": 0.06,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "unknown_exogenous",
+      "confidence": 0.25,
+      "reasoning": "5/5 metrics show proportional degradation without a dominant intrinsic failure signal. No known failure pattern matched. Exogenous cause (e.g. context pressure, mesh disruption, environmental shift) suspected. MeshAudit recommended before intervening.",
+      "attributed_at": "2026-04-18T11:27:25.487176"
+    },
+    "intervention_plan": null,
+    "checkins": [],
+    "remediation_window_ticks": 0,
+    "exit_outcome": null,
+    "created_at": "2026-04-18T11:27:25.485763",
+    "updated_at": "2026-04-18T11:27:25.487180"
+  },
+  "5d600e08-3e8e-4285-8e9e-ce4853bd112d": {
+    "apip_id": "5d600e08-3e8e-4285-8e9e-ce4853bd112d",
+    "agent_id": "escalation-001",
+    "phase": "attribution",
+    "trigger_events": [
+      {
+        "metric_name": "task_completion_rate",
+        "observed_value": 0.6458,
+        "threshold_value": 0.82,
+        "trigger_type": "absolute"
+      },
+      {
+        "metric_name": "csat_score",
+        "observed_value": 3.0824,
+        "threshold_value": 3.8,
+        "trigger_type": "absolute"
+      },
+      {
+        "metric_name": "policy_citation_error_rate",
+        "observed_value": 0.0273,
+        "threshold_value": 0.05,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "tool_misuse_rate",
+        "observed_value": 0.0136,
+        "threshold_value": 0.04,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "hallucination_rate",
+        "observed_value": 0.0409,
+        "threshold_value": 0.06,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "unknown_exogenous",
+      "confidence": 0.25,
+      "reasoning": "5/5 metrics show proportional degradation without a dominant intrinsic failure signal. No known failure pattern matched. Exogenous cause (e.g. context pressure, mesh disruption, environmental shift) suspected. MeshAudit recommended before intervening.",
+      "attributed_at": "2026-04-18T11:27:25.489481"
+    },
+    "intervention_plan": null,
+    "checkins": [],
+    "remediation_window_ticks": 0,
+    "exit_outcome": null,
+    "created_at": "2026-04-18T11:27:25.486638",
+    "updated_at": "2026-04-18T11:27:25.489485"
+  },
+  "c9154c4a-7a5f-4be4-8bf7-4e3fb196322c": {
+    "apip_id": "c9154c4a-7a5f-4be4-8bf7-4e3fb196322c",
+    "agent_id": "aria-001",
+    "phase": "closed",
+    "trigger_events": [
+      {
+        "metric_name": "policy_citation_error_rate",
+        "observed_value": 0.021,
+        "threshold_value": 0.05,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "hallucination_rate",
+        "observed_value": 0.030799999999999998,
+        "threshold_value": 0.06,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "input_brittleness",
+      "confidence": 0.65,
+      "reasoning": "Overall task_completion_rate appears healthy but other signals suggest a subcategory may be failing silently. Disaggregated metric review recommended.",
+      "attributed_at": "2026-04-18T12:00:58.922220"
+    },
+    "intervention_plan": {
+      "tier": 1,
+      "steps": [
+        {
+          "description": "Enable disaggregated metric monitoring per input category.",
+          "estimated_effort": "low",
+          "expected_impact": "high"
+        },
+        {
+          "description": "Add targeted few-shot examples for the failing category to the system prompt.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        },
+        {
+          "description": "Collect and label 50+ failure cases from the brittle category for eval.",
+          "estimated_effort": "medium",
+          "expected_impact": "high"
+        }
+      ],
+      "created_at": "2026-04-18T12:00:58.923946"
+    },
+    "checkins": [
+      {
+        "tick": 1,
+        "metrics_snapshot": {
+          "task_completion_rate": 0.87,
+          "csat_score": 4.3,
+          "policy_citation_error_rate": 0.02,
+          "tool_misuse_rate": 0.01,
+          "hallucination_rate": 0.03
+        },
+        "trajectory": "flat",
+        "recorded_at": "2026-04-18T12:00:58.934906",
+        "escalated": false
+      }
+    ],
+    "remediation_window_ticks": 10,
+    "exit_outcome": "RESOLVED",
+    "created_at": "2026-04-18T12:00:58.920786",
+    "updated_at": "2026-04-18T12:00:58.938903"
+  },
+  "524f80e7-9f3c-4793-8802-4b0910e5c1e4": {
+    "apip_id": "524f80e7-9f3c-4793-8802-4b0910e5c1e4",
+    "agent_id": "aria-001",
+    "phase": "remediation",
+    "trigger_events": [
+      {
+        "metric_name": "csat_score",
+        "observed_value": 4.2924999999999995,
+        "threshold_value": 3.8,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "input_brittleness",
+      "confidence": 0.65,
+      "reasoning": "Overall task_completion_rate appears healthy but other signals suggest a subcategory may be failing silently. Disaggregated metric review recommended.",
+      "attributed_at": "2026-04-18T12:00:58.943337"
+    },
+    "intervention_plan": {
+      "tier": 1,
+      "steps": [
+        {
+          "description": "Enable disaggregated metric monitoring per input category.",
+          "estimated_effort": "low",
+          "expected_impact": "high"
+        },
+        {
+          "description": "Add targeted few-shot examples for the failing category to the system prompt.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        },
+        {
+          "description": "Collect and label 50+ failure cases from the brittle category for eval.",
+          "estimated_effort": "medium",
+          "expected_impact": "high"
+        }
+      ],
+      "created_at": "2026-04-18T12:00:58.944690"
+    },
+    "checkins": [],
+    "remediation_window_ticks": 10,
+    "exit_outcome": null,
+    "created_at": "2026-04-18T12:00:58.942526",
+    "updated_at": "2026-04-18T12:00:58.944700"
+  },
+  "f8ca729a-1e47-4bbd-a118-162e85bf2571": {
+    "apip_id": "f8ca729a-1e47-4bbd-a118-162e85bf2571",
+    "agent_id": "billing-001",
+    "phase": "closed",
+    "trigger_events": [
+      {
+        "metric_name": "task_completion_rate",
+        "observed_value": 0.8272,
+        "threshold_value": 0.82,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "csat_score",
+        "observed_value": 3.948,
+        "threshold_value": 3.8,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "policy_citation_error_rate",
+        "observed_value": 0.0213,
+        "threshold_value": 0.05,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "tool_misuse_rate",
+        "observed_value": 0.0106,
+        "threshold_value": 0.04,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "hallucination_rate",
+        "observed_value": 0.0319,
+        "threshold_value": 0.06,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "alignment_creep",
+      "confidence": 0.9,
+      "reasoning": "CSAT has drifted -0.252 over the last 10 ticks while remaining above absolute threshold \u2014 classic early-stage alignment creep.",
+      "attributed_at": "2026-04-18T12:00:58.958115"
+    },
+    "intervention_plan": {
+      "tier": 1,
+      "steps": [
+        {
+          "description": "Review recent system-prompt changes for tone and brand-voice drift.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        },
+        {
+          "description": "Run CSAT deep-dive: correlate low scores with specific conversation patterns.",
+          "estimated_effort": "medium",
+          "expected_impact": "high"
+        },
+        {
+          "description": "Re-anchor brand voice guidelines in system prompt; add brand-violation eval.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        }
+      ],
+      "created_at": "2026-04-18T12:00:58.959692"
+    },
+    "checkins": [],
+    "remediation_window_ticks": 10,
+    "exit_outcome": "RESOLVED",
+    "created_at": "2026-04-18T12:00:58.957133",
+    "updated_at": "2026-04-18T12:00:58.976105"
+  },
+  "0a4024b1-5da5-49a4-832c-3126da9fe52f": {
+    "apip_id": "0a4024b1-5da5-49a4-832c-3126da9fe52f",
+    "agent_id": "escalation-001",
+    "phase": "closed",
+    "trigger_events": [
+      {
+        "metric_name": "task_completion_rate",
+        "observed_value": 0.8272,
+        "threshold_value": 0.82,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "csat_score",
+        "observed_value": 3.948,
+        "threshold_value": 3.8,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "policy_citation_error_rate",
+        "observed_value": 0.0213,
+        "threshold_value": 0.05,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "tool_misuse_rate",
+        "observed_value": 0.0106,
+        "threshold_value": 0.04,
+        "trigger_type": "drift"
+      },
+      {
+        "metric_name": "hallucination_rate",
+        "observed_value": 0.0319,
+        "threshold_value": 0.06,
+        "trigger_type": "drift"
+      }
+    ],
+    "attribution": {
+      "failure_mode": "alignment_creep",
+      "confidence": 0.9,
+      "reasoning": "CSAT has drifted -0.252 over the last 10 ticks while remaining above absolute threshold \u2014 classic early-stage alignment creep.",
+      "attributed_at": "2026-04-18T12:00:58.963603"
+    },
+    "intervention_plan": {
+      "tier": 1,
+      "steps": [
+        {
+          "description": "Review recent system-prompt changes for tone and brand-voice drift.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        },
+        {
+          "description": "Run CSAT deep-dive: correlate low scores with specific conversation patterns.",
+          "estimated_effort": "medium",
+          "expected_impact": "high"
+        },
+        {
+          "description": "Re-anchor brand voice guidelines in system prompt; add brand-violation eval.",
+          "estimated_effort": "low",
+          "expected_impact": "medium"
+        }
+      ],
+      "created_at": "2026-04-18T12:00:58.965488"
+    },
+    "checkins": [],
+    "remediation_window_ticks": 10,
+    "exit_outcome": "RESOLVED",
+    "created_at": "2026-04-18T12:00:58.962190",
+    "updated_at": "2026-04-18T12:00:58.977895"
+  }
+}
