@@ -392,3 +392,66 @@ To add a new section:
 
 1. Create `latex/<conference>/sections/my_section.tex`
 2. Add `\input{sections/my_section}` to `main.tex` at the desired position
+
+---
+
+## Word ➜ LaTeX Conversion Pipeline
+
+This repo now ships with a CLI and backend/frontend experiences for turning Word
+manuscripts into venue-specific LaTeX workspaces.
+
+### CLI usage
+
+```
+uv run papers convert manuscript.docx --template ieee --overwrite
+```
+
+Outputs land in `documents/<document_title>/` with the original `.docx`, copied
+template files, generated `sections/*.tex`, `references/references.bib`, and an
+optional PDF build (invokes `script/latex/<template>/build.sh`).
+
+Key behaviors:
+
+- Section boundaries come from Word heading styles (`Heading 1/2/3`, etc.)
+- Figures are exported into `assets/` and inserted as LaTeX figure blocks
+- A `manifest.json` tracks metadata for the backend/frontend
+
+### FastAPI backend
+
+```
+uv run uvicorn docserver.main:app --reload
+```
+
+Endpoints:
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/documents` | List all converted workspaces |
+| `POST` | `/documents` | Upload a `.docx` + template name and kick off conversion |
+| `GET` | `/documents/{id}` | Fetch manifest, sections, figures, build state |
+| `GET` | `/documents/{id}/sections/{slug}` | Raw LaTeX for a section |
+| `GET` | `/documents/{id}/pdf` | Download compiled PDF |
+| `GET` | `/documents/{id}/word` | Download original Word file |
+| `POST` | `/documents/{id}/compile` | Re-run LaTeX build |
+
+The backend serves as the data source for the React UI and can power other
+automation (CI, submissions, etc.).
+
+### React document viewer
+
+```
+cd web
+npm install
+npm run dev
+```
+
+Set `VITE_API_BASE` (default `http://localhost:8000`) to point at the FastAPI
+service. The UI provides:
+
+1. Upload flow with template selection
+2. Library of converted documents (per-template status, timestamps)
+3. Section browser with LaTeX preview
+4. PDF iframe preview + DOCX download tab
+
+Build for production with `npm run build` (or `npx vite build`). Serve via
+`npm run preview` or any static host.

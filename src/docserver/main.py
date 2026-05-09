@@ -1,0 +1,120 @@
+from __future__ import annotations
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, PlainTextResponse
+
+from docbuilder.config import DOCUMENTS_ROOT
+from docbuilder.converter import ConversionError, ConversionOptions, convert_document, rebuild_pdf
+
+from .schemas import (
+    CompileResponse,
+    CreateDocumentResponse,
+    DocumentListResponse,
+    DocumentResponse,
+    SectionResponse,
+)
+from .storage import convert_upload, delete_document, list_documents, load_document
+
+app = FastAPI(title="Research Paper Workspace API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/documents", response_model=DocumentListResponse)
+def get_documents():
+    documents = list_documents()
+    return DocumentListResponse(documents=documents)
+
+
+@app.get("/documents/{document_id}", response_model=DocumentResponse)
+def get_document(document_id: str):
+    try:
+        return load_document(document_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+
+@app.delete("/documents/{document_id}")
+def remove_document(document_id: str):
+    try:
+        delete_document(document_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"status": "deleted", "document_id": document_id}
+
+
+@app.get("/documents/{document_id}/sections", response_model=list[SectionResponse])
+def get_sections(document_id: str):
+    manifest = get_document(document_id)
+    return manifest.sections
+
+
+@app.get("/documents/{document_id}/sections/{section_slug}", response_class=PlainTextResponse)
+def get_section_source(document_id: str, section_slug: str):
+    manifest = get_document(document_id)
+    try:
+        section = next(s for s in manifest.sections if s.slug == section_slug)
+    except StopIteration:
+        raise HTTPException(status_code=404, detail="Section not found")
+
+    section_path = DOCUMENTS_ROOT / document_id / manifest.template / section.latex_path
+    if not section_path.exists():
+        raise HTTPException(status_code=404, detail="Section file missing")
+    return PlainTextResponse(section_path.read_text(), media_type="text/x-latex")
+
+
+@app.post("/documents", response_model=CreateDocumentResponse)
+async def create_document(
+    file: UploadFile = File(...),
+    template: str = "ieee",
+    build_pdf: bool = True,
+    overwrite: bool = False,
+):
+    if not file.filename.endswith(".docx"):
+        raise HTTPException(status_code=400, detail="Only .docx uploads are supported")
+
+    try:
+        document = convert_upload(upload=file, template=template, build_pdf=build_pdf, overwrite=overwrite)
+    except ConversionError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return CreateDocumentResponse(document=document)
+
+
+@app.post("/documents/{document_id}/compile", response_model=CompileResponse)
+def recompile_document(document_id: str):
+    manifest_path = DOCUMENTS_ROOT / document_id / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    try:
+        manifest = rebuild_pdf(document_id)
+    except ConversionError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return CompileResponse(status="ok", build=manifest.build)
+
+
+@app.get("/documents/{document_id}/pdf")
+def get_pdf(document_id: str):
+    manifest = load_document(document_id)
+    if not manifest.build.pdf_path:
+        raise HTTPException(status_code=404, detail="PDF not available")
+    pdf_path = DOCUMENTS_ROOT / document_id / manifest.build.pdf_path
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="PDF file missing")
+    return FileResponse(pdf_path)
+
+
+@app.get("/documents/{document_id}/word")
+def get_word(document_id: str):
+    manifest = load_document(document_id)
+    docx_path = DOCUMENTS_ROOT / document_id / manifest.source_docx
+    if not docx_path.exists():
+        raise HTTPException(status_code=404, detail="Original docx missing")
+    return FileResponse(docx_path)
