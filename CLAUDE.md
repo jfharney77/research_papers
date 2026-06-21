@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Skills
+
+- **docx-to-latex** (`.claude/skills/docx-to-latex/SKILL.md`) — convert a `.docx` file into per-section LaTeX files. Trigger: `/docx-to-latex`
+
+When the user types `/docx-to-latex`, invoke the Skill tool with `skill: "docx-to-latex"` before doing anything else.
+
 ## What This Repo Does
 
 A research paper template management system for AI/ML conference submissions. It provides four LaTeX templates (IEEE, NeurIPS, ACM, AAAI), automated build scripts for each, Python diagram generators, and conference deadline tracking for 2026 submissions.
