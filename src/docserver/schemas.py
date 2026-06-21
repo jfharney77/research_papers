@@ -6,6 +6,9 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+# Re-exported so docserver consumers import template schemas from one place.
+from docbuilder.models import TemplateInfo, TemplateListResponse  # noqa: F401
+
 
 class SectionResponse(BaseModel):
     section_id: str

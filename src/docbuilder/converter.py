@@ -13,8 +13,9 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.text.paragraph import Paragraph
 
-from .config import DOCUMENTS_ROOT, LATEX_ROOT, REPO_ROOT, SCRIPT_ROOT
+from .config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT, LATEX_ROOT, REPO_ROOT, SCRIPT_ROOT
 from .models import DocumentManifest, FigureEntry, SectionEntry
+from .templates import is_buildable, is_valid_template, valid_template_ids
 from .utils import slugify, snake_case, text_to_latex
 
 
@@ -34,10 +35,19 @@ def convert_document(docx_path: Path, options: ConversionOptions | None = None) 
     if not docx_path.exists():
         raise FileNotFoundError(docx_path)
 
-    options = options or ConversionOptions(template="ieee", build_pdf=True)
+    options = options or ConversionOptions(template=DEFAULT_TEMPLATE, build_pdf=True)
+    if not is_valid_template(options.template):
+        raise ConversionError(
+            f"Unknown template '{options.template}'. Valid templates: "
+            f"{', '.join(valid_template_ids()) or '(none found)'}"
+        )
+    if options.build_pdf and not is_buildable(options.template):
+        raise ConversionError(
+            f"Template '{options.template}' has no build script "
+            f"(expected {SCRIPT_ROOT / options.template / 'build.sh'}). "
+            "Re-run with build disabled, or add the build script."
+        )
     template_dir = (LATEX_ROOT / options.template).resolve()
-    if not template_dir.exists():
-        raise ConversionError(f"Unknown template '{options.template}' — expected {template_dir}")
 
     DOCUMENTS_ROOT.mkdir(parents=True, exist_ok=True)
 

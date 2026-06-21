@@ -31,6 +31,18 @@ class BuildInfo(BaseModel):
     message: str | None = None
 
 
+class TemplateInfo(BaseModel):
+    id: str
+    name: str
+    description: str | None = None
+    buildable: bool = True
+
+
+class TemplateListResponse(BaseModel):
+    templates: list[TemplateInfo]
+    default: str
+
+
 class DocumentManifest(BaseModel):
     document_id: str
     title: str

@@ -4,8 +4,9 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 
-from docbuilder.config import DOCUMENTS_ROOT
+from docbuilder.config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT
 from docbuilder.converter import ConversionError, ConversionOptions, convert_document, rebuild_pdf
+from docbuilder.templates import available_templates, is_valid_template, valid_template_ids
 
 from .schemas import (
     CompileResponse,
@@ -13,6 +14,7 @@ from .schemas import (
     DocumentListResponse,
     DocumentResponse,
     SectionResponse,
+    TemplateListResponse,
 )
 from .storage import convert_upload, delete_document, list_documents, load_document
 
@@ -23,6 +25,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/templates", response_model=TemplateListResponse)
+def get_templates():
+    return TemplateListResponse(templates=available_templates(), default=DEFAULT_TEMPLATE)
 
 
 @app.get("/documents", response_model=DocumentListResponse)
@@ -71,12 +78,18 @@ def get_section_source(document_id: str, section_slug: str):
 @app.post("/documents", response_model=CreateDocumentResponse)
 async def create_document(
     file: UploadFile = File(...),
-    template: str = "ieee",
+    template: str = DEFAULT_TEMPLATE,
     build_pdf: bool = True,
     overwrite: bool = False,
 ):
     if not file.filename.endswith(".docx"):
         raise HTTPException(status_code=400, detail="Only .docx uploads are supported")
+
+    if not is_valid_template(template):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid template '{template}'. Valid templates: {', '.join(valid_template_ids())}",
+        )
 
     try:
         document = convert_upload(upload=file, template=template, build_pdf=build_pdf, overwrite=overwrite)

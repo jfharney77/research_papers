@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import { fetchTemplates, type TemplateInfo } from "./api";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+
+const FALLBACK_TEMPLATES: TemplateInfo[] = [{ id: "ieee", name: "IEEE", buildable: true }];
+const FALLBACK_DEFAULT = "ieee";
 
 type BuildState = {
   status: "pending" | "succeeded" | "failed";
@@ -28,10 +32,10 @@ type DocumentRecord = {
   build: BuildState;
 };
 
-const TEMPLATE_CHOICES = ["ieee", "acm", "neurips", "aaai"];
-
 function App() {
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [templates, setTemplates] = useState<TemplateInfo[]>(FALLBACK_TEMPLATES);
+  const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_DEFAULT);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<"pdf" | "latex" | "word">("pdf");
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -47,7 +51,23 @@ function App() {
 
   useEffect(() => {
     void refreshDocuments();
+    void loadTemplates();
   }, []);
+
+  async function loadTemplates() {
+    try {
+      const data = await fetchTemplates();
+      if (data.templates?.length) {
+        setTemplates(data.templates);
+      }
+      if (data.default) {
+        setDefaultTemplate(data.default);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load templates; using defaults.");
+    }
+  }
 
   async function refreshDocuments() {
     try {
@@ -72,7 +92,7 @@ function App() {
     }
 
     const file = formData.get("file") as File;
-    const template = (formData.get("template") as string) ?? "ieee";
+    const template = (formData.get("template") as string) ?? defaultTemplate;
     await submitUpload(file, template, false, event.currentTarget);
   }
 
@@ -168,10 +188,16 @@ function App() {
           </label>
           <label>
             <span>Template</span>
-            <select name="template" defaultValue="ieee">
-              {TEMPLATE_CHOICES.map((tpl) => (
-                <option key={tpl} value={tpl}>
-                  {tpl.toUpperCase()}
+            <select name="template" key={defaultTemplate} defaultValue={defaultTemplate}>
+              {templates.map((tpl) => (
+                <option
+                  key={tpl.id}
+                  value={tpl.id}
+                  disabled={!tpl.buildable}
+                  title={tpl.description ?? undefined}
+                >
+                  {tpl.name}
+                  {tpl.buildable ? "" : " (build script missing)"}
                 </option>
               ))}
             </select>
