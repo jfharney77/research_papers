@@ -37,11 +37,13 @@ function App() {
   const [templates, setTemplates] = useState<TemplateInfo[]>(FALLBACK_TEMPLATES);
   const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_DEFAULT);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [view, setView] = useState<"pdf" | "latex" | "word">("pdf");
+  const [view, setView] = useState<"pdf" | "latex" | "word" | "log">("pdf");
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [latexSource, setLatexSource] = useState<string>("Select a section to inspect its LaTeX.");
+  const [buildLog, setBuildLog] = useState<string>("Select Log to view the LaTeX build output.");
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [recompiling, setRecompiling] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<{ file: File; template: string } | null>(null);
 
   const selected = useMemo(
@@ -167,6 +169,41 @@ function App() {
     }
   }
 
+  async function recompile(docId: string) {
+    setRecompiling(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/documents/${docId}/compile`, { method: "POST" });
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        throw new Error(detail.detail ?? "Recompile failed");
+      }
+      await refreshDocuments();
+      if (view === "log") {
+        await loadBuildLog(docId);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Recompile failed");
+    } finally {
+      setRecompiling(false);
+    }
+  }
+
+  async function loadBuildLog(docId: string) {
+    setView("log");
+    setBuildLog("Loading build log…");
+    try {
+      const res = await fetch(`${API_BASE}/documents/${docId}/log`);
+      if (!res.ok) {
+        setBuildLog(res.status === 404 ? "No build log available yet." : "Unable to load build log.");
+        return;
+      }
+      setBuildLog(await res.text());
+    } catch {
+      setBuildLog("Unable to load build log.");
+    }
+  }
+
   const pdfUrl = selected?.build.pdf_path ? `${API_BASE}/documents/${selected.document_id}/pdf` : null;
   const wordUrl = selected ? `${API_BASE}/documents/${selected.document_id}/word` : null;
 
@@ -258,18 +295,26 @@ function App() {
               <div className="document-header">
                 <div>
                   <h2>{selected.title}</h2>
-                  <p className="doc-meta">Template · {selected.template.toUpperCase()}</p>
+                  <p className="doc-meta">
+                    Template · {selected.template.toUpperCase()} ·{" "}
+                    <span className={`status ${selected.build.status}`}>build {selected.build.status}</span>
+                  </p>
                 </div>
                 <div className="tab-bar">
-                  {["pdf", "latex", "word"].map((tab) => (
+                  {(["pdf", "latex", "word", "log"] as const).map((tab) => (
                     <button
                       key={tab}
                       className={view === tab ? "active" : ""}
-                      onClick={() => setView(tab as typeof view)}
+                      onClick={() =>
+                        tab === "log" ? void loadBuildLog(selected.document_id) : setView(tab)
+                      }
                     >
                       {tab.toUpperCase()}
                     </button>
                   ))}
+                  <button onClick={() => void recompile(selected.document_id)} disabled={recompiling}>
+                    {recompiling ? "Recompiling…" : "↻ Recompile"}
+                  </button>
                   <button className="danger" onClick={() => deleteSelected(selected.document_id)}>
                     Delete
                   </button>
@@ -300,12 +345,23 @@ function App() {
                       <iframe title="PDF preview" src={pdfUrl} />
                     ) : (
                       <div className="empty-state">
-                        <p>No PDF build yet. Convert or recompile to generate one.</p>
+                        {selected.build.status === "failed" ? (
+                          <>
+                            <p>{selected.build.message ?? "The LaTeX build failed."}</p>
+                            <button onClick={() => void loadBuildLog(selected.document_id)}>
+                              View build log
+                            </button>
+                          </>
+                        ) : (
+                          <p>No PDF build yet. Convert or recompile to generate one.</p>
+                        )}
                       </div>
                     )
                   )}
 
                   {view === "latex" && <pre className="latex-view">{latexSource}</pre>}
+
+                  {view === "log" && <pre className="latex-view">{buildLog}</pre>}
 
                   {view === "word" && (
                     <div className="word-view">

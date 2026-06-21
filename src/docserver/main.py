@@ -124,6 +124,17 @@ def get_pdf(document_id: str):
     return FileResponse(pdf_path)
 
 
+@app.get("/documents/{document_id}/log", response_class=PlainTextResponse)
+def get_build_log(document_id: str):
+    manifest = load_document(document_id)
+    if not manifest.build.log_path:
+        raise HTTPException(status_code=404, detail="No build log available")
+    log_path = DOCUMENTS_ROOT / document_id / manifest.build.log_path
+    if not log_path.exists():
+        raise HTTPException(status_code=404, detail="Build log file missing")
+    return PlainTextResponse(log_path.read_text(), media_type="text/plain")
+
+
 @app.get("/documents/{document_id}/word")
 def get_word(document_id: str):
     manifest = load_document(document_id)
