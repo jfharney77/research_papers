@@ -58,6 +58,10 @@ class CompileResponse(BaseModel):
     build: BuildResponse
 
 
+class SectionUpdate(BaseModel):
+    content: str
+
+
 def read_manifest(manifest_path: Path) -> DocumentResponse:
     data = json.loads(manifest_path.read_text())
     return DocumentResponse(**data)

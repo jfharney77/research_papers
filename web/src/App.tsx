@@ -42,8 +42,10 @@ function App() {
   const [latexSource, setLatexSource] = useState<string>("Select a section to inspect its LaTeX.");
   const [buildLog, setBuildLog] = useState<string>("Select Log to view the LaTeX build output.");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [recompiling, setRecompiling] = useState(false);
+  const [savingSection, setSavingSection] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<{ file: File; template: string } | null>(null);
 
   const selected = useMemo(
@@ -143,6 +145,7 @@ function App() {
       setLatexSource(text);
       setActiveSection(section.slug);
       setView("latex");
+      setNotice(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load section");
     }
@@ -204,7 +207,31 @@ function App() {
     }
   }
 
+  async function saveSection() {
+    if (!selected || !activeSection) return;
+    setSavingSection(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await fetch(`${API_BASE}/documents/${selected.document_id}/sections/${activeSection}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: latexSource }),
+      });
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        throw new Error(detail.detail ?? "Failed to save section");
+      }
+      setNotice("Section saved. Recompile to rebuild the PDF.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save section");
+    } finally {
+      setSavingSection(false);
+    }
+  }
+
   const pdfUrl = selected?.build.pdf_path ? `${API_BASE}/documents/${selected.document_id}/pdf` : null;
+  const archiveUrl = selected ? `${API_BASE}/documents/${selected.document_id}/archive` : null;
   const wordUrl = selected ? `${API_BASE}/documents/${selected.document_id}/word` : null;
 
   return (
@@ -246,6 +273,7 @@ function App() {
       </header>
 
       {error && <div className="banner error">{error}</div>}
+      {notice && <div className="banner">{notice}</div>}
 
       <div className="layout">
         <aside>
@@ -359,16 +387,39 @@ function App() {
                     )
                   )}
 
-                  {view === "latex" && <pre className="latex-view">{latexSource}</pre>}
+                  {view === "latex" && (
+                    <div className="latex-editor">
+                      <div className="editor-toolbar">
+                        <span>
+                          {activeSection ? `Editing: ${activeSection}` : "Select a section to edit its LaTeX."}
+                        </span>
+                        <button onClick={() => void saveSection()} disabled={!activeSection || savingSection}>
+                          {savingSection ? "Saving…" : "Save"}
+                        </button>
+                      </div>
+                      <textarea
+                        className="latex-view"
+                        value={latexSource}
+                        onChange={(e) => setLatexSource(e.target.value)}
+                        readOnly={!activeSection}
+                        spellCheck={false}
+                      />
+                    </div>
+                  )}
 
                   {view === "log" && <pre className="latex-view">{buildLog}</pre>}
 
                   {view === "word" && (
                     <div className="word-view">
-                      <p>Download the original manuscript to iterate in Word.</p>
+                      <p>Download the original manuscript or the generated LaTeX sources.</p>
                       {wordUrl && (
                         <a href={wordUrl} target="_blank" rel="noreferrer">
                           Download DOCX
+                        </a>
+                      )}
+                      {archiveUrl && (
+                        <a href={archiveUrl} target="_blank" rel="noreferrer">
+                          Download LaTeX (.zip)
                         </a>
                       )}
                     </div>

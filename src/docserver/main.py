@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 
@@ -14,9 +14,16 @@ from .schemas import (
     DocumentListResponse,
     DocumentResponse,
     SectionResponse,
+    SectionUpdate,
     TemplateListResponse,
 )
-from .storage import convert_upload, delete_document, list_documents, load_document
+from .storage import (
+    convert_upload,
+    delete_document,
+    list_documents,
+    load_document,
+    zip_directory,
+)
 
 app = FastAPI(title="Research Paper Workspace API")
 app.add_middleware(
@@ -75,6 +82,21 @@ def get_section_source(document_id: str, section_slug: str):
     return PlainTextResponse(section_path.read_text(), media_type="text/x-latex")
 
 
+@app.put("/documents/{document_id}/sections/{section_slug}")
+def update_section_source(document_id: str, section_slug: str, body: SectionUpdate):
+    manifest = get_document(document_id)
+    try:
+        section = next(s for s in manifest.sections if s.slug == section_slug)
+    except StopIteration:
+        raise HTTPException(status_code=404, detail="Section not found")
+
+    section_path = DOCUMENTS_ROOT / document_id / manifest.template / section.latex_path
+    if not section_path.exists():
+        raise HTTPException(status_code=404, detail="Section file missing")
+    section_path.write_text(body.content)
+    return {"status": "saved", "section_slug": section_slug}
+
+
 @app.post("/documents", response_model=CreateDocumentResponse)
 async def create_document(
     file: UploadFile = File(...),
@@ -122,6 +144,24 @@ def get_pdf(document_id: str):
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="PDF file missing")
     return FileResponse(pdf_path)
+
+
+@app.get("/documents/{document_id}/archive")
+def get_archive(document_id: str):
+    try:
+        manifest = load_document(document_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+    workspace = DOCUMENTS_ROOT / document_id / manifest.template
+    if not workspace.exists():
+        raise HTTPException(status_code=404, detail="LaTeX workspace not found")
+    data = zip_directory(workspace)
+    filename = f"{document_id}_{manifest.template}_latex.zip"
+    return Response(
+        content=data,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @app.get("/documents/{document_id}/log", response_class=PlainTextResponse)
