@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import { authHeaders, authParam, fetchTemplates, type TemplateInfo } from "./api";
+import {
+  authHeaders,
+  authParam,
+  critiqueAdhoc,
+  fetchCritique,
+  fetchTemplates,
+  runCritique,
+  type CritiqueResult,
+  type TemplateInfo,
+} from "./api";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -37,7 +46,10 @@ function App() {
   const [templates, setTemplates] = useState<TemplateInfo[]>(FALLBACK_TEMPLATES);
   const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_DEFAULT);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [view, setView] = useState<"pdf" | "latex" | "word" | "log">("pdf");
+  const [view, setView] = useState<"pdf" | "latex" | "word" | "log" | "critic">("pdf");
+  const [critique, setCritique] = useState<CritiqueResult | null>(null);
+  const [critiquing, setCritiquing] = useState(false);
+  const [adhoc, setAdhoc] = useState<CritiqueResult | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [latexSource, setLatexSource] = useState<string>("Select a section to inspect its LaTeX.");
   const [buildLog, setBuildLog] = useState<string>("Select Log to view the LaTeX build output.");
@@ -239,6 +251,46 @@ function App() {
     }
   }
 
+  async function openCritic(docId: string) {
+    setView("critic");
+    setAdhoc(null);
+    try {
+      setCritique(await fetchCritique(docId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load critique");
+    }
+  }
+
+  async function runCriticNow(docId: string, refresh = false) {
+    setCritiquing(true);
+    setError(null);
+    try {
+      setCritique(await runCritique(docId, refresh));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Critique failed");
+    } finally {
+      setCritiquing(false);
+    }
+  }
+
+  async function handleAdhoc(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setCritiquing(true);
+    setError(null);
+    try {
+      const result = await critiqueAdhoc(file);
+      setAdhoc(result);
+      setSelectedId(null);
+      setView("critic");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ad-hoc critique failed");
+    } finally {
+      setCritiquing(false);
+    }
+  }
+
   const pdfUrl = selected?.build.pdf_path
     ? `${API_BASE}/documents/${selected.document_id}/pdf${authParam()}`
     : null;
@@ -246,6 +298,76 @@ function App() {
     ? `${API_BASE}/documents/${selected.document_id}/archive${authParam()}`
     : null;
   const wordUrl = selected ? `${API_BASE}/documents/${selected.document_id}/word${authParam()}` : null;
+
+  function gaugeClass(score: number): string {
+    return score > 65 ? "red" : score >= 35 ? "amber" : "green";
+  }
+
+  function renderCritique(result: CritiqueResult | null, isAdhoc: boolean) {
+    if (!result) {
+      return (
+        <div className="empty-state">
+          <p>No critique yet for this document.</p>
+          {selected && (
+            <button onClick={() => void runCriticNow(selected.document_id)} disabled={critiquing}>
+              {critiquing ? "Analyzing…" : "Run Critic"}
+            </button>
+          )}
+        </div>
+      );
+    }
+    return (
+      <div className="critic-view">
+        <div className="critic-head">
+          <span className={`gauge ${gaugeClass(result.overall_ai_score)}`}>{result.overall_ai_score}</span>
+          <div>
+            <p className="doc-meta">{result.summary}</p>
+            <p className="doc-meta">
+              provider · {result.provider}
+              {!isAdhoc && selected && (
+                <button
+                  className="refresh"
+                  onClick={() => void runCriticNow(selected.document_id, true)}
+                  disabled={critiquing}
+                >
+                  {critiquing ? "Analyzing…" : "↻ Re-run"}
+                </button>
+              )}
+            </p>
+          </div>
+        </div>
+        {result.sections.map((s) => (
+          <div className="critic-section" key={s.section_slug}>
+            <div className="critic-section-head">
+              <h4>{s.title}</h4>
+              <span
+                className={`gauge small ${gaugeClass(s.ai_score)}`}
+                title={`heuristic ${s.ai_score_breakdown.heuristic} · model ${s.ai_score_breakdown.model}`}
+              >
+                {s.ai_score}
+              </span>
+            </div>
+            <ol className="criticisms">
+              {s.criticisms.map((c, i) => (
+                <li key={i}>
+                  <span className="chip">{c.category}</span> <strong>{c.issue}</strong>
+                  <div className="suggestion">{c.suggestion}</div>
+                </li>
+              ))}
+            </ol>
+            {s.ai_signals.length > 0 && <p className="signals">Signals: {s.ai_signals.join("; ")}</p>}
+            {s.deai_tips.length > 0 && (
+              <ul className="tips">
+                {s.deai_tips.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -296,6 +418,10 @@ function App() {
               ↻ Refresh
             </button>
           </div>
+          <label className="adhoc">
+            <span>Critique a file (PDF/DOCX, no workspace)</span>
+            <input type="file" accept=".pdf,.docx" onChange={handleAdhoc} disabled={critiquing} />
+          </label>
           {pendingOverwrite && (
             <div className="banner warning">
               <p>
@@ -342,13 +468,15 @@ function App() {
                   </p>
                 </div>
                 <div className="tab-bar">
-                  {(["pdf", "latex", "word", "log"] as const).map((tab) => (
+                  {(["pdf", "latex", "word", "log", "critic"] as const).map((tab) => (
                     <button
                       key={tab}
                       className={view === tab ? "active" : ""}
-                      onClick={() =>
-                        tab === "log" ? void loadBuildLog(selected.document_id) : setView(tab)
-                      }
+                      onClick={() => {
+                        if (tab === "log") void loadBuildLog(selected.document_id);
+                        else if (tab === "critic") void openCritic(selected.document_id);
+                        else setView(tab);
+                      }}
                     >
                       {tab.toUpperCase()}
                     </button>
@@ -422,6 +550,8 @@ function App() {
 
                   {view === "log" && <pre className="latex-view">{buildLog}</pre>}
 
+                  {view === "critic" && renderCritique(critique, false)}
+
                   {view === "word" && (
                     <div className="word-view">
                       <p>Download the original manuscript or the generated LaTeX sources.</p>
@@ -438,6 +568,15 @@ function App() {
                     </div>
                   )}
                 </section>
+              </div>
+            </>
+          ) : view === "critic" && adhoc ? (
+            <>
+              <div className="document-header">
+                <h2>Ad-hoc critique</h2>
+              </div>
+              <div className="workspace">
+                <section className="viewer">{renderCritique(adhoc, true)}</section>
               </div>
             </>
           ) : (

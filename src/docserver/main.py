@@ -12,6 +12,10 @@ from docbuilder.config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT
 from docbuilder.converter import ConversionError, ConversionOptions, convert_document, rebuild_pdf
 from docbuilder.templates import available_templates, is_valid_template, valid_template_ids
 
+from critic.models import CritiqueResult, ProviderListResponse
+from critic.pipeline import critique_adhoc, critique_document, load_cached
+from critic.providers import available_providers
+
 from .schemas import (
     CompileResponse,
     CreateDocumentResponse,
@@ -56,6 +60,46 @@ def health():
 @app.get("/templates", response_model=TemplateListResponse)
 def get_templates():
     return TemplateListResponse(templates=available_templates(), default=DEFAULT_TEMPLATE)
+
+
+# ---------------------------------------------------------------------------
+# Critic — per-section criticism + AI-genericness analysis
+# ---------------------------------------------------------------------------
+
+@app.get("/critic/providers", response_model=ProviderListResponse)
+def critic_providers():
+    return available_providers()
+
+
+@app.post("/documents/{document_id}/critique", response_model=CritiqueResult)
+def run_critique(document_id: str, refresh: bool = False):
+    try:
+        return critique_document(document_id, refresh=refresh)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+
+@app.get("/documents/{document_id}/critique", response_model=CritiqueResult)
+def get_critique(document_id: str):
+    cached = load_cached(document_id)
+    if cached is None:
+        raise HTTPException(status_code=404, detail="No critique yet; run one first")
+    return cached
+
+
+@app.post("/critic/adhoc", response_model=CritiqueResult)
+async def critique_adhoc_upload(file: UploadFile = File(...)):
+    name = file.filename or ""
+    if not (name.endswith(".pdf") or name.endswith(".docx")):
+        raise HTTPException(status_code=400, detail="Only .pdf and .docx uploads are supported")
+    data = await file.read()
+    try:
+        result = critique_adhoc(name, data)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not result.sections:
+        raise HTTPException(status_code=400, detail="Could not extract any text from the upload")
+    return result
 
 
 @app.get("/documents", response_model=DocumentListResponse)

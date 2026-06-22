@@ -350,6 +350,107 @@ textarea.latex-view {
   border-radius: 12px;
 }
 
+/* --- Critic view --- */
+.adhoc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 14px;
+  font-size: 0.8rem;
+  color: #c7d0f0;
+}
+
+.critic-view {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.critic-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.gauge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #04111f;
+}
+
+.gauge.small {
+  min-width: 34px;
+  height: 34px;
+  font-size: 0.9rem;
+}
+
+.gauge.green {
+  background: #4ade80;
+}
+.gauge.amber {
+  background: #fbbf24;
+}
+.gauge.red {
+  background: #f87171;
+}
+
+.critic-section {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.critic-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.criticisms {
+  margin: 8px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.criticisms .suggestion {
+  color: #a8b3d8;
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.2);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.signals {
+  color: #8b96bd;
+  font-size: 0.82rem;
+}
+
+.tips {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: #cbd5ff;
+  font-size: 0.88rem;
+}
+
 .banner.error {
   background: rgba(239, 68, 68, 0.15);
   border-left: 4px solid #f87171;
