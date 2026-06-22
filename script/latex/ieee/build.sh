@@ -44,6 +44,14 @@ MISSING_PKGS=()
 command -v pdflatex &>/dev/null || MISSING_PKGS+=("pdflatex")
 command -v bibtex   &>/dev/null || MISSING_PKGS+=("bibtex")
 
+if [[ ${#MISSING_PKGS[@]} -gt 0 && "${LATEX_AUTO_INSTALL:-0}" != "1" ]]; then
+    echo "[ERROR] Missing commands: ${MISSING_PKGS[*]}"
+    echo "        TeX Live is not installed and host auto-install is disabled."
+    echo "        Install TeX Live, set LATEX_AUTO_INSTALL=1 to allow apt-get,"
+    echo "        or build with LATEX_SANDBOX=docker."
+    exit 1
+fi
+
 if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
     echo "[INFO] Missing commands: ${MISSING_PKGS[*]}"
 
@@ -78,7 +86,7 @@ echo ""
 pushd "${SRC_DIR}" > /dev/null
 
 echo "[1/4] pdflatex (first pass) ..."
-pdflatex -interaction=nonstopmode main.tex
+pdflatex -no-shell-escape -halt-on-error -interaction=nonstopmode main.tex
 
 echo ""
 echo "[2/4] bibtex (bibliography) ..."
@@ -86,11 +94,11 @@ bibtex main
 
 echo ""
 echo "[3/4] pdflatex (second pass -- resolving citations) ..."
-pdflatex -interaction=nonstopmode main.tex
+pdflatex -no-shell-escape -halt-on-error -interaction=nonstopmode main.tex
 
 echo ""
 echo "[4/4] pdflatex (third pass -- resolving cross-references) ..."
-pdflatex -interaction=nonstopmode main.tex
+pdflatex -no-shell-escape -halt-on-error -interaction=nonstopmode main.tex
 
 popd > /dev/null
 

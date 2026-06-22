@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +14,7 @@ from docx.text.paragraph import Paragraph
 
 from .config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT, LATEX_ROOT, REPO_ROOT, SCRIPT_ROOT
 from .models import DocumentManifest, FigureEntry, SectionEntry
+from .sandbox import run_sandboxed
 from .templates import is_buildable, is_valid_template, valid_template_ids
 from .utils import slugify, snake_case, text_to_latex
 
@@ -333,30 +333,35 @@ def _run_build(*, template_name: str, template_workspace: Path, manifest_path: P
     script = SCRIPT_ROOT / template_name / "build.sh"
     log_file = template_workspace / "build.log"
     manifest_data = json.loads(manifest_path.read_text())
-    try:
-        result = subprocess.run(
-            ["bash", str(script), str(template_workspace)],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        log_file.write_text(result.stdout + "\n" + result.stderr)
+
+    # Compile under the sandbox: timeout, resource limits, no shell-escape, and
+    # TeX file IO restricted to the workspace. For docker, the build script and
+    # workspace are both mounted at /work.
+    result = run_sandboxed(
+        ["bash", str(script), str(template_workspace)],
+        cwd=REPO_ROOT,
+        workspace=template_workspace,
+        docker_cmd=["bash", f"/work/{script.name}", "/work"],
+    )
+    log_file.write_text(result.stdout + "\n" + result.stderr)
+    if result.returncode == 0:
         manifest_data["build"] = {
             "status": "succeeded",
             "last_run": datetime.utcnow().isoformat(),
             "pdf_path": f"{template_name}/main.pdf",
             "log_path": str(log_file.relative_to(template_workspace.parent)),
         }
-    except subprocess.CalledProcessError as exc:  # pragma: no cover
-        combined = exc.stdout + "\n" + exc.stderr
-        log_file.write_text(combined)
+    else:
+        message = (
+            f"LaTeX build timed out after the configured limit."
+            if result.timed_out
+            else "LaTeX build failed. See log for details."
+        )
         manifest_data["build"] = {
             "status": "failed",
             "last_run": datetime.utcnow().isoformat(),
             "pdf_path": None,
             "log_path": str(log_file.relative_to(template_workspace.parent)),
-            "message": "LaTeX build failed. See log for details.",
+            "message": message,
         }
-    finally:
-        manifest_path.write_text(json.dumps(manifest_data, indent=2))
+    manifest_path.write_text(json.dumps(manifest_data, indent=2))

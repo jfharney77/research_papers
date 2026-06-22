@@ -6,3 +6,5 @@ __pycache__/
 
 # docserver runtime output
 documents/
+logs/
+web/dist/

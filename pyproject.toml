@@ -1,7 +1,7 @@
 [project]
 name = "research-papers"
 version = "0.1.0"
-description = "Add your description here"
+description = "Research Paper Workspace — convert Word manuscripts into per-section LaTeX, build conference PDFs, and review them in a web UI."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

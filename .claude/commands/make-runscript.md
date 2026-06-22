@@ -1,6 +1,6 @@
-Generate an executable startup script for the src/apip FastAPI backend.
+Generate an executable startup script for the research/apip_sim FastAPI backend (research artifact).
 
-Write the file `run_apip.sh` in the repo root with this exact content:
+Write the file `run_apip.sh` in research/ with this exact content:
 
 ```bash
 #!/usr/bin/env bash
@@ -13,9 +13,9 @@ echo "Installing dependencies..."
 uv sync
 
 echo "Starting APIP simulation server..."
-uv run uvicorn src.apip.backend.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn research.apip_sim.backend.main:app --reload --host 0.0.0.0 --port 8100
 ```
 
 After writing the file, make it executable with: `chmod +x run_apip.sh`
 
-Then confirm to the user that `run_apip.sh` was created and is ready to run with `./run_apip.sh`. The server will be available at http://localhost:8000 and the WebSocket stream at ws://localhost:8000/ws/metrics.
+Then confirm to the user that `run_apip.sh` was created and is ready to run with `./run_apip.sh`. The server will be available at http://localhost:8100 and the WebSocket stream at ws://localhost:8100/ws/metrics.

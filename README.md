@@ -1,6 +1,25 @@
-# research_papers
+# Research Paper Workspace
 
-A repository of LaTeX templates and sample documents for academic conference submissions.
+A **Word → LaTeX tool**: upload a `.docx` manuscript, convert it into per-section LaTeX,
+build a conference-ready PDF (IEEE / NeurIPS / ACM / AAAI), and review/edit it in a web UI.
+
+## Run it
+
+```bash
+python main.py            # product backend (FastAPI) on http://localhost:8000
+scripts/start_web.sh      # backend + React dev server (http://localhost:5173)
+papers convert paper.docx --template ieee   # CLI conversion
+```
+
+**Layout:** the product is `src/docbuilder` (converter + CLI), `src/docserver` (API),
+`web/` (React), `latex/` + `script/latex/` (templates and build scripts). Unrelated
+**research artifacts** — the APIP paper and its simulation app — live under `research/`
+(run the simulation with `research/run_apip.sh`, port 8100).
+
+**Security:** the LaTeX build runs sandboxed (no shell-escape, restricted file IO,
+resource limits, timeout — see `src/docbuilder/sandbox.py`; `LATEX_SANDBOX=docker` for
+container isolation). Set `DOCSERVER_API_KEY` to require auth, and `DOCSERVER_CORS_ORIGINS`
+to allowlist browser origins.
 
 ---
 

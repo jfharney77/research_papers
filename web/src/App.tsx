@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import { fetchTemplates, type TemplateInfo } from "./api";
+import { authHeaders, authParam, fetchTemplates, type TemplateInfo } from "./api";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -75,7 +75,7 @@ function App() {
 
   async function refreshDocuments() {
     try {
-      const res = await fetch(`${API_BASE}/documents`);
+      const res = await fetch(`${API_BASE}/documents`, { headers: authHeaders() });
       const data = await res.json();
       setDocuments(data.documents ?? []);
       if (!selectedId && data.documents?.length) {
@@ -112,6 +112,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/documents?template=${encodeURIComponent(template)}&build_pdf=true&overwrite=${overwrite}`, {
         method: "POST",
+        headers: authHeaders(),
         body: payload,
       });
       if (!res.ok) {
@@ -139,7 +140,9 @@ function App() {
   async function loadSection(section: Section) {
     if (!selected) return;
     try {
-      const res = await fetch(`${API_BASE}/documents/${selected.document_id}/sections/${section.slug}`);
+      const res = await fetch(`${API_BASE}/documents/${selected.document_id}/sections/${section.slug}`, {
+        headers: authHeaders(),
+      });
       if (!res.ok) throw new Error("Unable to load section");
       const text = await res.text();
       setLatexSource(text);
@@ -156,7 +159,10 @@ function App() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/documents/${docId}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE}/documents/${docId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
         throw new Error(detail.detail ?? "Failed to delete workspace");
@@ -176,7 +182,10 @@ function App() {
     setRecompiling(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/documents/${docId}/compile`, { method: "POST" });
+      const res = await fetch(`${API_BASE}/documents/${docId}/compile`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
         throw new Error(detail.detail ?? "Recompile failed");
@@ -196,7 +205,7 @@ function App() {
     setView("log");
     setBuildLog("Loading build log…");
     try {
-      const res = await fetch(`${API_BASE}/documents/${docId}/log`);
+      const res = await fetch(`${API_BASE}/documents/${docId}/log`, { headers: authHeaders() });
       if (!res.ok) {
         setBuildLog(res.status === 404 ? "No build log available yet." : "Unable to load build log.");
         return;
@@ -215,7 +224,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/documents/${selected.document_id}/sections/${activeSection}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ content: latexSource }),
       });
       if (!res.ok) {
@@ -230,9 +239,13 @@ function App() {
     }
   }
 
-  const pdfUrl = selected?.build.pdf_path ? `${API_BASE}/documents/${selected.document_id}/pdf` : null;
-  const archiveUrl = selected ? `${API_BASE}/documents/${selected.document_id}/archive` : null;
-  const wordUrl = selected ? `${API_BASE}/documents/${selected.document_id}/word` : null;
+  const pdfUrl = selected?.build.pdf_path
+    ? `${API_BASE}/documents/${selected.document_id}/pdf${authParam()}`
+    : null;
+  const archiveUrl = selected
+    ? `${API_BASE}/documents/${selected.document_id}/archive${authParam()}`
+    : null;
+  const wordUrl = selected ? `${API_BASE}/documents/${selected.document_id}/word${authParam()}` : null;
 
   return (
     <div className="app-shell">

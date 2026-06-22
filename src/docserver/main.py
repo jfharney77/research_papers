@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, File, HTTPException, Response, UploadFile
+import os
+
+from fastapi import Depends, FastAPI, File, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
+
+from .auth import require_api_key
 
 from docbuilder.config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT
 from docbuilder.converter import ConversionError, ConversionOptions, convert_document, rebuild_pdf
@@ -25,13 +29,28 @@ from .storage import (
     zip_directory,
 )
 
-app = FastAPI(title="Research Paper Workspace API")
+app = FastAPI(title="Research Paper Workspace API", dependencies=[Depends(require_api_key)])
+
+# Restrict CORS to explicitly configured origins (default: the local Vite dev
+# server). Override with DOCSERVER_CORS_ORIGINS="https://a.com,https://b.com".
+_cors_origins = [
+    o.strip()
+    for o in os.environ.get(
+        "DOCSERVER_CORS_ORIGINS", "http://localhost:5173,http://localhost:3000"
+    ).split(",")
+    if o.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.get("/templates", response_model=TemplateListResponse)

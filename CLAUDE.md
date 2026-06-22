@@ -10,7 +10,19 @@ When the user types `/docx-to-latex`, invoke the Skill tool with `skill: "docx-t
 
 ## What This Repo Does
 
-A research paper template management system for AI/ML conference submissions. It provides four LaTeX templates (IEEE, NeurIPS, ACM, AAAI), automated build scripts for each, Python diagram generators, and conference deadline tracking for 2026 submissions.
+**The product** is the **Research Paper Workspace**: a Word → LaTeX tool that converts `.docx` manuscripts into per-section LaTeX, builds conference PDFs (IEEE / NeurIPS / ACM / AAAI), and serves a React review UI.
+
+- Product code lives in `src/docbuilder` (converter + CLI), `src/docserver` (FastAPI API), and `web/` (React/Vite).
+- **Single entry point:** `python main.py` (backend on :8000), or `scripts/start_web.sh` for backend + frontend.
+- LaTeX templates are in `latex/`; per-conference build scripts in `script/latex/`.
+
+**Research artifacts are separate.** The APIP paper (the "New Hire Paradox") and its standalone simulation app live entirely under `research/` and are *not* part of the product:
+- `research/apip/` — the paper (docx/pptx/markdown); `research/apip_sim/` — the FastAPI simulation, launched via `research/run_apip.sh` (port 8100).
+- `research/conferences2026/` — submission deadlines; `research/assets/`, `research/png_gen.py` — figure generators.
+
+## Build Security
+
+The build path compiles LaTeX derived from untrusted uploads, so it runs in a sandbox (`src/docbuilder/sandbox.py`): no shell-escape, restricted TeX file IO, resource limits, and a timeout. Set `LATEX_SANDBOX=docker` for container isolation. The doc server requires an API key when `DOCSERVER_API_KEY` is set (see `src/docserver/auth.py`) and restricts CORS via `DOCSERVER_CORS_ORIGINS`.
 
 ## Building LaTeX Papers
 
@@ -29,7 +41,7 @@ bash script/latex/ieee/build.sh /custom/path/to/latex/ieee
 
 All scripts run the standard 4-step pipeline: `pdflatex → bibtex → pdflatex → pdflatex`. The AAAI script also cleans auxiliary files (`.aux`, `.bbl`, `.blg`) before each build.
 
-**Requirements:** `pdflatex`, `bibtex`, TeX Live packages. Scripts will auto-install via `apt-get` on Linux/WSL if missing.
+**Requirements:** `pdflatex`, `bibtex`, TeX Live packages. Host auto-install is **disabled by default** — set `LATEX_AUTO_INSTALL=1` to allow the scripts to `apt-get install` TeX Live, or build with `LATEX_SANDBOX=docker`. When invoked through the doc server, builds always run under the sandbox.
 
 **NeurIPS:** The style file (`neurips_2025.sty`) is auto-downloaded from the NeurIPS website on first build. Update `STYLE_YEAR` and `STYLE_URL` at the top of `script/latex/neurips/build.sh` annually.
 
@@ -41,19 +53,22 @@ All scripts run the standard 4-step pipeline: `pdflatex → bibtex → pdflatex 
 
 ```bash
 # Graphviz-based system architecture diagram → ai_architecture.png
-python src/png_gen.py
+python research/png_gen.py
 
-# Matplotlib transformer/encoder-decoder diagram → assets/figures/ai_architecture.{pdf,png}
-python assets/figures/generate_diagram.py
+# Matplotlib transformer/encoder-decoder diagram → research/assets/figures/ai_architecture.{pdf,png}
+python research/assets/figures/generate_diagram.py
 ```
 
 ## Python Environment
 
-Uses `uv` for package management. Single runtime dependency: `graphviz>=0.21`.
+Uses `uv` for package management. Runtime deps include `fastapi`, `uvicorn`, `python-docx`,
+`typer`, and `graphviz` (see `pyproject.toml`); test deps are in the `dev` group.
 
 ```bash
 uv sync
-uv run python src/png_gen.py
+uv run --group dev pytest        # run the test suite
+python main.py                   # run the product backend
+uv run python research/png_gen.py
 ```
 
 ## LaTeX Template Structure
@@ -68,7 +83,7 @@ Edit section files independently; `main.tex` rarely needs changes. This layout i
 
 ## Conference Deadlines
 
-Submission info and deadlines are tracked in `conferences2026/`. Key upcoming deadlines:
+Submission info and deadlines are tracked in `research/conferences2026/`. Key upcoming deadlines:
 
 - **RecSys 2026:** Abstract due 2026-04-14, full paper due 2026-04-21
 - **ICDM 2026:** Paper deadline 2026-06-06
