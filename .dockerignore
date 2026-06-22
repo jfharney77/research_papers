@@ -1,0 +1,16 @@
+# Keep the backend build context small. Backend needs src/, latex/, script/,
+# pyproject.toml, uv.lock, main.py — not the frontend, research artifacts, or local state.
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+web
+research
+tests
+documents
+logs
+dist
+*.md
+!README.md
+SPEC-*.md

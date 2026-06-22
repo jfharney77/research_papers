@@ -1,0 +1,69 @@
+name: Deploy to AWS ECS
+
+# Bring-up: run manually or on pushes to the deploy-aws branch. Switch to your
+# default branch once AWS is the primary target.
+on:
+  workflow_dispatch:
+  push:
+    branches: [deploy-aws]
+
+permissions:
+  id-token: write   # GitHub OIDC -> AWS role assumption
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
+  BACKEND_REPO: research-papers-backend
+  FRONTEND_REPO: research-papers-frontend
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build & push backend image
+        run: |
+          IMG="$ECR/$BACKEND_REPO"
+          docker build -f docker/backend.Dockerfile -t "$IMG:${{ github.sha }}" -t "$IMG:latest" .
+          docker push "$IMG:${{ github.sha }}"
+          docker push "$IMG:latest"
+      - name: Deploy backend (ECS Express Mode)
+        run: |
+          IMG="$ECR/$BACKEND_REPO:${{ github.sha }}"
+          aws ecs update-express-gateway-service \
+            --service-arn "${{ secrets.BACKEND_SERVICE_ARN }}" \
+            --primary-container "{\"image\":\"$IMG\",\"containerPort\":8080,\"environment\":[{\"name\":\"DOCSERVER_API_KEY\",\"value\":\"${{ secrets.DOCSERVER_API_KEY }}\"},{\"name\":\"DOCSERVER_CORS_ORIGINS\",\"value\":\"${{ vars.FRONTEND_URL }}\"},{\"name\":\"LATEX_SANDBOX\",\"value\":\"local\"}]}" \
+            --region "$AWS_REGION"
+
+  frontend:
+    needs: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build & push frontend image (VITE_* baked in)
+        run: |
+          IMG="$ECR/$FRONTEND_REPO"
+          docker build \
+            --build-arg VITE_API_BASE="${{ vars.BACKEND_URL }}" \
+            --build-arg VITE_DOCSERVER_TOKEN="${{ secrets.DOCSERVER_API_KEY }}" \
+            -f web/Dockerfile -t "$IMG:${{ github.sha }}" -t "$IMG:latest" web
+          docker push "$IMG:${{ github.sha }}"
+          docker push "$IMG:latest"
+      - name: Deploy frontend (ECS Express Mode)
+        run: |
+          IMG="$ECR/$FRONTEND_REPO:${{ github.sha }}"
+          aws ecs update-express-gateway-service \
+            --service-arn "${{ secrets.FRONTEND_SERVICE_ARN }}" \
+            --primary-container "{\"image\":\"$IMG\",\"containerPort\":8080}" \
+            --region "$AWS_REGION"
