@@ -22,8 +22,9 @@ RUN pip install --no-cache-dir uv
 WORKDIR /app
 
 # Install dependencies only (the project uses a src layout with no build backend).
+# `--extra llm` pulls in the anthropic SDK so the Claude Critic provider works.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --no-install-project --extra llm
 
 # Application code (web/, research/, tests/ are excluded via .dockerignore).
 COPY . .
@@ -35,7 +36,8 @@ ENV PATH="/app/.venv/bin:$PATH" \
     DOCSERVER_HOST=0.0.0.0 \
     DOCSERVER_PORT=8080
 
-# Auth + CORS are supplied at runtime via the ECS service environment:
-#   DOCSERVER_API_KEY, DOCSERVER_CORS_ORIGINS
+# Supplied at runtime via the ECS service environment:
+#   DOCSERVER_API_KEY, DOCSERVER_CORS_ORIGINS  (auth + CORS)
+#   CRITIC_PROVIDER=claude, ANTHROPIC_API_KEY  (enable the Claude Critic provider)
 EXPOSE 8080
 CMD ["python", "-m", "uvicorn", "docserver.main:app", "--host", "0.0.0.0", "--port", "8080"]

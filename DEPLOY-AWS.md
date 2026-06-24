@@ -115,16 +115,17 @@ aws ecs create-express-gateway-service \
   --region $REGION
 # → note ingressPaths[0].endpoint  →  FRONTEND_URL
 
-# 4d. Open backend CORS to the frontend origin (use the backend service ARN)
+# 4d. Open backend CORS to the frontend origin (use the backend service ARN).
+#     Optionally enable Claude here too: add CRITIC_PROVIDER=claude + ANTHROPIC_API_KEY.
 aws ecs update-express-gateway-service --service-arn <BACKEND_SERVICE_ARN> \
-  --primary-container "{\"image\":\"$ECR/research-papers-backend:latest\",\"containerPort\":8080,\"environment\":[{\"name\":\"DOCSERVER_API_KEY\",\"value\":\"$KEY\"},{\"name\":\"DOCSERVER_CORS_ORIGINS\",\"value\":\"<FRONTEND_URL>\"},{\"name\":\"LATEX_SANDBOX\",\"value\":\"local\"}]}" \
+  --primary-container "{\"image\":\"$ECR/research-papers-backend:latest\",\"containerPort\":8080,\"environment\":[{\"name\":\"DOCSERVER_API_KEY\",\"value\":\"$KEY\"},{\"name\":\"DOCSERVER_CORS_ORIGINS\",\"value\":\"<FRONTEND_URL>\"},{\"name\":\"LATEX_SANDBOX\",\"value\":\"local\"},{\"name\":\"CRITIC_PROVIDER\",\"value\":\"claude\"},{\"name\":\"ANTHROPIC_API_KEY\",\"value\":\"<ANTHROPIC_API_KEY>\"}]}" \
   --region $REGION
 ```
 Open `<FRONTEND_URL>` — the app should load and talk to the backend.
 
 ## Step 5 — GitHub repo settings (Settings → Secrets and variables → Actions)
-**Variables:** `AWS_REGION`, `AWS_ACCOUNT_ID`, `BACKEND_URL` (from 4b), `FRONTEND_URL` (from 4c)
-**Secrets:** `AWS_DEPLOY_ROLE_ARN` (from Step 3), `DOCSERVER_API_KEY` (`$KEY`), `BACKEND_SERVICE_ARN`, `FRONTEND_SERVICE_ARN`
+**Variables:** `AWS_REGION`, `AWS_ACCOUNT_ID`, `BACKEND_URL` (from 4b), `FRONTEND_URL` (from 4c), `CRITIC_PROVIDER` (`claude` to enable Claude, else leave blank for the offline stub)
+**Secrets:** `AWS_DEPLOY_ROLE_ARN` (from Step 3), `DOCSERVER_API_KEY` (`$KEY`), `BACKEND_SERVICE_ARN`, `FRONTEND_SERVICE_ARN`, `ANTHROPIC_API_KEY` (only if using Claude)
 
 ## Step 6 — Automated deploys
 ```bash
@@ -138,5 +139,5 @@ services. Flip the `on.push.branches` in the workflow to your default branch whe
 ## Notes & caveats
 - **Backend image is large (~2 GB)** because it bundles TeX Live for all four templates. First build/push is slow; trim the `apt-get` list in `docker/backend.Dockerfile` if you only need one template.
 - **Local disk is ephemeral.** `documents/` (converted workspaces, built PDFs, `critique.json`) lives in the task and is lost on redeploy/scale. For persistence, attach **EFS** to the service or move artifacts to S3.
-- **Critic providers:** the default `stub` runs offline. To use Claude, add `anthropic` to the image (`uv add anthropic` or the `llm` extra) and set `CRITIC_PROVIDER=claude` + `ANTHROPIC_API_KEY` in the backend service env. Ollama won't be reachable from AWS unless you expose it.
+- **Critic providers:** the `anthropic` SDK is already baked into the backend image (the Dockerfile installs the `llm` extra). To use **Claude** in the deployed app, set the backend service env `CRITIC_PROVIDER=claude` and `ANTHROPIC_API_KEY=<your key>` — the CI workflow wires these from the `CRITIC_PROVIDER` variable and `ANTHROPIC_API_KEY` secret. Leave `CRITIC_PROVIDER` unset (or `stub`) to run the offline analyzer. If the key is missing or invalid, the provider degrades to the stub rather than failing. Ollama isn't reachable from AWS unless you expose it.
 - **Never** run `aws ecs update-service` against these services — only `*-express-gateway-service` APIs. Mixing them corrupts the deployment state (recover by `delete-express-gateway-service` + recreate).

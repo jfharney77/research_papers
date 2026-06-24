@@ -38,7 +38,7 @@ jobs:
           IMG="$ECR/$BACKEND_REPO:${{ github.sha }}"
           aws ecs update-express-gateway-service \
             --service-arn "${{ secrets.BACKEND_SERVICE_ARN }}" \
-            --primary-container "{\"image\":\"$IMG\",\"containerPort\":8080,\"environment\":[{\"name\":\"DOCSERVER_API_KEY\",\"value\":\"${{ secrets.DOCSERVER_API_KEY }}\"},{\"name\":\"DOCSERVER_CORS_ORIGINS\",\"value\":\"${{ vars.FRONTEND_URL }}\"},{\"name\":\"LATEX_SANDBOX\",\"value\":\"local\"}]}" \
+            --primary-container "{\"image\":\"$IMG\",\"containerPort\":8080,\"environment\":[{\"name\":\"DOCSERVER_API_KEY\",\"value\":\"${{ secrets.DOCSERVER_API_KEY }}\"},{\"name\":\"DOCSERVER_CORS_ORIGINS\",\"value\":\"${{ vars.FRONTEND_URL }}\"},{\"name\":\"LATEX_SANDBOX\",\"value\":\"local\"},{\"name\":\"CRITIC_PROVIDER\",\"value\":\"${{ vars.CRITIC_PROVIDER }}\"},{\"name\":\"ANTHROPIC_API_KEY\",\"value\":\"${{ secrets.ANTHROPIC_API_KEY }}\"}]}" \
             --region "$AWS_REGION"
 
   frontend:
