@@ -18,8 +18,10 @@ and `web/Dockerfile` (Vite build → static `serve`). The workflow is `.github/w
 ---
 
 ## Prerequisites
-- AWS account + AWS CLI v2 logged in (`aws sts get-caller-identity` works), Docker locally for the first manual push.
+- AWS account + AWS CLI v2 logged in (`aws sts get-caller-identity` works), and **Docker or Podman** locally for the first manual push.
 - This repo on GitHub (`jfharney77/research_papers`).
+
+> **Docker or Podman?** Both Dockerfiles build and run unchanged with either. The commands below use `docker`, but `podman` is a drop-in — `podman build`, `podman push`, and `aws ecr get-login-password | podman login --username AWS --password-stdin <ecr>` all take the same flags. Both images have been verified to build and run locally with Podman (backend `/health` OK with TeX Live present; frontend serves; auth enforced when `DOCSERVER_API_KEY` is set).
 
 ## Step 1 — ECR repositories
 ```bash

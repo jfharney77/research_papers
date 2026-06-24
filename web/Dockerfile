@@ -3,7 +3,10 @@
 FROM node:20-slim AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+# `npm install` (not `npm ci`): npm omits Vite 8 / rolldown's platform+libc-gated
+# native binding (@rolldown/binding-linux-x64-gnu) from a `ci` install in slim
+# images, which breaks `vite build`. install re-resolves it for this platform.
+RUN npm install --no-audit --no-fund
 
 # Vite inlines these at build time — they cannot be changed at runtime.
 ARG VITE_API_BASE
