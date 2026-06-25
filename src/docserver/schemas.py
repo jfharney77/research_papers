@@ -43,6 +43,7 @@ class DocumentResponse(BaseModel):
     sections: list[SectionResponse]
     figures: list[FigureResponse]
     build: BuildResponse
+    references_warning: str | None = None
 
 
 class DocumentListResponse(BaseModel):

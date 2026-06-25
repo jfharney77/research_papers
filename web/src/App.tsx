@@ -39,6 +39,7 @@ type DocumentRecord = {
   created_at: string;
   sections: Section[];
   build: BuildState;
+  references_warning?: string | null;
 };
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
   const [recompiling, setRecompiling] = useState(false);
   const [savingSection, setSavingSection] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<{ file: File; template: string } | null>(null);
+  const [refWarningDismissed, setRefWarningDismissed] = useState<string | null>(null);
 
   const selected = useMemo(
     () => documents.find((doc) => doc.document_id === selectedId) ?? null,
@@ -509,6 +511,19 @@ function App() {
                 </section>
 
                 <section className="viewer">
+                  {selected.references_warning &&
+                    (view === "pdf" || view === "word") &&
+                    refWarningDismissed !== selected.document_id && (
+                      <div className="banner warning ref-warning">
+                        <span>⚠ {selected.references_warning}</span>
+                        <button
+                          className="dismiss"
+                          onClick={() => setRefWarningDismissed(selected.document_id)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
                   {view === "pdf" && (
                     pdfUrl ? (
                       <iframe title="PDF preview" src={pdfUrl} />

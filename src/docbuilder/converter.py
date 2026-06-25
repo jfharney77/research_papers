@@ -14,6 +14,7 @@ from docx.text.paragraph import Paragraph
 
 from .config import DEFAULT_TEMPLATE, DOCUMENTS_ROOT, LATEX_ROOT, REPO_ROOT, SCRIPT_ROOT
 from .models import DocumentManifest, FigureEntry, SectionEntry
+from .refextract import extract_references
 from .sandbox import run_sandboxed
 from .templates import is_buildable, is_valid_template, valid_template_ids
 from .utils import slugify, snake_case, text_to_latex
@@ -72,6 +73,7 @@ def convert_document(docx_path: Path, options: ConversionOptions | None = None) 
 
     manifest = _build_from_docx(
         docx_path=Document(stored_docx),
+        source_path=stored_docx,
         workspace=workspace,
         template_name=options.template,
         template_workspace=template_workspace,
@@ -114,7 +116,7 @@ def _copy_template(template_dir: Path, destination: Path) -> None:
     shutil.copytree(template_dir, destination)
 
 
-def _build_from_docx(*, docx_path: Document, workspace: Path, template_name: str, template_workspace: Path) -> DocumentManifest:
+def _build_from_docx(*, docx_path: Document, source_path: Path, workspace: Path, template_name: str, template_workspace: Path) -> DocumentManifest:
     sections_dir = template_workspace / "sections"
     sections_dir.mkdir(exist_ok=True)
     references_dir = template_workspace / "references"
@@ -210,10 +212,18 @@ def _build_from_docx(*, docx_path: Document, workspace: Path, template_name: str
     manifest.sections = sections
     manifest.figures = figures
 
-    # Always provide a references stub
-    references_bib = references_dir / "references.bib"
-    if not references_bib.exists():
-        references_bib.write_text("% TODO: Populate references extracted from the document\n")
+    # Extract the bibliography from the source document and emit a populated
+    # references.bib. When extraction is partial or impossible, the warning is
+    # surfaced in the manifest instead of silently writing a comment stub.
+    #
+    # The templates all do \bibliography{references}, which bibtex resolves to
+    # references.bib next to main.tex — so the extracted entries replace the
+    # placeholder bib in the template root. A copy is also kept under
+    # references/ for reference.
+    bib_content, references_warning = extract_references(source_path)
+    (template_workspace / "references.bib").write_text(bib_content)
+    (references_dir / "references.bib").write_text(bib_content)
+    manifest.references_warning = references_warning
 
     _rewrite_main(template_workspace, manifest.sections)
 

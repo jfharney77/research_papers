@@ -476,6 +476,19 @@ textarea.latex-view {
   cursor: pointer;
 }
 
+.banner.warning.ref-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.banner.warning.ref-warning .dismiss {
+  flex: none;
+  padding: 2px 10px;
+}
+
 .empty-state {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 16px;

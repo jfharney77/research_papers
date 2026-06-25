@@ -52,6 +52,7 @@ class DocumentManifest(BaseModel):
     sections: list[SectionEntry] = Field(default_factory=list)
     figures: list[FigureEntry] = Field(default_factory=list)
     build: BuildInfo = Field(default_factory=BuildInfo)
+    references_warning: str | None = None
 
     @property
     def workspace(self) -> Path:
