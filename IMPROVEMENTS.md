@@ -36,3 +36,36 @@ anywhere.
 **Note:** the test suite could not be executed in this session because Python
 execution was blocked by the sandbox permission gate. Run
 `uv run --group dev pytest` to verify.
+
+## Non-blocking upload handlers (CRITIQUE_SPEC_2.md)
+
+**Problem:** Two `async def` route handlers in `src/docserver/main.py` performed
+blocking work directly on the asyncio event loop. `create_document` (LaTeX build
+via `subprocess.run`, 30–120 s) and `critique_adhoc_upload` (synchronous LLM
+call, 10–60 s) froze the whole server for every other request while they ran —
+health checks, document listing, section edits and PDF downloads all queued up.
+FastAPI only offloads `def` handlers to its anyio thread pool; `async def`
+handlers run on the loop thread with no offload.
+
+**Fix:**
+- **`src/docserver/main.py:91`** — `critique_adhoc_upload` changed from
+  `async def` to `def`; `data = await file.read()` replaced with the synchronous
+  `data = file.file.read()` (same `SpooledTemporaryFile` pattern as
+  `storage.save_upload`).
+- **`src/docserver/main.py:164`** — `create_document` changed from `async def`
+  to `def` (it never used `await`).
+
+Both now match the already-correct `recompile_document` / `run_critique`
+handlers and are dispatched to the thread pool, keeping the event loop free.
+
+- **`tests/test_concurrency.py`** *(new)* — asserts both handlers are sync
+  `def`; verifies `GET /health` returns 200 in <1 s while a 2 s blocking
+  `POST /documents` is in flight; verifies two simultaneous uploads run
+  concurrently (~1 s, not serialized ~2 s); and confirms `UploadFile.file.read()`
+  round-trips bytes identically. Tests drive the ASGI app via
+  `httpx.AsyncClient` + `anyio` task groups (run through `anyio.run` since no
+  async-pytest plugin is configured).
+
+**Note:** the test suite could not be executed in this session — every Python /
+pytest invocation was blocked by the permission gate. Run
+`uv run --group dev pytest` to verify.

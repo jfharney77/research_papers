@@ -88,11 +88,11 @@ def get_critique(document_id: str):
 
 
 @app.post("/critic/adhoc", response_model=CritiqueResult)
-async def critique_adhoc_upload(file: UploadFile = File(...)):
+def critique_adhoc_upload(file: UploadFile = File(...)):
     name = file.filename or ""
     if not (name.endswith(".pdf") or name.endswith(".docx")):
         raise HTTPException(status_code=400, detail="Only .pdf and .docx uploads are supported")
-    data = await file.read()
+    data = file.file.read()
     try:
         result = critique_adhoc(name, data)
     except ValueError as exc:
@@ -161,7 +161,7 @@ def update_section_source(document_id: str, section_slug: str, body: SectionUpda
 
 
 @app.post("/documents", response_model=CreateDocumentResponse)
-async def create_document(
+def create_document(
     file: UploadFile = File(...),
     template: str = DEFAULT_TEMPLATE,
     build_pdf: bool = True,
