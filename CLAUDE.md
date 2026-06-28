@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Status & session summary (2026-06-28)
+
+> Full handoff: see **`AGENTS.md`**. User docs: `MANUAL.md`, `README.md`, `DEPLOY-AWS.md`.
+
+All work lives on branch **`devel-apip-fullfeatures`** (never merged to `main`; has unpushed
+commits). The product (Word → LaTeX workspace) is feature-complete and tested; the APIP research
+artifacts were moved out to `research/`.
+
+Built so far: **dynamic template selection** · **section editing + recompile + build-log** ·
+**LaTeX `.zip` export** · **sandboxed LaTeX build + API-key auth + scoped CORS** · **the Critic**
+(`src/critic/`: per-section criticisms + AI-genericness score, providers stub/claude/ollama/cerebras) ·
+**reference extraction** (`src/docbuilder/refextract.py`) · **AWS deploy** (Dockerfiles + GitHub
+Actions ECS Express, verified with Podman; Claude provider baked into the image) · **`MANUAL.md`** ·
+a **PowerPoint deck builder** (`build_deck.py` + `POWERPOINT_SPEC.md`).
+
+Verify with `uv run --group dev pytest` and `npm run build` (in `web/`). Open items and next steps
+are listed at the end of `AGENTS.md`.
+
 ## Project Skills
 
 - **docx-to-latex** (`.claude/skills/docx-to-latex/SKILL.md`) — convert a `.docx` file into per-section LaTeX files. Trigger: `/docx-to-latex`
