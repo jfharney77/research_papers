@@ -69,3 +69,28 @@ handlers and are dispatched to the thread pool, keeping the event loop free.
 **Note:** the test suite could not be executed in this session — every Python /
 pytest invocation was blocked by the permission gate. Run
 `uv run --group dev pytest` to verify.
+
+## CRITIQUE_SPEC_3 — `_rewrite_main` buried user content behind template Lorem ipsum (2026-06-28)
+
+**Problem:** `_rewrite_main` *appended* the converted section `\input{}` calls
+after the full template body, so every compiled PDF led with the placeholder
+title ("Paper Title Goes Here"), five Lorem-ipsum sections, and a bibliography
+fired mid-document — the user's actual paper was buried at the very end.
+
+**Fix (`src/docbuilder/converter.py`):**
+- `_rewrite_main` now strips the template's placeholder `\input{sections/...}`
+  and `\input{references/...}` lines, splices the converted section inputs in
+  **just before** the `\bibliography`/`\bibliographystyle` line (falling back to
+  end-of-body if absent), and substitutes the manifest title into `\title{...}`
+  (LaTeX-escaped). New signature takes a `title` parameter; call site passes
+  `manifest.title`.
+- `_copy_template` now deletes the placeholder `sections/*.tex` files after
+  copying, so a stale `\input{}` can never silently pull Lorem ipsum.
+
+**Tests:** added `tests/test_converter.py` — verifies no placeholder inputs
+remain, each slug appears once in `order`, sections precede `\bibliography`,
+title is substituted and escaped, the no-bibliography fallback, and that
+`_copy_template` drops placeholder section files. No LaTeX toolchain required.
+
+**Note:** Python/pytest execution was blocked by the permission gate this
+session; run `uv run --group dev pytest tests/test_converter.py` to verify.

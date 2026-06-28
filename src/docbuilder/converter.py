@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from dataclasses import dataclass
 from datetime import datetime
@@ -111,9 +112,15 @@ def rebuild_pdf(document_id: str) -> DocumentManifest:
 
 
 def _copy_template(template_dir: Path, destination: Path) -> None:
-    import shutil
-
     shutil.copytree(template_dir, destination)
+
+    # Drop the placeholder Lorem-ipsum section files so a stale \input{} can never
+    # silently pull template boilerplate into the compiled PDF. The converter writes
+    # fresh section files for the actual manuscript under sections/.
+    placeholder_sections = destination / "sections"
+    if placeholder_sections.is_dir():
+        for tex in placeholder_sections.glob("*.tex"):
+            tex.unlink()
 
 
 def _build_from_docx(*, docx_path: Document, source_path: Path, workspace: Path, template_name: str, template_workspace: Path) -> DocumentManifest:
@@ -225,7 +232,7 @@ def _build_from_docx(*, docx_path: Document, source_path: Path, workspace: Path,
     (references_dir / "references.bib").write_text(bib_content)
     manifest.references_warning = references_warning
 
-    _rewrite_main(template_workspace, manifest.sections)
+    _rewrite_main(template_workspace, manifest.sections, title=manifest.title)
 
     return manifest
 
@@ -306,7 +313,19 @@ def _latex_figure_block(image_path: Path, caption: str | None) -> str:
     return "".join(latex)
 
 
-def _rewrite_main(template_workspace: Path, sections: list[SectionEntry]) -> None:
+_SECTION_INPUT_RE = re.compile(r"^\s*\\input\{(?:sections|references)/[^}]*\}\s*$")
+_TITLE_RE = re.compile(r"\\title\{[^}]*\}")
+_BIB_RE = re.compile(r"^\s*\\bibliography(style)?\{")
+
+
+def _rewrite_main(template_workspace: Path, sections: list[SectionEntry], *, title: str | None = None) -> None:
+    """Rewrite main.tex so the compiled PDF holds only the user's content.
+
+    The template body carries placeholder ``\\input{sections/...}`` lines (Lorem
+    ipsum) and a placeholder ``\\title``. We strip those section calls, splice the
+    converted section inputs in just before the bibliography, and substitute the
+    real manuscript title — otherwise the PDF would lead with boilerplate.
+    """
     main_tex = template_workspace / "main.tex"
     if not main_tex.exists():
         return
@@ -322,18 +341,46 @@ def _rewrite_main(template_workspace: Path, sections: list[SectionEntry]) -> Non
         body = after
         tail = ""
 
-    section_inputs = ["% Auto-generated sections\n"]
+    # Substitute the real title (templates put \title after \begin{document}, but
+    # cover both halves to be safe).
+    if title:
+        latex_title = text_to_latex(title)
+        replacement = f"\\title{{{latex_title}}}"
+        before = _TITLE_RE.sub(lambda _m: replacement, before)
+        body = _TITLE_RE.sub(lambda _m: replacement, body)
+
+    # Drop the template's placeholder section/reference \input lines.
+    cleaned_lines = [
+        line for line in body.splitlines(keepends=True)
+        if not _SECTION_INPUT_RE.match(line)
+    ]
+
+    section_inputs = ["% ---- Auto-generated sections ----\n"]
     for entry in sorted(sections, key=lambda s: s.order):
         section_inputs.append(f"\\input{{sections/{entry.slug}}}\n")
+    section_inputs.append("% ---- End auto-generated sections ----\n")
+    section_block = "".join(section_inputs)
+
+    # Splice the user's sections in just before the bibliography so the body comes
+    # before the references; fall back to appending at the end of the body.
+    bib_index = next(
+        (i for i, line in enumerate(cleaned_lines) if _BIB_RE.match(line)),
+        None,
+    )
+    if bib_index is None:
+        rebuilt_body = "".join(cleaned_lines).rstrip("\n") + "\n" + section_block
+    else:
+        rebuilt_body = (
+            "".join(cleaned_lines[:bib_index])
+            + section_block
+            + "".join(cleaned_lines[bib_index:])
+        )
 
     rebuilt = (
         before
-        + "\\begin{document}\n"
-        + body
-        + "\n"
-        + "".join(section_inputs)
-        + "% ---- End auto-generated sections ----\n"
-        + "\\end{document}\n"
+        + "\\begin{document}"
+        + rebuilt_body
+        + "\\end{document}"
         + tail
     )
     main_tex.write_text(rebuilt)
