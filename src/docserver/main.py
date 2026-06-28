@@ -75,13 +75,18 @@ def critic_providers():
 def run_critique(document_id: str, refresh: bool = False):
     try:
         return critique_document(document_id, refresh=refresh)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Document not found")
 
 
 @app.get("/documents/{document_id}/critique", response_model=CritiqueResult)
 def get_critique(document_id: str):
-    cached = load_cached(document_id)
+    try:
+        cached = load_cached(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     if cached is None:
         raise HTTPException(status_code=404, detail="No critique yet; run one first")
     return cached
@@ -112,6 +117,8 @@ def get_documents():
 def get_document(document_id: str):
     try:
         return load_document(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Document not found")
 
@@ -120,6 +127,8 @@ def get_document(document_id: str):
 def remove_document(document_id: str):
     try:
         delete_document(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Document not found")
     return {"status": "deleted", "document_id": document_id}
@@ -213,6 +222,8 @@ def get_pdf(document_id: str):
 def get_archive(document_id: str):
     try:
         manifest = load_document(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Document not found")
     workspace = DOCUMENTS_ROOT / document_id / manifest.template

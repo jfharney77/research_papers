@@ -7,7 +7,7 @@ import logging
 from collections import Counter
 from pathlib import Path
 
-from docbuilder.config import DOCUMENTS_ROOT
+from docbuilder.config import DOCUMENTS_ROOT, validate_document_id
 
 from .config import RUBRIC
 from .heuristics import compute_heuristics
@@ -86,6 +86,7 @@ def _build_result(
 # --- Workspace documents -----------------------------------------------------
 
 def _critique_path(document_id: str) -> Path:
+    validate_document_id(document_id)
     return DOCUMENTS_ROOT / document_id / "critique.json"
 
 
@@ -99,6 +100,7 @@ def load_cached(document_id: str) -> CritiqueResult | None:
 def critique_document(
     document_id: str, *, provider: CritiqueProvider | None = None, refresh: bool = False
 ) -> CritiqueResult:
+    validate_document_id(document_id)
     workspace = DOCUMENTS_ROOT / document_id
     manifest_path = workspace / "manifest.json"
     if not manifest_path.exists():

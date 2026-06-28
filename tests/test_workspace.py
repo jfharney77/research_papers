@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from docserver import storage
 from docserver.main import app
-from docserver.storage import safe_upload_name, zip_directory
+from docserver.storage import _validate_document_id, safe_upload_name, zip_directory
 
 client = TestClient(app)
 
@@ -99,6 +99,52 @@ def test_archive_missing_document_returns_404():
 
 def test_update_section_missing_document_returns_404():
     res = client.put("/documents/does-not-exist/sections/intro", json={"content": "hi"})
+    assert res.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# _validate_document_id — path traversal hardening for URL-derived ids
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("good", ["my-paper", "doc_1", "Paper2024", "a", "my_paper_2024"])
+def test_validate_document_id_accepts_legitimate(good):
+    _validate_document_id(good)  # should not raise
+
+
+@pytest.mark.parametrize(
+    "bad",
+    ["..", "../etc", "a/b", "", "/etc", "%2E%2E", "foo.bar", "a\\b", "with space", "nested/path"],
+)
+def test_validate_document_id_rejects_traversal(bad):
+    with pytest.raises(ValueError):
+        _validate_document_id(bad)
+
+
+# ---------------------------------------------------------------------------
+# Destructive / read endpoints reject traversal ids with 400 (not 200/404/500)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("bad_id", ["..", "../etc", "%2E%2E", "foo.bar"])
+def test_delete_document_rejects_traversal(bad_id):
+    res = client.delete(f"/documents/{bad_id}")
+    assert res.status_code == 400
+
+
+@pytest.mark.parametrize("bad_id", ["..", "../etc", "%2E%2E", "foo.bar"])
+def test_get_document_rejects_traversal(bad_id):
+    res = client.get(f"/documents/{bad_id}")
+    assert res.status_code == 400
+
+
+@pytest.mark.parametrize("bad_id", ["..", "../etc", "%2E%2E", "foo.bar"])
+def test_get_archive_rejects_traversal(bad_id):
+    res = client.get(f"/documents/{bad_id}/archive")
+    assert res.status_code == 400
+
+
+def test_delete_legitimate_missing_document_returns_404():
+    # A well-formed but non-existent id must still report "not found", not 400.
+    res = client.delete("/documents/nonexistent-doc")
     assert res.status_code == 404
 
 

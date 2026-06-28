@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -9,6 +10,24 @@ SCRIPT_ROOT = REPO_ROOT / "script" / "latex"
 DOCUMENTS_ROOT = REPO_ROOT / "documents"
 
 DEFAULT_TEMPLATE = "ieee"
+
+
+# --- Document-id validation --------------------------------------------------
+# document_id arrives from URL path parameters and is joined directly to
+# DOCUMENTS_ROOT. A strict allowlist stops path traversal (``..``, separators,
+# absolute prefixes) before any filesystem operation can escape the root.
+# Legitimate ids are produced by ``snake_case(stem)`` in the converter, so they
+# only ever contain letters, digits, and underscores.
+_SAFE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def validate_document_id(document_id: str) -> None:
+    """Raise ValueError if document_id could traverse outside DOCUMENTS_ROOT."""
+    if not document_id or not _SAFE_ID.match(document_id):
+        raise ValueError(
+            f"Invalid document_id {document_id!r}: "
+            "must be non-empty and contain only letters, digits, hyphens, or underscores."
+        )
 
 
 def _int_env(name: str, default: int) -> int:
@@ -37,6 +56,7 @@ __all__ = [
     "SCRIPT_ROOT",
     "DOCUMENTS_ROOT",
     "DEFAULT_TEMPLATE",
+    "validate_document_id",
     "LATEX_SANDBOX",
     "LATEX_DOCKER_IMAGE",
     "LATEX_BUILD_TIMEOUT",

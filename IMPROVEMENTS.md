@@ -94,3 +94,37 @@ title is substituted and escaped, the no-bibliography fallback, and that
 
 **Note:** Python/pytest execution was blocked by the permission gate this
 session; run `uv run --group dev pytest tests/test_converter.py` to verify.
+
+## document_id path-traversal hardening (CRITIQUE_SPEC_4.md)
+
+**Problem:** `document_id` arrives from URL path parameters and was joined
+directly to `DOCUMENTS_ROOT` with no validation. `DELETE /documents/..`
+resolved to the repo root (`DOCUMENTS_ROOT / ".."`), `target.exists()` returned
+`True`, and `shutil.rmtree` would have deleted the entire project. The same
+unsanitised id reached `load_document`, the archive/critique paths, and
+`_critique_path` (which could write `critique.json` above the documents root).
+`safe_upload_name` already guarded uploaded filenames, but URL-derived ids were
+never covered.
+
+**Fix:**
+- Added `validate_document_id(document_id)` in `src/docbuilder/config.py` (next
+  to `DOCUMENTS_ROOT`) — a strict allowlist `^[A-Za-z0-9_-]+$` that raises
+  `ValueError` on `..`, separators, absolute prefixes, or empty ids. It lives in
+  `docbuilder` to avoid a circular import (`docserver.main` imports
+  `critic.pipeline`). `snake_case`-derived ids all pass, so it is backward
+  compatible.
+- `src/docserver/storage.py` re-exports it as `_validate_document_id` and calls
+  it first in `load_document` and `delete_document`.
+- `src/critic/pipeline.py` calls `validate_document_id` at the top of
+  `_critique_path` and `critique_document`.
+- `src/docserver/main.py` now maps `ValueError` to HTTP 400 (not 404/500) in
+  `get_document`, `remove_document`, `get_archive`, `run_critique`, and
+  `get_critique`, so traversal attempts are surfaced rather than masked.
+
+**Tests (`tests/test_workspace.py`):** unit coverage for the validator
+allowlist boundary, plus parametrized API tests asserting `DELETE`/`GET
+/documents/{id}` and `/documents/{id}/archive` return 400 for `..`, `../etc`,
+`%2E%2E`, `foo.bar`, while a well-formed missing id still returns 404.
+
+**Note:** pytest execution was blocked by the permission gate this session; run
+`uv run --group dev pytest tests/test_workspace.py` to verify.

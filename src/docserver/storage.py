@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
-from docbuilder.config import DOCUMENTS_ROOT
+from docbuilder.config import DOCUMENTS_ROOT, validate_document_id
 from docbuilder.converter import ConversionOptions, convert_document
 
 from .schemas import DocumentResponse, read_manifest
@@ -36,7 +36,13 @@ def safe_upload_name(filename: str | None) -> str:
     return name
 
 
+# Re-exported under the storage namespace so callers (and tests) can validate a
+# document_id at the storage boundary; canonical definition lives in docbuilder.config.
+_validate_document_id = validate_document_id
+
+
 def load_document(document_id: str) -> DocumentResponse:
+    _validate_document_id(document_id)
     manifest_path = DOCUMENTS_ROOT / document_id / "manifest.json"
     if not manifest_path.exists():
         raise FileNotFoundError(f"document {document_id} not found")
@@ -73,6 +79,7 @@ def zip_directory(root: Path) -> bytes:
 
 
 def delete_document(document_id: str) -> None:
+    _validate_document_id(document_id)
     target = DOCUMENTS_ROOT / document_id
     if not target.exists():
         raise FileNotFoundError(f"document {document_id} not found")
