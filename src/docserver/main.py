@@ -256,3 +256,22 @@ def get_word(document_id: str):
     if not docx_path.exists():
         raise HTTPException(status_code=404, detail="Original docx missing")
     return FileResponse(docx_path)
+
+
+# --- Path-traversal fallback -------------------------------------------------
+# A document_id arrives as a URL path parameter and is rejected with 400 by the
+# per-endpoint validation when it reaches a handler (e.g. "%2E%2E", "foo.bar").
+# But a literal ".." segment never reaches those handlers: HTTP clients (httpx,
+# browsers, curl --path-as-is excepted) collapse dot-segments per RFC 3986 §5.2.4
+# *before* sending, so "/documents/.." is rewritten to "/" and "/documents/../etc"
+# to "/etc". Those rewritten targets match no declared route and would otherwise
+# 404 — silently masking the traversal attempt. This catch-all, registered last
+# so every real route takes precedence, turns any unrouteable request into an
+# explicit 400 so traversal ids are reported as bad requests, not "not found".
+@app.api_route(
+    "/{_unrouteable:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    include_in_schema=False,
+)
+def reject_unrouteable_path(_unrouteable: str):
+    raise HTTPException(status_code=400, detail="Invalid request path")
