@@ -45,9 +45,22 @@ cd simulation_research
 uv sync --group dev
 uv run --group dev pytest                 # 22 tests
 uv run python examples/make_synthetic_panel.py
-uv run python examples/calibsoc_demo.py   # freeze manifest → simulate 3 conditions → score
-uv run python examples/divprobe_demo.py   # collapse baseline vs re-injection intervention
+uv run python examples/calibsoc_demo.py       # synthetic panel: freeze manifest → simulate → score
+uv run python examples/calibsoc_gss_demo.py   # REAL DATA: GSS 2016-2020 panel (auto-downloads ~12MB)
+uv run python examples/divprobe_demo.py       # collapse baseline vs re-injection intervention
 ```
+
+### Real data: GSS 2016–2020 panel
+
+`simsuite/calibsoc/gss.py` ingests NORC's public GSS panel release (2016/2018 respondents
+re-interviewed in 2020; no registration needed) into the PanelStore format: 1,823 respondents
+with both-wave responses on an 8-instrument battery (polviews, eqwlth, attend, natfare, trust,
+happy, cappun, grass) plus demographic personas (age, sex, race, degree, partyid). Measured
+human stability ceilings range from **0.52 (happy)** to **0.87 (polviews)** — real numbers that
+replace the synthetic ones as normalization denominators. Caveat: the 2–4-year wave gap
+measures attitude *stability*, not the 2-week test-retest reliability Park et al. 2024 used, so
+these ceilings are lower and normalized accuracy is correspondingly generous. ANES panel data
+would sharpen this but requires registered download; the ingest module is the template.
 
 The CalibSoc demo reproduces, in miniature, the headline pattern of Park et al. 2024: a
 rich-persona simulator clears the human test-retest ceiling (normalized ≈ 1.04) while a
@@ -58,8 +71,8 @@ to ~2 effective voices with high structural coupling, and interview-persona re-i
 
 ## Next steps (in spec order)
 
-1. **Real data**: swap `examples/make_synthetic_panel.py` for GSS/ANES panel extracts melted
-   into the same long format (`person_id, wave, instrument, response, …persona cols`).
+1. ~~**Real data**~~: done — GSS 2016–2020 panel wired in (`simsuite/calibsoc/gss.py`). ANES
+   re-interviews (registered download) remain the path to a true short-gap ceiling.
 2. **Real models**: `pip install litellm`, pass `LiteLLMProvider()` to `ModelClient`, and rerun
    the demo grid — this is the Weeks 4–6 baseline experiment from the Project 1 spec.
 3. **Project 2 (AsymBench)**: the belief-probe/information-ledger design plugs into the same

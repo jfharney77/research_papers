@@ -1,0 +1,67 @@
+name: gss-2016-2020-panel-battery
+instruments:
+- name: polviews
+  kind: continuous
+  options: []
+  lo: 1.0
+  hi: 7.0
+- name: eqwlth
+  kind: continuous
+  options: []
+  lo: 1.0
+  hi: 7.0
+- name: attend
+  kind: continuous
+  options: []
+  lo: 0.0
+  hi: 8.0
+- name: natfare
+  kind: categorical
+  options:
+  - too_little
+  - about_right
+  - too_much
+  lo: null
+  hi: null
+- name: trust
+  kind: categorical
+  options:
+  - can_trust
+  - cannot_be_too_careful
+  - depends
+  lo: null
+  hi: null
+- name: happy
+  kind: categorical
+  options:
+  - very_happy
+  - pretty_happy
+  - not_too_happy
+  lo: null
+  hi: null
+- name: cappun
+  kind: categorical
+  options:
+  - favor
+  - oppose
+  lo: null
+  hi: null
+- name: grass
+  kind: categorical
+  options:
+  - legal
+  - not_legal
+  lo: null
+  hi: null
+treatments: []
+sample_size: 1823
+persona_condition: demographic
+subgroup_fields:
+- race
+- partyid
+exclusion_rules:
+- respondents missing both wave responses are dropped per instrument
+metrics:
+- individual
+- marginal
+- treatment_effect
