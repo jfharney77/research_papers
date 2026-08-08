@@ -1,0 +1,7 @@
+.venv/
+data/traces/
+__pycache__/
+*.egg-info/
+uv.lock
+data/
+*.frozen.json

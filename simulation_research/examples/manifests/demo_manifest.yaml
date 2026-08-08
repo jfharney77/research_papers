@@ -1,0 +1,26 @@
+name: demo-gss-like-battery
+sample_size: 300
+persona_condition: rich
+subgroup_fields: [ideology, race]
+exclusion_rules:
+  - "drop personas with missing ideology"
+metrics: [individual, marginal, treatment_effect]
+instruments:
+  - name: gov_should_reduce_inequality
+    kind: categorical
+    options: [strongly_agree, agree, neutral, disagree, strongly_disagree]
+  - name: trust_in_science_0_10
+    kind: continuous
+    lo: 0
+    hi: 10
+  - name: dictator_game_share
+    kind: continuous
+    lo: 0
+    hi: 1
+treatments:
+  - name: framing_effect
+    instrument: dictator_game_share
+    treatment_field: framing
+    control_value: neutral
+    treatment_value: charity
+    known_effect: 0.12
