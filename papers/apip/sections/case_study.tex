@@ -1,0 +1,86 @@
+% =============================================================================
+% Section 6 -- Illustrative Case Study: Aria at RetailCo
+% =============================================================================
+\section{Illustrative Case Study: Aria at RetailCo}
+\label{sec:case-study}
+
+We illustrate the APIP framework through a hypothetical scenario grounded in
+realistic deployment conditions. RetailCo is a mid-sized e-commerce retailer
+that deployed a customer service agent, Aria, to handle order status inquiries,
+return requests, and billing disputes. Aria was built on a large language model
+with a RAG pipeline indexing RetailCo's product catalog, returns policy, and
+billing FAQ documents. At deployment, Aria achieved a task completion rate of
+87\% and a CSAT score of 4.3 out of 5.0. All numerical values in this
+section---performance thresholds, check-in days, observed metric
+movements---are illustrative parameter choices rather than empirical
+measurements, selected to be consistent with the simulation in
+Section~\ref{sec:simulation}.
+
+\subsection{The Degradation Event}
+\label{subsec:degradation-event}
+
+Ninety days post-deployment, RetailCo's customer support team began noticing an
+increase in escalation requests from customers who had interacted with Aria. An
+informal audit revealed that Aria was consistently citing an outdated version
+of the returns policy---specifically, citing a 30-day return window that had
+been extended to 45 days in a policy update three weeks prior. Additionally, a
+new product line launched six weeks post-deployment was producing a high rate
+of ``I don't have information about that product'' responses, reflecting a RAG
+index that had not been refreshed.
+
+In the absence of a formal APIP process, the response was: a developer updated
+the system prompt to include the new return window figure (a Tier 1
+intervention applied to a Tier 2 problem), and a ticket was filed to update the
+RAG index. The system prompt change was deployed without a regression test,
+inadvertently overriding a constraint that prevented Aria from offering
+unsolicited discounts. Over the following week, discount offer rates tripled,
+producing a measurable revenue impact before the issue was detected.
+
+\subsection{APIP Application}
+\label{subsec:apip-application}
+
+Under the APIP framework, the scenario unfolds differently. RetailCo's
+behavioral contract for Aria specifies trigger conditions including: task
+completion rate below 82\% (7-day rolling), CSAT below 3.8 (7-day rolling), and
+policy citation error rate above 5\% (measured via weekly human review sample of
+50 conversations). The policy citation error rate trigger fires at week 10.
+
+Phase 2 cause attribution identifies the failure as behavioral drift: the RAG
+index is stale relative to the current policy and product catalog. The failure
+is not attributable to model capability, prompt constraints, or tool
+configuration. The cause attribution report notes that the system prompt
+intervention applied in the ad-hoc scenario was a misclassification of failure
+mode.
+
+Phase 3 intervention planning selects Tier 2: RAG index refresh for the returns
+policy document and product catalog additions. The intervention plan specifies
+a regression test suite to be run before re-deployment, including coverage of
+the discount constraint behavior.
+
+A 14-day remediation window is opened with check-ins at days 4, 7, and 11.
+Following Kirkpatrick's framework, the day 4 check-in evaluates at multiple
+levels: Level 2 (does Aria now cite the correct policy?), Level 3 (has the
+pattern of escalation-triggering responses changed?), and Level 4 (is CSAT
+recovering?). The policy citation error rate has dropped to below 2\% following
+the index refresh. At day 14, the exit evaluation confirms resolution: task
+completion has returned to 86\%, CSAT to 4.2, and policy citation errors to
+1.5\%. The APIP is closed with outcome: \texttt{resolved}. The full APIP
+record---cause attribution report, intervention specification, regression test
+results, Kirkpatrick-level check-in assessments, and metric snapshots---is
+stored in RetailCo's AI audit trail.
+
+\subsection{Lessons from the Case Study}
+\label{subsec:lessons}
+
+The case study illustrates several key properties of the APIP framework. First,
+the discipline of cause attribution prevents tier mismatch---applying the
+correct intervention tier is as important as applying any intervention. Second,
+the behavioral contract formalizes the trigger, making it objective and
+consistently applied rather than dependent on informal noticing. Third, the
+documented APIP record creates organizational memory: when Aria's RAG index
+next requires refreshing, the prior APIP provides a template for the
+intervention and a baseline for exit criteria. Fourth, the regression test
+requirement embedded in the intervention plan prevents the cascading failure
+that occurred in the ad-hoc scenario. Fifth, the Kirkpatrick-level evaluation
+at check-ins provides confidence that recovery is durable rather than
+superficial.

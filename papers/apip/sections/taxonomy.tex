@@ -1,0 +1,109 @@
+% =============================================================================
+% Section 3 -- A Taxonomy of Agent Failure Modes
+% Contains Table 1 (tab:taxonomy), a single-column table.
+% =============================================================================
+\section{A Taxonomy of Agent Failure Modes}
+\label{sec:taxonomy}
+
+A critical prerequisite to structured remediation is structured cause-finding.
+We propose a four-category taxonomy of agent failure modes relevant to
+customer-facing agents. These categories are not mutually exclusive, but they
+suggest distinct remediation pathways, which is the operationally important
+property for APIP design. Following Kirkpatrick's~\cite{kirkpatrick1994evaluating}
+insight that evaluation should be hierarchical, we note that each failure mode
+category corresponds to a different level of the agent's behavioral stack, and
+consequently to a different intervention tier.
+
+\begin{table}[t]
+  \centering
+  \caption{Agent failure mode taxonomy with Kirkpatrick level mapping and
+           remediation tier.}
+  \label{tab:taxonomy}
+  \footnotesize
+  \begin{tabular}{@{}L{1.4cm}L{3.6cm}L{2.1cm}@{}}
+    \toprule
+    \textbf{Failure Mode} & \textbf{Description \& Signals} &
+    \textbf{Remediation Tier} \\
+    \midrule
+    Behavioral Drift &
+    Gradual degradation as world-state diverges from training or retrieval
+    context. Signals: rising hallucination rate on new entities, outdated
+    policy citations, product terminology mismatches. Kirkpatrick Level 4
+    (Results) failure. &
+    Tier 2: Retrieval / RAG update \\
+    \addlinespace
+    Input Brittleness &
+    Strong performance on modal inputs, catastrophic failure on a specific
+    subclass. Signals: bimodal CSAT distribution, failure clustering around
+    user segment or topic. Kirkpatrick Level 2 (Learning/Capability) failure. &
+    Tier 1 (examples) or Tier 3 (fine-tune) \\
+    \addlinespace
+    Alignment Creep &
+    Subtle drift in tone, value expression, or policy compliance. Signals:
+    escalating human review flags, regulatory keyword triggers, brand
+    guidelines violations. Kirkpatrick Level 3 (Behavior) failure. &
+    Tier 1: Prompt constraint injection \\
+    \addlinespace
+    Tool Misuse &
+    Correct intent identification with incorrect tool invocation. Signals:
+    action errors, silent failures in downstream integrations, over- or
+    under-use of tool surface. Kirkpatrick Level 3 (Behavior) failure. &
+    Tier 1 (prompt) or Tier 3 (fine-tune) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Behavioral Drift} is perhaps the most common failure mode in production
+deployments. A customer service agent trained or prompted against a product
+catalog from six months ago will increasingly produce incorrect citations as
+the catalog evolves. This is not a model capability failure---it is a retrieval
+or context freshness failure, and its remediation pathway is correspondingly
+different from fine-tuning. In Kirkpatrick's terms, this is a Level 4 failure:
+the agent's learned behavior has not changed, but the organizational results
+are degrading because the environment has shifted.
+
+\textbf{Input Brittleness} is particularly pernicious because aggregate metrics
+mask it. An agent with 85\% task success overall may be failing catastrophically
+on the 8\% of requests that involve a particular billing scenario or a
+non-native-English speaker segment. Without disaggregated evaluation, the APIP
+trigger will not fire until overall performance has substantially degraded.
+This maps to a Kirkpatrick Level 2 failure: the agent lacks the capability
+(learning) to handle a specific input class, even though its general capability
+is adequate.
+
+\textbf{Alignment Creep} covers the class of failures in which the agent's
+behavior drifts from the intended value envelope---not necessarily producing
+factually incorrect outputs, but producing outputs that are off-brand, subtly
+non-compliant, or misaligned with the organization's customer communication
+policies. Hendrycks et al.~\cite{hendrycks2021values} characterize this class
+of failure as value misalignment, distinct from capability failure, and argue
+it requires distinct detection and remediation mechanisms. In Kirkpatrick's
+terms, this is a Level 3 failure: the agent's behavior has changed in ways that
+do not serve the organizational goals, even though its underlying capability
+has not degraded.
+
+\textbf{Tool Misuse} is increasingly relevant as agentic systems are given
+access to action surfaces: ticket creation, refund processing, escalation
+routing, and external API calls. An agent that correctly identifies user intent
+but invokes the wrong tool, invokes a tool with incorrect parameters, or fails
+to invoke a necessary tool produces a qualitatively different class of failure
+than a purely conversational agent---one with potentially significant downstream
+consequences.
+
+A fifth category, \textbf{Adversarial Subversion}, captures failures whose
+proximate cause is an adaptive attack rather than capability or value drift.
+Recent work demonstrates that frontier models can embed prompt injections in
+their outputs that consistently evade diverse monitors, and that
+resampling-based protocols can amplify rather than suppress such
+injections~\cite{schoen2025stress,bhatt2025ctrlz}. We treat adversarial
+subversion as a separate category because its remediation pathway diverges from
+the other four: prompt revision, retrieval refresh, and fine-tuning each address
+symptoms but not the underlying adversarial dynamic. Effective response requires
+architectural changes---monitor diversification, defer-to-trusted protocols, or
+reduced action authority---drawn from the AI Control literature (discussed in
+Section~\ref{subsec:ai-control}). The APIP schema accommodates this category
+through the \texttt{adversarial\_subversion} \texttt{failure\_mode} value, with
+cause attribution requirements that include monitor-output forensics in addition
+to the standard disaggregated performance analysis. A full treatment of this
+category is beyond the scope of this paper; we flag it here to delimit APIP's
+primary scope and to invite integration with control-protocol research.

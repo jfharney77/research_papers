@@ -1,0 +1,84 @@
+% =============================================================================
+% Your Agent is Underperforming: The Case for Agent Performance Improvement Plans
+%
+% Source: research/apip/APIP_Paper_v8_tracked.docx (tracked changes accepted)
+% Style:  IEEE conference template (ieee_agc/latex) + IEEEtran BibTeX
+%         style (ieee_agc/bibtex)
+%
+% Compilation:
+%   pdflatex main.tex
+%   bibtex   main
+%   pdflatex main.tex
+%   pdflatex main.tex
+%
+% Structure:
+%   main.tex                     -- root document (this file)
+%   sections/abstract.tex        -- abstract + index terms
+%   sections/introduction.tex    -- Sec. 1
+%   sections/background.tex      -- Sec. 2
+%   sections/taxonomy.tex        -- Sec. 3
+%   sections/framework.tex       -- Sec. 4
+%   sections/schema.tex          -- Sec. 5
+%   sections/case_study.tex      -- Sec. 6
+%   sections/simulation.tex      -- Sec. 7
+%   sections/open_problems.tex   -- Sec. 8
+%   sections/conclusion.tex      -- Sec. 9
+%   references.bib               -- bibliography entries
+% =============================================================================
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% ---------------- Packages ----------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+
+% Fixed-width paragraph cells for the taxonomy/schema/simulation tables:
+% L = ragged-right, C = centred (lets long numeric headers wrap).
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+% ---------------- Title block ----------------
+\title{Your Agent is Underperforming:\\
+The Case for Agent Performance Improvement Plans}
+
+% Double-blind submission: author information withheld per review guidelines.
+% Replace the block below with \IEEEauthorblockN / \IEEEauthorblockA entries
+% for the camera-ready version.
+\author{\IEEEauthorblockN{Anonymous Submission}
+\IEEEauthorblockA{\textit{Author information withheld per review guidelines}}}
+
+\maketitle
+
+% ---------------- Abstract ----------------
+\input{sections/abstract}
+
+% ---------------- Body sections ----------------
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/taxonomy}
+\input{sections/framework}
+\input{sections/schema}
+\input{sections/case_study}
+\input{sections/simulation}
+\input{sections/open_problems}
+\input{sections/conclusion}
+
+% ---------------- References ----------------
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,147 @@
+% =============================================================================
+% Section 4 -- The APIP Framework
+% Contains Figure 1 (fig:lifecycle), drawn with a plain tabular so that no
+% additional LaTeX packages (tikz, etc.) are required.
+% =============================================================================
+\section{The APIP Framework}
+\label{sec:framework}
+
+We now describe the APIP as a structured lifecycle protocol. The framework
+consists of five phases: Trigger, Cause Attribution, Intervention Planning,
+Remediation Window, and Exit Evaluation. Fig.~\ref{fig:lifecycle} illustrates
+the lifecycle; each phase is described in detail below.
+
+\begin{figure}[t]
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{@{}|c|c|c|@{}}
+    \hline
+    \multicolumn{3}{|c|}{1. Trigger} \\
+    \hline
+    \multicolumn{3}{|c|}{$\downarrow$} \\
+    \multicolumn{3}{|c|}{2. Cause Attribution} \\
+    \hline
+    \multicolumn{3}{|c|}{$\downarrow$} \\
+    \multicolumn{3}{|c|}{3. Intervention Plan} \\
+    \hline
+    \multicolumn{3}{|c|}{$\downarrow$} \\
+    \multicolumn{3}{|c|}{4. Remediation Window} \\
+    \hline
+    \multicolumn{3}{|c|}{$\downarrow$} \\
+    \multicolumn{3}{|c|}{5. Exit Evaluation} \\
+    \hline
+  \end{tabular}
+  \caption{The five-phase APIP lifecycle.}
+  \label{fig:lifecycle}
+\end{figure}
+
+\subsection{Phase 1: Trigger}
+\label{subsec:trigger}
+
+An APIP is initiated when an agent's performance crosses a pre-specified
+trigger threshold on one or more monitored metrics. This presupposes the
+existence of a \emph{behavioral contract}---a formal specification of the
+performance envelope the agent is expected to maintain at deployment time. The
+behavioral contract is a deliberate design artifact that most teams currently
+skip, delegating performance expectations to informal organizational memory.
+
+A minimal behavioral contract specifies task surface, success metrics and
+measurement methodology, acceptable performance ranges, escalation policy, and
+human review integration points. Trigger conditions are threshold crossings on
+these metrics---e.g., task completion rate below 82\% over a 7-day window.
+
+Two trigger modalities are relevant: absolute threshold triggers, which fire
+when a metric crosses a fixed floor, and relative drift triggers, which fire
+when a metric declines significantly from its recent baseline regardless of
+absolute level. Both are necessary; the former catches severe degradation, the
+latter catches gradual drift that may not breach an absolute floor for some
+time.
+
+\subsection{Phase 2: Cause Attribution}
+\label{subsec:cause-attribution}
+
+Once triggered, the APIP requires a structured cause attribution process before
+any intervention is applied. The goal is to identify which failure mode
+category (Section~\ref{sec:taxonomy}) best explains the degradation before any
+intervention is applied. Tier mismatch from misdiagnosis is the primary source
+of avoidable regression: prompt engineering applied to a retrieval freshness
+problem, for instance, consumes engineering cycles with no improvement.
+
+The cause attribution process should include: (1) disaggregated performance
+analysis by input category, user segment, and topic cluster to isolate failure
+locus; (2) review of a sampled set of failure cases by a qualified human
+reviewer; (3) retrieval audit if behavioral drift is suspected; (4) tool
+invocation log analysis if tool misuse is suspected; and (5) a structured
+classification of the failure into the four-category taxonomy. The output of
+this phase is a written cause attribution report that becomes part of the APIP
+record.
+
+\subsection{Phase 3: Intervention Planning and the Tier Model}
+\label{subsec:tiers}
+
+Interventions are organized into three tiers of increasing cost, disruption,
+and required lead time. The cause attribution output selects the appropriate
+starting tier; escalation to higher tiers is permitted if lower tiers prove
+insufficient within the remediation window.
+
+\textbf{Tier 1 --- Prompt-Level Interventions.} Prompt-level interventions
+modify the system prompt, few-shot examples, or instruction set: constraint
+injection, persona adjustment, example replacement, context restructuring.
+Tier 1 is fastest to implement, least disruptive, and easiest to roll back. It
+is the appropriate first response to alignment creep and many instances of
+input brittleness.
+
+\textbf{Tier 2 --- Retrieval and Context Interventions.} Tier 2 interventions
+modify the agent's information environment: updating RAG indices, revising
+knowledge bases, modifying tool schemas, adjusting context injection pipelines.
+They address behavioral drift caused by world-state divergence and tool misuse
+from stale tool descriptions. They carry moderate cost and require contract
+validation before re-deployment.
+
+\textbf{Tier 3 --- Model-Level Interventions.} Tier 3 interventions modify the
+underlying model: fine-tuning, DPO, or replacement. These carry the highest
+cost and regression risk. They are warranted when lower tiers are exhausted,
+when the failure mode is embedded in model weights, or when the overall
+performance profile cannot be returned to contract range through prompting or
+retrieval adjustments.
+
+\subsection{Phase 4: Remediation Window and Check-In Cadence}
+\label{subsec:window}
+
+The remediation window is a bounded time period during which the APIP
+interventions are implemented and their effects are evaluated. A defined window
+serves two functions: it creates urgency for the remediation process, and it
+provides a structured decision point at which the APIP outcome is formally
+evaluated. The duration of the window should be calibrated to the intervention
+tier---Tier 1 interventions may warrant a 7--14 day window, while Tier 3
+interventions may require 30--60 days to implement, validate, and stabilize.
+This mirrors the organizational PIP practice, where durations typically range
+from 30 to 90 days, calibrated to the complexity of the performance
+gap~\cite{kirkpatrick2016four}.
+
+Check-ins are scheduled evaluation points within the window at which the
+agent's performance on APIP-relevant metrics is reviewed against the recovery
+trajectory. Following Kirkpatrick's~\cite{kirkpatrick1994evaluating}
+hierarchical evaluation principle, each check-in should assess improvement at
+multiple levels: immediate output quality (Level 1/2), behavioral pattern
+change on the failure-mode class (Level 3), and business outcome metrics
+(Level 4). An intervention that improves surface metrics without producing
+Level 3/4 improvement should be flagged as potentially superficial. Check-ins
+are early warning mechanisms: no improvement at the first check-in triggers
+tier escalation rather than waiting for window expiry. A recommended cadence is
+three check-ins at 25\%, 50\%, and 75\% of elapsed time.
+
+\subsection{Phase 5: Exit Evaluation}
+\label{subsec:exit}
+
+At the close of the remediation window, a formal exit evaluation determines one
+of three outcomes: \emph{Resolution} (the agent has returned to within the
+behavioral contract envelope and the APIP is closed), \emph{Extension} (the
+agent shows improvement but has not yet reached the threshold; the APIP window
+is extended with modified parameters), or \emph{Escalation} (the agent has not
+recovered and more fundamental intervention---including potential model
+replacement or agent retirement---is warranted). The evaluation record becomes
+part of the organizational AI audit trail---providing governance documentation
+and institutional memory for future deployments.

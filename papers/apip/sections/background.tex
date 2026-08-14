@@ -1,0 +1,169 @@
+% =============================================================================
+% Section 2 -- Background and Related Work
+% =============================================================================
+\section{Background and Related Work}
+\label{sec:background}
+
+\subsection{Agent Evaluation and the Deployment Gap}
+\label{subsec:deployment-gap}
+
+Pre-deployment evaluation of AI systems has matured substantially. The
+emergence of standardized benchmarks~\cite{liang2022holistic}, automated
+red-teaming pipelines~\cite{ganguli2022redteaming,perez2022redteaming},
+behavioral testing frameworks such as CheckList~\cite{ribeiro2020checklist},
+and alignment techniques such as RLHF~\cite{ouyang2022instructions} and
+Constitutional AI~\cite{anthropic2023constitutional} have created a well-tooled
+pre-release lifecycle. Post-deployment monitoring has received comparatively
+less systematic attention. Pan, Arabzadeh, and Ellis~\cite{pan2025measuring}
+conducted the first large-scale empirical study of production AI agents,
+finding that most deployments fail or underdeliver and that little is publicly
+known about post-release management. Sapra et al.~\cite{sapra2025agentcompass}
+address detection via AgentCompass---structured post-deployment
+debugging---but prescribe no remediation. Rath~\cite{rath2026drift} formalizes
+agent drift across 12 measurable dimensions, projecting a 42\% task success
+reduction for unchecked drift via simulation. The APIP addresses what all three
+leave open: a structured remediation protocol once degradation is identified.
+
+\subsection{The Performance Improvement Plan as a Structural Template}
+\label{subsec:pip-template}
+
+The Performance Improvement Plan in organizational management is a formal
+document issued to an underperforming employee that specifies: the performance
+deficiencies observed, the root causes identified, the corrective actions
+required, the time window for improvement, the check-in schedule, and the
+criteria by which success or failure will be evaluated. The American Society
+for Human Resource Management recommends that a PIP should be used when there
+is a genuine commitment to help the employee improve, not merely as a precursor
+to termination~\cite{kirkpatrick2016four}.
+Kirkpatrick~\cite{kirkpatrick1994evaluating,kirkpatrick2016four} emphasizes
+that the PIP should be developed collaboratively by the manager and employee,
+because remediation requires both parties' participation to succeed.
+
+The PIP analogy to agent management is structurally productive but requires
+important qualification. A human employee can engage in self-directed
+improvement: they understand the feedback, adjust their behavior, and exercise
+agency. A deployed AI agent cannot. The APIP is therefore a management protocol
+imposed entirely by human operators---the agent is the subject, not the author,
+of the plan. This distinction is theoretically important and has practical
+implications for where we locate the locus of accountability in the APIP
+lifecycle. In organizational terms, the APIP collapses the manager--employee
+dyad: the operator is both the manager who writes the plan and the agent of
+change who implements it.
+
+\subsection{Kirkpatrick's Four-Level Evaluation Framework}
+\label{subsec:kirkpatrick}
+
+Kirkpatrick's~\cite{kirkpatrick1994evaluating} four-level training evaluation
+model, first published in 1959 and refined over the subsequent six decades,
+provides a hierarchical framework for evaluating the impact of interventions:
+Level 1 (Reaction) assesses immediate participant response, Level 2 (Learning)
+measures knowledge or skill acquisition, Level 3 (Behavior) evaluates whether
+learning transfers to on-the-job behavior change, and Level 4 (Results)
+measures organizational outcomes~\cite{kirkpatrick1994evaluating,kirkpatrick2016four}.
+The model has been applied across business, government, military, and
+healthcare contexts, and remains the most widely used training evaluation
+framework globally.
+
+We adopt the Kirkpatrick framework as a structural template for evaluating APIP
+interventions. When a prompt-level, retrieval-level, or model-level
+intervention is applied to a degraded agent, the check-in evaluation should
+assess impact at multiple levels: Did the intervention change the agent's
+immediate output patterns (Level 1/2)? Did it produce durable behavioral change
+in how the agent handles the failure-mode class (Level 3)? Did it improve the
+business metrics specified in the behavioral contract---CSAT, task completion,
+escalation rate (Level 4)? An intervention that improves Level 1/2 metrics
+without producing Level 3/4 improvement has not remediated the agent; it has
+merely suppressed the symptom. This hierarchical evaluation discipline is
+essential for distinguishing genuine recovery from surface-level metric
+manipulation.
+
+\subsection{AI Governance and Documentation Requirements}
+\label{subsec:governance}
+
+Regulatory frameworks for AI systems are increasingly emphasizing
+documentation, human oversight, and traceability. The EU AI
+Act~\cite{eu2024aiact} requires providers of high-risk AI systems to implement
+post-market monitoring systems and maintain logs sufficient to identify sources
+of error. US executive orders on AI safety have similarly emphasized the
+importance of human oversight in consequential automated decision systems.
+Brundage et al.~\cite{brundage2020trustworthy} argue that verifiable claims
+require mechanisms beyond pre-deployment testing alone. At FAccT 2024, Kolt,
+Heim, and Anderljung~\cite{kolt2024visibility} identified three visibility
+mechanisms for AI agents---identifiers, real-time monitoring, and activity
+logging---arguing accountability requires linking actions to specific agents and
+operators. The APIP schema's \texttt{apip\_id}, \texttt{agent\_id},
+\texttt{owner}, and \texttt{exit\_evaluated\_at} fields operationalize this
+linkage, positioning the APIP as both a technical practice and a governance
+instrument.
+
+\subsection{AI Control Protocols and the Threat-Model Boundary}
+\label{subsec:ai-control}
+
+A complementary line of work, the AI Control literature originating with
+Greenblatt et al.~\cite{greenblatt2023control}, addresses post-deployment
+safety under an explicitly adversarial threat model. Control protocols assume
+the deployed model may be scheming and design runtime safeguards---trusted
+monitoring (a weaker, trusted model audits an untrusted model's actions),
+untrusted monitoring (one instance of the untrusted model monitors another),
+defer-to-trusted, and resampling protocols---intended to maintain safety even
+when the agent is adversarial. Subsequent work has surfaced failure modes of
+these protocols, including capability gaps in trusted
+monitors~\cite{bhatt2025ctrlz}, collusion between untrusted monitor and
+policy~\cite{mallen2025subversion}, and adaptive prompt-injection attacks that
+evade diverse monitors and can be amplified by
+resampling~\cite{schoen2025stress}.
+
+The APIP framework is complementary to AI Control rather than competing with
+it. The two operate at different threat models, granularities, and timescales.
+Control protocols address the question ``is this individual action safe given a
+possibly-scheming agent?'' through per-action runtime decisions. The APIP
+addresses the question ``is this agent meeting its behavioral contract over an
+aggregated time window?'' through structured remediation across days to weeks.
+Control protocols presuppose adversarial intent; APIP's primary failure modes
+(Section~\ref{sec:taxonomy}) presuppose capability degradation or value drift.
+The two regimes also consume and produce different signals: control protocols
+generate per-action audit decisions that can serve as input to APIP triggers (a
+sustained rise in audit-flagged actions is itself a behavioral-contract
+breach), while APIP's aggregated cause attribution can identify when a
+degradation pattern warrants escalation to control-protocol-level intervention.
+We position the \texttt{adversarial\_subversion} failure mode
+(Section~\ref{sec:taxonomy}) as the integration point between the two regimes:
+when cause attribution identifies an adversarial pattern rather than capability
+drift, the appropriate intervention is drawn from the control literature rather
+than from APIP's standard tier model.
+
+\subsection{Team Dynamics, Membership Change, and Coordination}
+\label{subsec:team-dynamics}
+
+A growing body of organizational behavior research addresses how team
+composition changes affect team functioning and performance. Morgeson,
+Mitchell, and Liu~\cite{morgeson2015event} introduced Event System Theory
+(EST), which posits that organizational events are characterized by three
+properties---novelty, disruption, and criticality---that determine their impact
+on organizational entities. Events that are higher on these dimensions are more
+likely to produce changes in behavior, features, or subsequent events.
+
+Summers, Humphrey, and Ferris~\cite{summers2012team} applied an event-based
+lens to team member change and found that membership changes caused high levels
+of flux in coordination when the change involved a strategically core role or
+when information transfer during the transition was low. Trainer et
+al.~\cite{trainer2020membership} reconceptualized each team membership change as
+a discrete team-level event with varying degrees of novelty, disruptiveness,
+and criticality, finding that newcomer entry can substantially impact team
+functioning beyond its impact on the newcomer themselves.
+
+Research on Transactive Memory Systems (TMS)---collective memory systems in
+which team members specialize in different knowledge domains while maintaining
+shared awareness of who knows
+what~\cite{wegner1987transactive,lewis2007group,ren2011transactive,liang1995group,moreland2003transactive}---provides
+a cognitive mechanism for understanding how membership changes disrupt
+coordination. When a new member enters, the team's TMS becomes inaccurate:
+existing members' calibrations of who knows what and how to coordinate are
+invalidated~\cite{lewis2007group,wegner1987transactive}. The newcomer
+socialization literature further documents that support for newcomers declines
+within the first 90 days~\cite{kammeyer2013support}, and that structured
+onboarding significantly improves adjustment outcomes~\cite{bauer2025newcomer}.
+
+These streams provide the theoretical vocabulary for
+Section~\ref{subsec:mesh}: how a new agent introduced to an existing mesh can
+degrade peer performance even when performing its own task well.

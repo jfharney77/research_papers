@@ -1,0 +1,151 @@
+% =============================================================================
+% Section 8 -- Open Problems and Future Directions
+% =============================================================================
+\section{Open Problems and Future Directions}
+\label{sec:open-problems}
+
+\subsection{Behavioral Contract Specification}
+\label{subsec:contract-spec}
+
+The behavioral contract is architecturally foundational but currently absent in
+most production deployments. Authoring one requires prospective agreement on
+task surface, metrics, and acceptable ranges across ML engineering, product,
+and legal teams. Tooling and methodology to support contract authoring at
+deployment time is a significant open problem.
+
+\subsection{Causal Attribution at Scale}
+\label{subsec:attribution-scale}
+
+Cause attribution currently requires human review of sampled failures, which
+does not scale to high-volume deployments. LLM-as-judge pipelines or
+specialized classifiers trained on labeled failure cases would substantially
+reduce APIP initiation cost---an active area with connections to automated root
+cause analysis in SRE.
+
+\subsection{Multi-Agent Mesh Deployments: The New Hire Problem}
+\label{subsec:mesh}
+
+The APIP framework as presented assumes a single-agent deployment with a clear
+locus of accountability: one agent, one behavioral contract, one remediation
+process. This assumption breaks down in multi-agent systems---increasingly
+common in enterprise deployments---where a cluster of agents cooperates to
+handle a composite task, sharing context, tools, memory, and sometimes
+overlapping task surfaces.
+
+In such agent meshes, a class of failure mode emerges that is structurally
+invisible to the single-agent APIP: \emph{mesh disruption}. Consider the
+introduction of a new specialist agent---Agent N---into an existing mesh. Agent
+N performs its designated task well. Yet aggregate system performance, or the
+individual performance of peer agents, declines. The APIP framework triggers on
+the peer agents, whose metrics have crossed threshold. Cause attribution,
+however, fails to find an intrinsic failure mode: the peer agents have not
+drifted, their retrieval is fresh, their alignment is intact. The root cause is
+exogenous---and the single-agent APIP has no mechanism to represent or address
+it.
+
+Kim et al.~\cite{kim2025scaling} provide direct empirical support: their large
+controlled study of multi-agent scaling found performance change relative to
+single-agent baselines ranging from $+80.8\%$ on decomposable tasks to
+$-70.0\%$ on sequential planning, identifying a coordination-saturation effect
+where additional agents suppress rather than improve reasoning. Introducing
+Agent N into an existing mesh is precisely this kind of architecture
+change---and the degradation manifests in peer agents, not in Agent N itself,
+making standard per-agent monitoring blind to the cause. This maps onto a
+well-documented class of phenomena in organizational behavior. Morgeson,
+Mitchell, and Liu's~\cite{morgeson2015event} Event System Theory provides the
+overarching framework: the introduction of Agent N is an organizational event
+whose impact is a function of its novelty (the mesh has not previously included
+this capability), disruptiveness (it changes the shared context distribution),
+and criticality (it affects the mesh's output quality). Strizver and
+Ployhart~\cite{strizver2024disruption} extended EST specifically to team
+disruption and argued that all changes in team composition, emergent states,
+and structure only matter for team disruption to the extent they influence
+coordination---a claim that maps directly onto the agent mesh case, where the
+disruption manifests as coordination failure in shared context.
+
+We hypothesize four mechanisms by which a locally high-performing agent can
+produce performance externalities in its mesh peers, each grounded in
+organizational research.
+
+\textbf{Context Space Crowding.} If agents share a context window or working
+memory buffer, Agent N's high-confidence, well-formed outputs may dominate the
+shared context, displacing signals that peer agents depend on---an attention
+competition problem at the systems level. This maps to the Transactive Memory
+Systems literature~\cite{wegner1987transactive,lewis2007group,ren2011transactive}:
+when Agent N enters and changes the content of shared memory, the existing
+agents' TMS---their calibration to what is in the shared context and who
+produced it---is disrupted. Ren and Argote~\cite{ren2011transactive} document
+that TMS disruption from membership change degrades coordination. From a systems
+perspective, this is the coherence failure described in multi-agent memory
+research~\cite{fu2026memory}: without a coordination protocol governing shared
+context writes, one agent's outputs overwrite or displace another's.
+
+\textbf{Role Boundary Erosion.} Agent N, performing its task thoroughly, may
+produce outputs that functionally overlap with the input surface of adjacent
+agents, causing those agents to receive redundant, contradictory, or
+already-processed inputs. Summers, Humphrey, and Ferris~\cite{summers2012team}
+found that membership changes involving strategically core roles produced the
+highest levels of coordination flux---precisely the dynamic at play when Agent
+N occupies a central position in the mesh's task graph.
+
+\textbf{Distributional Shift in Shared State.} Agents calibrated against a
+certain content distribution in shared memory now operate out-of-distribution
+when Agent N begins populating that space. Lewis, Belliveau, Herndon, and
+Keller~\cite{lewis2007group} demonstrated that group cognition is disrupted by
+membership change in part because the collective knowledge structure
+shifts---existing members' expectations about the group's knowledge no longer
+hold.
+
+\textbf{Trust Calibration Collapse.} In architectures where agents implicitly
+weight peer outputs, a high-performing Agent N may receive disproportionate
+deference from the orchestrator or peer agents, causing valid contributions
+from other agents to be systematically underweighted. This mirrors the
+organizational finding that newcomer attributes interact with team norms to
+reshape coordination patterns~\cite{trainer2020membership}.
+
+This problem is directly analogous to a well-documented organizational
+phenomenon: the new hire who is individually excellent but systemically
+disruptive---who reshapes team communication patterns, crowds out peer
+contributions, or shifts implicit norms in ways that reduce collective
+performance. The newcomer socialization literature documents that support for
+newcomers from coworkers declines within the first 90
+days~\cite{kammeyer2013support}, and that structured onboarding---including
+socialization tactics, buddy systems, and norm
+communication~\cite{bauer2025newcomer,trainer2020membership}---significantly
+mitigates the disruptiveness of the transition process.
+
+From the APIP perspective, mesh disruption creates a causal attribution
+failure: the underperforming agents' APIPs cannot be resolved because the root
+cause is not remediable at the agent level. This motivates two extensions to
+the framework. First, a mesh-aware cause attribution
+category---\texttt{exogenous\_disruption}---should be added to the failure mode
+taxonomy (reflected in the schema in Table~\ref{tab:schema}), with a
+corresponding diagnosis protocol that includes analysis of shared context
+composition and peer agent behavioral change events. Second, a mesh onboarding
+protocol is needed: a structured introduction process for new agents that
+includes context scoping (isolating the new agent's context contributions
+during a probationary window), behavioral contract alignment across the mesh,
+and regression monitoring on peer agents during the introduction
+period---analogous to the 30-60-90 day structured onboarding plans documented
+in the newcomer socialization literature~\cite{bauer2025newcomer,kammeyer2013support}.
+
+We identify the formal treatment of agent mesh disruption as a significant open
+problem at the intersection of multi-agent coordination, information-theoretic
+resource allocation, and AI governance. The mechanism design framing is
+particularly productive: mesh disruption can be modeled as a congestion
+externality in shared context space, with the APIP framework providing the
+remediation layer once the externality is detected.
+Krishnan~\cite{krishnan2025mcp} notes that even with standardized context
+protocols such as MCP, tracing causality across hundreds of agents exceeds
+current tooling---confirming that the attribution failure we describe is a
+documented practical constraint. A full formal treatment is reserved for a
+companion paper.
+
+\subsection{Organizational Ownership of the APIP Process}
+\label{subsec:ownership}
+
+Who owns the APIP? In HR, the PIP is jointly owned by the manager and HR
+function; in AI deployments, the equivalent is unresolved. ML engineering,
+product, legal, and operations all have stake in different phases. Without a
+clear ownership model, adoption will stall. This is as much an organizational
+design problem as a technical one.

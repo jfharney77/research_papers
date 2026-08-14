@@ -1,3 +1,30 @@
+# Scripts
+
+- `start_web.sh` / `stop_web.sh` — run the FastAPI backend + React frontend (see below).
+- `build_apip_paper.sh` — compile the APIP paper in `papers/apip/` to PDF.
+
+## Build the APIP paper
+
+```bash
+./scripts/build_apip_paper.sh
+```
+
+Runs `pdflatex → bibtex → pdflatex → pdflatex` in `papers/apip/` and writes
+`papers/apip/main.pdf`, then reports the page count plus any undefined
+references, undefined citations, or overfull boxes from `main.log`.
+
+| Flag | Effect |
+| --- | --- |
+| `-c`, `--clean` | Delete `.aux/.bbl/.blg/.log/.out` before building — use after editing `references.bib` or renaming a `\label` |
+| `-q`, `--quiet` | Hide pdflatex/bibtex chatter; print only the summary |
+| `-s DIR`, `--src DIR` | Build a different paper directory instead of `papers/apip` |
+| `-h`, `--help` | Usage text |
+
+`IEEEtran.cls` and `IEEEtran.bst` are vendored in `papers/apip/`, so no IEEE
+TeX Live package is needed — only `pdflatex` and `bibtex`. As with the
+`script/latex/*` build scripts, host auto-install is off by default; set
+`LATEX_AUTO_INSTALL=1` to let the script `apt-get` TeX Live.
+
 # Web Stack Runbook
 
 These helper scripts start/stop the FastAPI backend (`docserver`) and React frontend (`web/`).

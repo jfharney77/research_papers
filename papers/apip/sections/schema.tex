@@ -1,0 +1,86 @@
+% =============================================================================
+% Section 5 -- Formal APIP Schema
+% Contains Table 2 (tab:schema), typeset as a full-width table* so the field
+% descriptions stay readable.
+% =============================================================================
+\section{Formal APIP Schema}
+\label{sec:schema}
+
+We formalize the APIP as a declarative schema to enable tooling integration and
+audit trail generation. The schema uses a notation analogous to JSON Schema;
+YAML, JSON, or DSL implementations are straightforward.
+
+\begin{table*}[t]
+  \centering
+  \caption{Formal APIP schema fields. New fields relative to a basic PIP
+           schema are \texttt{kirkpatrick\_levels}, the
+           \texttt{exogenous\_disruption} failure mode, and
+           \texttt{mesh\_context}.}
+  \label{tab:schema}
+  \footnotesize
+  \begin{tabular}{@{}L{4.2cm}L{1.8cm}L{10.4cm}@{}}
+    \toprule
+    \textbf{Field} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{apip\_id} & string &
+      Unique identifier for this APIP instance. \\
+    \texttt{agent\_id} & string &
+      Identifier of the agent subject to this APIP. \\
+    \texttt{created\_at} & datetime &
+      Timestamp when the APIP was initiated. \\
+    \texttt{triggered\_by} & object &
+      The metric, threshold value, and observed value that triggered
+      the APIP. \\
+    \texttt{behavioral\_contract\_ref} & string &
+      Reference to the behavioral contract document active at deployment
+      time. \\
+    \texttt{failure\_mode} & enum &
+      One of: \texttt{behavioral\_drift} $|$ \texttt{input\_brittleness} $|$
+      \texttt{alignment\_creep} $|$ \texttt{tool\_misuse} $|$
+      \texttt{exogenous\_disruption}. \\
+    \texttt{cause\_attribution\_report} & string &
+      Reference to the structured cause attribution document. \\
+    \texttt{kirkpatrick\_levels} & object &
+      Baseline and target values for Levels 1--4 evaluation at each
+      check-in. \\
+    \texttt{intervention\_tier} & enum &
+      One of: \texttt{prompt\_level} $|$ \texttt{retrieval\_level} $|$
+      \texttt{model\_level}. \\
+    \texttt{interventions} & array &
+      List of specific interventions applied, each with type, description,
+      and timestamp. \\
+    \texttt{window\_start} & datetime &
+      Start of the remediation window. \\
+    \texttt{window\_end} & datetime &
+      Scheduled end of the remediation window. \\
+    \texttt{checkins} & array &
+      Scheduled check-in timestamps and recorded metric snapshots with
+      Kirkpatrick level assessments. \\
+    \texttt{exit\_outcome} & enum &
+      One of: \texttt{resolved} $|$ \texttt{extended} $|$
+      \texttt{escalated}. \\
+    \texttt{exit\_evaluated\_at} & datetime &
+      Timestamp of the formal exit evaluation. \\
+    \texttt{owner} & string &
+      Identity of the human operator or team responsible for this APIP. \\
+    \texttt{mesh\_context} & object &
+      If applicable: \texttt{mesh\_id}, \texttt{peer\_agents},
+      \texttt{context\_weights} at trigger time, exogenous flag. \\
+    \texttt{notes} & string &
+      Free-text field for qualitative observations throughout the
+      lifecycle. \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+The schema is intentionally minimal at the field level but requires structured
+sub-schemas for \texttt{interventions} and \texttt{checkins} to preserve audit
+trail integrity. The \texttt{behavioral\_contract\_ref} field is
+architecturally critical: it enforces the discipline of writing a behavioral
+contract at deployment time, without which the APIP trigger and exit evaluation
+phases cannot be operationalized. The \texttt{kirkpatrick\_levels} field
+captures the multi-level evaluation data at each check-in, enabling post-hoc
+analysis of whether interventions produced superficial or durable improvement.
+The \texttt{mesh\_context} field, described further in
+Section~\ref{subsec:mesh}, supports cause attribution in multi-agent
+deployments.

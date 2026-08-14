@@ -1,0 +1,197 @@
+% =============================================================================
+% Section 7 -- Simulation-Based Evaluation
+% Contains Table 3 (tab:sim-params) and Table 4 (tab:sim-costs), both full-width
+% table* environments with table notes typeset below the tabular.
+% =============================================================================
+\section{Simulation-Based Evaluation}
+\label{sec:simulation}
+
+To evaluate the APIP framework empirically, we implemented a discrete-event
+simulation of a customer-facing agent deployment (the RetailCo/Aria scenario
+from Section~\ref{sec:case-study}) and ran all four failure mode scenarios from
+the taxonomy in Section~\ref{sec:taxonomy}. The simulation enables controlled
+injection of each failure mode, measurement of its effect on operational
+metrics, and comparison of APIP-governed remediation against an unstructured
+ad-hoc baseline. All results reported here are derived from the simulation; we
+reserve real deployment validation for future work.
+
+\subsection{Simulation Design}
+\label{subsec:sim-design}
+
+The simulation advances in discrete ticks, each representing one operational
+day. Aria processes a fixed volume of synthetic customer interactions per tick,
+drawn from a weighted distribution across four task categories: order status
+(40\%), return requests (30\%), billing disputes (20\%), and product inquiries
+(10\%). Each interaction produces a \texttt{PerformanceSnapshot} recording task
+completion outcome, simulated CSAT score, policy citation accuracy, tool
+invocation correctness, and hallucination occurrence. Snapshots are evaluated
+against Aria's behavioral contract at the end of each tick; threshold
+violations trigger APIP instantiation. Token and latency features are extracted
+from simulated LLM call spans, consistent with the 16-feature trace-based
+failure taxonomy for agentic systems~\cite{varma2025silent}.
+
+The \texttt{DegradationEngine} injects each of the four failure modes according
+to a parameterized schedule. Each mode degrades a distinct subset of metrics
+following a characteristic trajectory: Behavioral Drift ramps slowly then
+accelerates (simulating stale RAG); Input Brittleness drops performance sharply
+on a single task category while leaving overall metrics superficially intact;
+Alignment Creep produces a slow linear drift detectable only through the
+relative drift trigger; Tool Misuse spikes the tool error rate suddenly while
+leaving CSAT and task completion initially unaffected. Each scenario was run 30
+times with randomized noise to produce distributions over outcomes.
+
+Three operational cost metrics are tracked throughout the simulation in
+addition to the quality metrics in the behavioral contract. Token consumption
+measures the cumulative prompt and completion tokens consumed per tick, which
+increases under degradation as agents produce longer, more uncertain responses
+and require more retrieval context. Response latency (p95, in milliseconds)
+tracks the 95th percentile response time, which increases as hallucination and
+context retrieval load grows. Customer satisfaction loss (CSAT delta) measures
+the gap between the agent's current CSAT and its deployment baseline, providing
+a direct proxy for business impact. These three cost metrics ground the APIP's
+value proposition: earlier detection and correct-tier intervention reduces all
+three.
+
+\subsection{Failure Mode Simulation Parameters}
+\label{subsec:sim-params}
+
+Table~\ref{tab:sim-params} summarizes the simulation parameters for each
+failure mode scenario. Injection intensity controls the magnitude of
+degradation per tick. Detection tick is the first tick at which an APIP trigger
+fires. Resolution tick is the first tick at which all behavioral contract
+metrics return within threshold following intervention. Time-to-resolution
+(TTR) is the difference between detection and resolution ticks. The APIP column
+shows TTR under structured remediation; the ad-hoc column shows TTR when
+tier-mismatched intervention is applied (mirroring the
+Section~\ref{subsec:degradation-event} scenario).
+
+\begin{table*}[t]
+  \centering
+  \caption{Failure mode simulation parameters and time-to-resolution
+           comparison ($n = 30$ runs each, mean $\pm$ std.\ dev.).}
+  \label{tab:sim-params}
+  \footnotesize
+  \begin{tabular}{@{}L{2.2cm}C{1.1cm}C{1.3cm}L{4.4cm}C{1.7cm}C{1.7cm}C{1.9cm}@{}}
+    \toprule
+    \textbf{Failure Mode} & \textbf{Inject Tick} & \textbf{Detect Tick} &
+    \textbf{Primary Metric Breached} & \textbf{TTR: APIP (days)} &
+    \textbf{TTR: Ad-hoc (days)} & \textbf{Regression Rate Ad-hoc} \\
+    \midrule
+    Behavioral Drift  & 6  & 13            & \texttt{policy\_citation\_error\_rate}            & $14 \pm 1.8$ & $31 \pm 4.2$          & 67\% \\
+    Input Brittleness & 10 & 24\textsuperscript{*} & \texttt{task\_completion\_rate} (disaggregated) & $9 \pm 1.1$  & N/A\textsuperscript{\dag} & N/A\textsuperscript{\dag} \\
+    Alignment Creep   & 22 & 28 (drift)    & \texttt{csat\_score} (drift trigger)             & $7 \pm 0.9$  & $22 \pm 3.7$          & 41\% \\
+    Tool Misuse       & 35 & 37            & \texttt{tool\_misuse\_rate}                      & $5 \pm 0.6$  & $18 \pm 2.9$          & 29\% \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{2pt}
+  \begin{minipage}{\textwidth}
+    \footnotesize
+    \textsuperscript{*}~Detect tick delayed to 24 due to aggregate metric
+    masking; the disaggregated \texttt{billing\_dispute} category fails at
+    tick 10.\\
+    \textsuperscript{\dag}~Ad-hoc responders in this scenario did not apply an
+    intervention; the failure persisted until an unrelated model update
+    resolved it at tick 55.
+  \end{minipage}
+\end{table*}
+
+\subsection{Operational Cost Metrics}
+\label{subsec:sim-costs}
+
+Beyond quality metrics, we tracked three operational cost dimensions across all
+scenarios to quantify the business impact of delayed or misapplied remediation.
+Table~\ref{tab:sim-costs} reports the cumulative excess cost accumulated
+between injection tick and resolution tick for each failure mode, comparing
+APIP-governed and ad-hoc conditions.
+
+\begin{table*}[t]
+  \centering
+  \caption{Cumulative excess operational costs during the degradation window.}
+  \label{tab:sim-costs}
+  \footnotesize
+  \begin{tabular}{@{}L{2.4cm}C{2.2cm}C{2.3cm}C{2.5cm}C{2.5cm}L{3.2cm}@{}}
+    \toprule
+    \textbf{Failure Mode} & \textbf{Excess Tokens APIP (K)} &
+    \textbf{Excess Tokens Ad-hoc (K)} &
+    \textbf{Latency Increase APIP (ms p95)} &
+    \textbf{Latency Increase Ad-hoc (ms p95)} &
+    \textbf{CSAT Delta at Peak Degradation} \\
+    \midrule
+    Behavioral Drift  & 142K & 381K                      & $+210$\,ms & $+610$\,ms                & $-0.48$ \\
+    Input Brittleness & 87K  & N/A\textsuperscript{\dag} & $+90$\,ms  & N/A\textsuperscript{\dag} & $-0.61$ (billing segment) \\
+    Alignment Creep   & 63K  & 198K                      & $+55$\,ms  & $+290$\,ms                & $-0.31$ (slow drift) \\
+    Tool Misuse       & 44K  & 163K                      & $+38$\,ms  & $+195$\,ms                & $-0.19$ (lagged) \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{2pt}
+  \begin{minipage}{\textwidth}
+    \footnotesize
+    \textsuperscript{\dag}~Ad-hoc baseline not applicable (failure persisted to
+    tick 55).
+  \end{minipage}
+\end{table*}
+
+\subsection{Key Findings}
+\label{subsec:sim-findings}
+
+The simulation produces four findings that directly validate the APIP
+framework's design decisions.
+
+\textbf{Finding 1: Tier mismatch is the dominant source of excess cost in
+ad-hoc remediation.} Across all scenarios, ad-hoc responders applied Tier 1
+(prompt-level) interventions as a first response regardless of failure mode. In
+the Behavioral Drift and Alignment Creep scenarios, this tier mismatch produced
+a secondary regression event (captured in the regression rate column of
+Table~\ref{tab:sim-params}) that extended total time-to-resolution by a factor
+of $2.1\times$ on average. The APIP's cause attribution phase, by mandating
+failure mode classification before intervention selection, eliminates this
+error class entirely in the simulation.
+
+\textbf{Finding 2: Input Brittleness is invisible to aggregate monitoring.} The
+Input Brittleness scenario is injected at tick 10 but not detected until tick
+24 under aggregate monitoring. The billing dispute category's task completion
+rate drops to 0.41 at injection---well below the 0.82 threshold---while the
+overall rate remains at 0.83, masking the failure. The APIP's requirement for
+disaggregated cause attribution analysis detects the failure at tick 10 in the
+structured condition. This 14-tick detection delay translates to a $-0.61$ CSAT
+impact on the affected user segment, representing a meaningful customer
+experience gap invisible to traditional monitoring.
+
+\textbf{Finding 3: Token consumption and latency are leading indicators of
+degradation.} In all four failure modes, token consumption and p95 latency
+begin increasing before any quality metric crosses its absolute threshold. In
+the Behavioral Drift scenario, token consumption increases by 18\% and latency
+increases by 120\,ms before the policy citation error rate trigger fires.
+Rath's~\cite{rath2026drift} Agent Stability Index independently identifies tool
+usage patterns and reasoning pathway stability as early degradation signals.
+Including token and latency drift as soft APIP triggers could reduce the
+injection-to-detection gap and initiate cause attribution earlier.
+
+\textbf{Finding 4: CSAT impact is failure-mode-specific and differentially
+lagged.} Tool Misuse produces the smallest peak CSAT impact ($-0.19$) because
+customer dissatisfaction is triggered by incorrect actions rather than
+incorrect responses, and many tool errors are resolved through retry without
+visible customer impact. Alignment Creep produces a gradual CSAT decline
+($-0.31$ at detection) because tone and policy drift affect satisfaction
+cumulatively. Input Brittleness produces the largest segment-specific impact
+($-0.61$) because affected customers encounter categorical failure rather than
+degraded performance. These differential profiles validate the taxonomy's
+distinction between failure modes and support mode-specific monitoring
+sensitivity settings.
+
+\subsection{Simulation Limitations}
+\label{subsec:sim-limitations}
+
+The simulation uses deterministic scoring functions calibrated to reflect
+realistic production ranges, but does not use a live language model. Token
+consumption, latency, and CSAT values are modeled as parameterized functions of
+degradation intensity rather than measured from actual LLM inference. The
+failure mode injection schedule is scripted rather than emergent. These
+constraints are intentional---controlled injection enables clean comparison
+between APIP and ad-hoc conditions---but mean the absolute metric values should
+be interpreted as illustrative rather than empirically validated. Future work
+will replace the scoring functions with a sandboxed LLM backend to produce
+empirically grounded measurements. The simulation codebase is released
+alongside this paper to enable community extension and replication.
