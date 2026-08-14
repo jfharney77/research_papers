@@ -1,0 +1,97 @@
+% =============================================================================
+% AAAI 2026 Conference Paper Template
+%
+% Style files (aaai2026.sty, aaai2026.bst) are included in this directory,
+% extracted from the official AAAI 2026 author kit.
+%
+% For future years, update the \usepackage and \bibliographystyle lines
+% below, and re-run the build script to extract new style files from the
+% updated author kit in style_kits/AAAI/.
+%
+% Submission mode:   \usepackage[submission]{aaai2026}  (anonymous, default)
+% Camera-ready mode: \usepackage{aaai2026}
+%
+% Compilation:
+%   pdflatex main.tex
+%   bibtex main
+%   pdflatex main.tex
+%   pdflatex main.tex
+%
+% Structure:
+%   main.tex              -- root document (this file)
+%   aaai2026.sty          -- AAAI style file
+%   aaai2026.bst          -- AAAI bibliography style
+%   sections/abstract.tex
+%   sections/introduction.tex
+%   sections/related_work.tex
+%   sections/conclusion.tex
+%   references.bib        -- bibliography entries
+% =============================================================================
+
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai2026}    % swap [submission] for [] on camera-ready
+\usepackage{times}                   % DO NOT CHANGE THIS
+\usepackage{helvet}                  % DO NOT CHANGE THIS
+\usepackage{courier}                 % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}            % DO NOT CHANGE THIS
+\usepackage{graphicx}                % DO NOT CHANGE THIS
+% Figure search path. Listed in order so a template builds in place
+% (templates/latex/<conf>/) and a paper seeded from it by scripts/new-paper.sh
+% builds too (papers/<slug>/latex/), preferring the paper's own figures/.
+\graphicspath{{figures/}{../figures/}{../../assets/figures/}{../../../templates/assets/figures/}}
+\urlstyle{rm}                        % DO NOT CHANGE THIS
+\def\UrlFont{\rm}                    % DO NOT CHANGE THIS
+\usepackage{natbib}                  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{caption}                 % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\frenchspacing                       % DO NOT CHANGE THIS
+\setlength{\pdfpagewidth}{8.5in}     % DO NOT CHANGE THIS
+\setlength{\pdfpageheight}{11in}     % DO NOT CHANGE THIS
+
+% Optional: algorithms (comment out if not used)
+% \usepackage{algorithm}
+% \usepackage{algorithmic}           % requires texlive-science
+
+% ---------------- Additional packages ----------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+% -----------------------------------------------------
+
+% Required \pdfinfo -- do NOT add /Title or /Author here
+\pdfinfo{
+  /TemplateVersion (2026.1)
+}
+
+% --- Title and authors ---
+% For anonymous submission, author info is suppressed by the [submission] option.
+% Fill in author details now; they will only appear in camera-ready mode.
+\title{Paper Title Goes Here}
+
+\author{
+  First Author\textsuperscript{\rm 1},
+  Second Author\textsuperscript{\rm 2}
+}
+\affiliations{
+  \textsuperscript{\rm 1}Department of Computer Science, University Name, City, Country\\
+  \textsuperscript{\rm 2}Department of Electrical Engineering, University Name, City, Country\\
+  first.author@university.edu, second.author@university.edu
+}
+
+\begin{document}
+
+\maketitle
+
+% ---------------- Abstract ----------------
+% In AAAI, \maketitle comes first, then the abstract.
+\input{sections/abstract}
+
+% ---------------- Body sections ----------------
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/figures}
+\input{sections/conclusion}
+
+% ---------------- References ----------------
+% NOTE: do NOT add \bibliographystyle here -- aaai2026.sty sets it internally.
+\bibliography{references}
+
+\end{document}

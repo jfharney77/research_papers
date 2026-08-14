@@ -1,9 +1,9 @@
 # Backend image: FastAPI doc server + LaTeX build toolchain.
-# Build from the REPO ROOT (the src/ layout needs latex/, script/, etc.):
+# Build from the REPO ROOT (the src/ layout needs templates/, scripts/, etc.):
 #   docker build -f docker/backend.Dockerfile -t research-papers-backend .
 FROM python:3.12-slim
 
-# TeX Live for the four conference templates (matches script/latex/*/build.sh),
+# TeX Live for the four conference templates (matches scripts/templates/*/build.sh),
 # plus curl/unzip for NeurIPS/AAAI style-file fetching. Debian base avoids the
 # Alpine musl pyexpat bug.
 RUN apt-get update && apt-get install -y --no-install-recommends \

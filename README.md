@@ -7,14 +7,13 @@ build a conference-ready PDF (IEEE / NeurIPS / ACM / AAAI), and review/edit it i
 
 ```bash
 python main.py            # product backend (FastAPI) on http://localhost:8000
-scripts/start_web.sh      # backend + React dev server (http://localhost:5173)
+scripts/web/start.sh      # backend + React dev server (http://localhost:5173)
 papers convert paper.docx --template ieee   # CLI conversion
 ```
 
-**Layout:** the product is `src/docbuilder` (converter + CLI), `src/docserver` (API),
-`web/` (React), `latex/` + `script/latex/` (templates and build scripts). Unrelated
-**research artifacts** — the APIP paper and its simulation app — live under `research/`
-(run the simulation with `research/run_apip.sh`, port 8100).
+**Layout:** the product is `src/docbuilder` (converter + CLI), `src/docserver` (API), and
+`web/` (React). Research content is split into `templates/` (styles), `papers/` (content),
+`sims/` (supporting code) and `docs/` (specs) — see [Repository Structure](#repository-structure).
 
 **Security:** the LaTeX build runs sandboxed (no shell-escape, restricted file IO,
 resource limits, timeout — see `src/docbuilder/sandbox.py`; `LATEX_SANDBOX=docker` for
@@ -25,65 +24,58 @@ to allowlist browser origins.
 
 ## Repository Structure
 
+Four content areas, plus the product. Each has its own README.
+
 ```
 research_papers/
-├── latex/
-│   ├── ieee/                   # IEEE conference template (IEEEtran)
-│   │   ├── main.tex            # Root document
-│   │   ├── references.bib      # Bibliography entries
-│   │   └── sections/
-│   │       ├── abstract.tex
-│   │       ├── introduction.tex
-│   │       ├── related_work.tex
-│   │       └── conclusion.tex
-│   ├── neurips/                # NeurIPS conference template
-│   │   ├── main.tex            # Root document
-│   │   ├── neurips_YYYY.sty    # Style file (auto-downloaded on first build)
-│   │   ├── references.bib      # Bibliography entries
-│   │   └── sections/
-│   │       ├── abstract.tex
-│   │       ├── introduction.tex
-│   │       ├── related_work.tex
-│   │       └── conclusion.tex
-│   ├── acm/                    # ACM conference template (acmart/sigconf)
-│   │   ├── main.tex            # Root document
-│   │   ├── references.bib      # Bibliography entries
-│   │   └── sections/
-│   │       ├── abstract.tex
-│   │       ├── introduction.tex
-│   │       ├── related_work.tex
-│   │       └── conclusion.tex
-│   └── aaai/                   # AAAI conference template
-│       ├── main.tex            # Root document
-│       ├── aaaiYY.sty          # Style file (auto-downloaded on first build)
-│       ├── aaaiYY.bst          # Bibliography style (auto-downloaded on first build)
-│       ├── references.bib      # Bibliography entries
-│       └── sections/
-│           ├── abstract.tex
-│           ├── introduction.tex
-│           ├── related_work.tex
-│           └── conclusion.tex
-└── script/
-    └── latex/
-        ├── ieee/
-        │   ├── build.bat       # Windows build script
-        │   └── build.sh        # WSL / Linux / macOS build script
-        ├── neurips/
-        │   ├── build.bat       # Windows build script
-        │   └── build.sh        # WSL / Linux / macOS build script
-        ├── acm/
-        │   ├── build.bat       # Windows build script
-        │   └── build.sh        # WSL / Linux / macOS build script
-        └── aaai/
-            ├── build.bat       # Windows build script
-            └── build.sh        # WSL / Linux / macOS build script
+├── templates/                  # (1) styles — reusable, never paper content
+│   ├── latex/
+│   │   ├── ieee/               #     conference skeletons: main.tex + sections/
+│   │   ├── neurips/            #     neurips_YYYY.sty auto-downloaded on first build
+│   │   ├── acm/                #     acmart.cls version-controlled
+│   │   ├── aaai/               #     aaaiYY.sty + .bst version-controlled
+│   │   └── _vendor/            #     upstream author kits, kept verbatim
+│   ├── bibtex/                 #     shared IEEEtran .bst + IEEE .bib abbreviations
+│   ├── word/                   #     Word style templates (.dotx, reference.docx)
+│   └── assets/figures/         #     placeholder figures the skeletons reference
+│
+├── papers/                     # (2) content — one directory per paper
+│   └── apip/
+│       ├── manuscript/         #     .docx / .md sources
+│       ├── latex/              #     main.tex + sections/ — the build target
+│       ├── figures/
+│       └── deck/
+│
+├── sims/                       # (3) simulations and supporting code
+│   ├── apip_sim/               #     APIP case-study simulation (:8100)
+│   ├── simsuite/               #     CalibSoc + DivProbe research suite
+│   └── figures/                #     figure generators
+│
+├── docs/                       # (4) specs and supporting documents
+│   ├── specs/                  #     feature/design specs
+│   ├── guides/                 #     MANUAL.md, DEPLOY-AWS.md, ...
+│   └── research/               #     conference deadlines, notes, reviews
+│
+├── scripts/                    # build + run, mirroring papers/ and templates/
+│   ├── lib/latex_build.sh      #     the one build engine; every build.sh wraps it
+│   ├── papers/<slug>/          #     build.sh (+ run_sim.sh, build.bat) per paper
+│   ├── templates/<conference>/ #     build.sh per conference skeleton
+│   ├── web/                    #     start.sh / stop.sh for the product
+│   └── new-paper.sh            #     scaffold papers/<slug> + scripts/papers/<slug>
+│
+├── src/                        # the product: docbuilder, docserver, critic
+├── web/                        # the product's React/Vite UI
+└── tests/
 ```
+
+Add a paper with `bash scripts/new-paper.sh <slug> [conference]` — it creates the
+content directories *and* the build script, so the two trees stay in step.
 
 ---
 
 ## Requirements
 
-### Windows (build.bat)
+### Windows
 
 Install one of the following LaTeX distributions and ensure the `pdflatex` and
 `bibtex` commands are available in your `PATH`:
@@ -98,7 +90,7 @@ pdflatex --version
 bibtex --version
 ```
 
-### WSL / Linux / macOS (build.sh)
+### WSL / Linux / macOS
 
 Install TeX Live via your package manager. Inside WSL (Ubuntu/Debian):
 
@@ -117,275 +109,32 @@ pdflatex --version
 bibtex --version
 ```
 
-> The `build.sh` scripts will attempt to auto-install the required packages via
-> `apt-get` if `pdflatex` or `bibtex` are not found.
+> Host auto-install is **off by default**. Set `LATEX_AUTO_INSTALL=1` to let a
+> build script `apt-get` the packages when `pdflatex` or `bibtex` are missing, or
+> build with `LATEX_SANDBOX=docker`. Builds invoked through the doc server always
+> run under the sandbox.
 
 ---
 
-## Building the IEEE Document
+## Building
 
-### Windows — using `build.bat`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bat
-script\latex\ieee\build.bat
-```
-
-#### Option 2 — Run from inside the script directory
-
-```bat
-cd script\latex\ieee
-build.bat
-```
-
-#### Option 3 — Pass a custom source path
-
-```bat
-script\latex\ieee\build.bat "C:\path\to\your\latex\ieee"
-```
-
----
-
-### WSL / Linux / macOS — using `build.sh`
-
-#### Option 1 — Run from the repository root (recommended)
+Every build — papers and conference skeletons alike — goes through one script,
+`scripts/lib/latex_build.sh`. The per-target `build.sh` files are thin wrappers
+over it, so they all behave the same and all take the same flags.
 
 ```bash
-bash script/latex/ieee/build.sh
+bash scripts/papers/apip/build.sh          # a paper     → papers/apip/latex/main.pdf
+bash scripts/templates/ieee/build.sh       # a skeleton  → templates/latex/ieee/main.pdf
 ```
 
-#### Option 2 — Make executable and run directly
-
-```bash
-chmod +x script/latex/ieee/build.sh
-./script/latex/ieee/build.sh
-```
-
-#### Option 3 — Pass a custom source path
-
-```bash
-bash script/latex/ieee/build.sh /path/to/latex/ieee
-```
-
-> **WSL path tip:** Your Windows repository is typically accessible under
-> `/mnt/c/Users/<username>/`. For example:
-> ```bash
-> cd /mnt/c/Users/jfhar/github/research_papers
-> bash script/latex/ieee/build.sh
-> ```
-
----
-
-## Building the NeurIPS Document
-
-### NeurIPS style file — auto-downloaded
-
-NeurIPS provides a year-specific `.sty` file that is not bundled in this
-repository. Both build scripts will **automatically download and extract it**
-the first time they run. If the file is already present the download is skipped.
-
-The download URL is stored in a variable at the top of each script:
-
-```
-# build.sh / build.bat
-STYLE_YEAR="2025"
-STYLE_URL="https://media.nips.cc/Conferences/2025/Styles/neurips_2025.zip"
-```
-
-**Update these two variables each year** when NeurIPS publishes new style files.
-The current year's link can always be found at:
-```
-https://neurips.cc/Conferences/<YEAR>/PaperInformation/StyleFiles
-```
-
-Requirements for auto-download:
-- **Windows:** `curl` (built into Windows 10 1803+)
-- **WSL/Linux:** `curl` + `unzip` (or Python 3 as fallback)
-
----
-
-### Windows — using `build.bat`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bat
-script\latex\neurips\build.bat
-```
-
-#### Option 2 — Run from inside the script directory
-
-```bat
-cd script\latex\neurips
-build.bat
-```
-
-#### Option 3 — Pass a custom source path
-
-```bat
-script\latex\neurips\build.bat "C:\path\to\your\latex\neurips"
-```
-
----
-
-### WSL / Linux / macOS — using `build.sh`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bash
-bash script/latex/neurips/build.sh
-```
-
-#### Option 2 — Make executable and run directly
-
-```bash
-chmod +x script/latex/neurips/build.sh
-./script/latex/neurips/build.sh
-```
-
-#### Option 3 — Pass a custom source path
-
-```bash
-bash script/latex/neurips/build.sh /path/to/latex/neurips
-```
-
----
-
-## Building the ACM Document
-
-`acmart.cls` (v2.03, Feb 2024) and its companion files are committed directly
-in `latex/acm/` — **no TeX Live package or separate download is required.**
-To update to a newer version, replace the files in `latex/acm/` with those
-from https://ctan.org/pkg/acmart.
-
-The default mode is `sigconf` (two-column conference proceedings), which is
-correct for venues like RecSys, SIGIR, CHI, and most ACM conferences. To switch
-modes, change the `\documentclass` option in `latex/acm/main.tex`:
-
-| Option | Use case |
-|--------|----------|
-| `sigconf` | ACM conference proceedings (default) |
-| `manuscript` | Single-column review / preprint mode |
-| `anonymous` | Add alongside `sigconf` for double-blind submission |
-
-### Windows — using `build.bat`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bat
-script\latex\acm\build.bat
-```
-
-#### Option 2 — Run from inside the script directory
-
-```bat
-cd script\latex\acm
-build.bat
-```
-
-#### Option 3 — Pass a custom source path
-
-```bat
-script\latex\acm\build.bat "C:\path\to\your\latex\acm"
-```
-
----
-
-### WSL / Linux / macOS — using `build.sh`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bash
-bash script/latex/acm/build.sh
-```
-
-#### Option 2 — Make executable and run directly
-
-```bash
-chmod +x script/latex/acm/build.sh
-./script/latex/acm/build.sh
-```
-
-#### Option 3 — Pass a custom source path
-
-```bash
-bash script/latex/acm/build.sh /path/to/latex/acm
-```
-
----
-
-## Building the AAAI Document
-
-### AAAI style files
-
-`aaai2026.sty` and `aaai2026.bst` are already extracted and committed in
-`latex/aaai/` — no download or extraction is needed to build.
-
-The build scripts will error with instructions if the `.sty` file is ever
-missing (e.g. after switching to a new year).
-
-**To update for a new year:**
-1. Download the new author kit from the AAAI website
-2. Extract `aaaiYYYY.sty` and `aaaiYYYY.bst` into `latex/aaai/`
-3. Update `STYLE_YEAR` and `STY_FILE` at the top of each build script:
-
-```
-STYLE_YEAR="2027"
-STY_FILE="aaai2027.sty"
-BST_FILE="aaai2027.bst"
-```
-
-4. Remove the old `.sty` and `.bst` from `latex/aaai/`
-
-### Windows — using `build.bat`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bat
-script\latex\aaai\build.bat
-```
-
-#### Option 2 — Run from inside the script directory
-
-```bat
-cd script\latex\aaai
-build.bat
-```
-
-#### Option 3 — Pass a custom source path
-
-```bat
-script\latex\aaai\build.bat "C:\path\to\your\latex\aaai"
-```
-
----
-
-### WSL / Linux / macOS — using `build.sh`
-
-#### Option 1 — Run from the repository root (recommended)
-
-```bash
-bash script/latex/aaai/build.sh
-```
-
-#### Option 2 — Make executable and run directly
-
-```bash
-chmod +x script/latex/aaai/build.sh
-./script/latex/aaai/build.sh
-```
-
-#### Option 3 — Pass a custom source path
-
-```bash
-bash script/latex/aaai/build.sh /path/to/latex/aaai
-```
-
----
-
-### What the build scripts do
-
-All build scripts run the same standard four-step LaTeX compilation process:
+| Flag | Effect |
+| --- | --- |
+| `-c`, `--clean` | Delete `.aux/.bbl/.blg/.log/.out` first — use after editing `references.bib` or renaming a `\label` |
+| `-q`, `--quiet` | Hide pdflatex/bibtex chatter; print only the summary |
+| `-s DIR`, `--src DIR` | Build a different directory |
+| `-h`, `--help` | Usage text |
+
+Each run does the standard four-step compilation:
 
 | Step | Command | Purpose |
 |------|---------|---------|
@@ -394,23 +143,83 @@ All build scripts run the same standard four-step LaTeX compilation process:
 | 3 | `pdflatex main.tex` | Second pass — inserts citations |
 | 4 | `pdflatex main.tex` | Third pass — resolves cross-references |
 
-On success the output PDF is written to `main.pdf` inside the respective source
-directory. If a step fails, check the relevant log file:
+It then prints the page count and any undefined references, undefined citations,
+or overfull boxes found in `main.log`. On failure, check `main.log` (LaTeX errors)
+and `main.blg` (BibTeX errors) in the source directory.
 
-- `main.log` — LaTeX errors
-- `main.blg` — BibTeX errors
+**Windows:** only the APIP paper ships a batch equivalent,
+`scripts\papers\apip\build.bat`. It takes the same flags but is standalone —
+batch has no `source`, so it does not share the engine and must be updated
+separately. Install [MiKTeX](https://miktex.org) or TeX Live for Windows first;
+there is no auto-install path (that escape hatch is apt-specific).
+
+### Per-conference notes
+
+**NeurIPS** — the year-specific `.sty` is not bundled; the build downloads and
+extracts it on first run and skips the download once present. Update these two
+variables at the top of `scripts/templates/neurips/build.sh` each year:
+
+```
+STYLE_YEAR="2025"
+STYLE_URL="https://media.neurips.cc/Conferences/NeurIPS2025/Styles.zip"
+```
+
+The current year's link is at `https://neurips.cc/Conferences/<YEAR>/PaperInformation/StyleFiles`.
+Auto-download needs `curl` plus `unzip` (or Python 3 as fallback).
+
+Note the style requires a **track option** alongside the mode — `main`,
+`position`, `dandb`, `creativeai`, `sglblindworkshop` or `dblblindworkshop`.
+Omitting it leaves `\@trackname` undefined and the build dies with "Undefined
+control sequence".
+
+**ACM** — `acmart.cls` (v2.03, Feb 2024) and its companion files are committed in
+`templates/latex/acm/`; no TeX Live package or download is required. To update,
+replace them with files from https://ctan.org/pkg/acmart. The default mode is
+`sigconf` (two-column proceedings), correct for RecSys, SIGIR, CHI and most ACM
+venues. Change the `\documentclass` option in `templates/latex/acm/main.tex`:
+
+| Option | Use case |
+|--------|----------|
+| `sigconf` | ACM conference proceedings (default) |
+| `manuscript` | Single-column review / preprint mode |
+| `anonymous` | Add alongside `sigconf` for double-blind submission |
+
+**AAAI** — `aaai2026.sty` and `aaai2026.bst` are committed in
+`templates/latex/aaai/`; the build errors with instructions if they go missing.
+This template always cleans aux files first, since a stale `main.aux` triggers
+duplicate `\bibstyle` errors. To update for a new year: download the author kit,
+extract `aaaiYYYY.sty`/`.bst` into `templates/latex/aaai/`, bump `STYLE_YEAR` in
+`scripts/templates/aaai/build.sh`, and delete the old files.
+
+**IEEE** — `IEEEtran.cls` and the `.bst` files are vendored (in
+`templates/latex/_vendor/` and `templates/bibtex/`), so no IEEE TeX Live package
+is needed.
 
 ---
 
 ## Adding Content
 
-Each section lives in its own file under `sections/` so that collaborators can
-work in parallel without merge conflicts on the root document.
+### A new paper
 
-To add a new section:
+```bash
+bash scripts/new-paper.sh <slug> [conference]     # conference defaults to ieee
+```
 
-1. Create `latex/<conference>/sections/my_section.tex`
+Creates `papers/<slug>/{manuscript,latex,figures,deck}/` seeded from
+`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh`. Drop your
+`.docx` in `manuscript/`, put images in `figures/` (referenced by bare filename
+via `\graphicspath`), and build with `bash scripts/papers/<slug>/build.sh`.
+
+### A new section
+
+Each section lives in its own file under `sections/` so collaborators can work in
+parallel without merge conflicts on the root document.
+
+1. Create `papers/<slug>/latex/sections/my_section.tex`
 2. Add `\input{sections/my_section}` to `main.tex` at the desired position
+
+Build artifacts (`.aux`, `.bbl`, `main.pdf`, …) are gitignored repo-wide — commit
+sources, not output.
 
 ---
 
@@ -427,7 +236,7 @@ uv run papers convert manuscript.docx --template ieee --overwrite
 
 Outputs land in `documents/<document_title>/` with the original `.docx`, copied
 template files, generated `sections/*.tex`, `references/references.bib`, and an
-optional PDF build (invokes `script/latex/<template>/build.sh`).
+optional PDF build (invokes `scripts/templates/<template>/build.sh`).
 
 Key behaviors:
 

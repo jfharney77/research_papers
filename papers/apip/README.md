@@ -1,40 +1,50 @@
 # APIP paper — IEEE conference LaTeX
 
-LaTeX conversion of `research/apip/APIP_Paper_v8_tracked.docx` into the IEEE
-conference style from `ieee_agc/`.
+LaTeX conversion of `manuscript/APIP_Paper_v8_tracked.docx` into the IEEE
+conference style.
+
+```
+manuscript/   the .docx versions and the New_Hire_Paradox.md draft
+latex/        main.tex + sections/ + vendored IEEE style files  ← the build target
+figures/      figures for this paper (referenced by bare filename)
+deck/         APIP_Deck_v1.pptx
+```
+
+The simulation behind the case study lives in `sims/apip_sim/`; start it with
+`bash scripts/papers/apip/run_sim.sh` (port 8100).
 
 ## Build
 
-From the repository root:
+From anywhere in the repo:
 
 ```bash
-./scripts/build_apip_paper.sh            # pdflatex → bibtex → pdflatex ×2 → main.pdf
-./scripts/build_apip_paper.sh --clean    # drop stale .aux/.bbl first
-./scripts/build_apip_paper.sh --quiet    # summary and warnings only
+bash scripts/papers/apip/build.sh            # pdflatex → bibtex → pdflatex ×2 → latex/main.pdf
+bash scripts/papers/apip/build.sh --clean    # drop stale .aux/.bbl first
+bash scripts/papers/apip/build.sh --quiet    # summary and warnings only
 ```
 
 The script reports the page count and any undefined references, undefined
 citations, or overfull boxes left in `main.log`.
 
-`IEEEtran.cls` (from `ieee_agc/latex/IEEE-conference-template-062824/`) and
-`IEEEtran.bst`, `IEEEabrv.bib`, `IEEEfull.bib` (from `ieee_agc/bibtex/`) are
-copied into this directory, so the build needs no TeX Live IEEE packages.
+`IEEEtran.cls` (from `templates/latex/_vendor/ieee-conference-template/`) and
+`IEEEtran.bst`, `IEEEabrv.bib`, `IEEEfull.bib` (from `templates/bibtex/`) are
+copied into `latex/`, so the build needs no TeX Live IEEE packages.
 
 ## Layout
 
 | File | Contents |
 | --- | --- |
-| `main.tex` | Root document: class options, packages, title block, `\input` list |
-| `sections/abstract.tex` | Abstract + `IEEEkeywords` |
-| `sections/introduction.tex` | 1. Introduction |
-| `sections/background.tex` | 2. Background and Related Work (2.1–2.6) |
-| `sections/taxonomy.tex` | 3. A Taxonomy of Agent Failure Modes (Table I) |
-| `sections/framework.tex` | 4. The APIP Framework (Fig. 1, 4.1–4.5) |
-| `sections/schema.tex` | 5. Formal APIP Schema (Table II) |
-| `sections/case_study.tex` | 6. Illustrative Case Study (6.1–6.3) |
-| `sections/simulation.tex` | 7. Simulation-Based Evaluation (Tables III, IV) |
-| `sections/open_problems.tex` | 8. Open Problems (8.1–8.4) |
-| `sections/conclusion.tex` | 9. Conclusion |
+| `latex/main.tex` | Root document: class options, packages, title block, `\input` list |
+| `latex/sections/abstract.tex` | Abstract + `IEEEkeywords` |
+| `latex/sections/introduction.tex` | 1. Introduction |
+| `latex/sections/background.tex` | 2. Background and Related Work (2.1–2.6) |
+| `latex/sections/taxonomy.tex` | 3. A Taxonomy of Agent Failure Modes (Table I) |
+| `latex/sections/framework.tex` | 4. The APIP Framework (Fig. 1, 4.1–4.5) |
+| `latex/sections/schema.tex` | 5. Formal APIP Schema (Table II) |
+| `latex/sections/case_study.tex` | 6. Illustrative Case Study (6.1–6.3) |
+| `latex/sections/simulation.tex` | 7. Simulation-Based Evaluation (Tables III, IV) |
+| `latex/sections/open_problems.tex` | 8. Open Problems (8.1–8.4) |
+| `latex/sections/conclusion.tex` | 9. Conclusion |
 | `references.bib` | 35 entries; a comment gives each entry's number in the Word doc |
 
 Section numbering is produced by `IEEEtran`, so the hardcoded numbers from the

@@ -5,7 +5,7 @@ Run the product backend:
     python main.py            # serves the doc server on :8000
     DOCSERVER_PORT=9000 python main.py
 
-For the full stack (backend + React dev server) use ``scripts/start_web.sh``.
+For the full stack (backend + React dev server) use ``scripts/web/start.sh``.
 The unrelated APIP research simulation lives under ``research/`` and is launched
 separately via ``research/run_apip.sh``.
 """

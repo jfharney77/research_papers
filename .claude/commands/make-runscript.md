@@ -1,4 +1,4 @@
-Generate an executable startup script for the research/apip_sim FastAPI backend (research artifact).
+Generate an executable startup script for the sims/apip_sim FastAPI backend (research artifact).
 
 Write the file `run_apip.sh` in research/ with this exact content:
 

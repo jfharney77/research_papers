@@ -5,8 +5,8 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LATEX_ROOT = REPO_ROOT / "latex"
-SCRIPT_ROOT = REPO_ROOT / "script" / "latex"
+LATEX_ROOT = REPO_ROOT / "templates" / "latex"
+SCRIPT_ROOT = REPO_ROOT / "scripts" / "templates"
 DOCUMENTS_ROOT = REPO_ROOT / "documents"
 
 DEFAULT_TEMPLATE = "ieee"

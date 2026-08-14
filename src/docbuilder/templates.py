@@ -1,8 +1,9 @@
 """Template registry — the single source of truth for which LaTeX templates exist.
 
-A template is a directory under ``latex/<id>/`` that contains a ``main.tex``. It is
-considered *buildable* only when a matching build script ``script/latex/<id>/build.sh``
-also exists. The docserver, converter, and CLI all consult these helpers so the set of
+A template is a directory under ``templates/latex/<id>/`` that contains a ``main.tex``.
+It is considered *buildable* only when a matching build script
+``scripts/templates/<id>/build.sh`` also exists. Directories whose name starts with an
+underscore (``_vendor/``) hold upstream author kits and are never templates. The docserver, converter, and CLI all consult these helpers so the set of
 valid templates is discovered from the filesystem rather than hardcoded.
 """
 
@@ -28,7 +29,7 @@ def _build_script_exists(template_id: str) -> bool:
 def available_templates() -> list[TemplateInfo]:
     """Discover templates on disk, sorted by id.
 
-    Includes any ``latex/<id>/`` directory containing a ``main.tex``. Each is flagged
+    Includes any ``templates/latex/<id>/`` directory containing a ``main.tex``. Each is flagged
     ``buildable`` based on whether its build script is present.
     """
     if not LATEX_ROOT.exists():
@@ -36,6 +37,8 @@ def available_templates() -> list[TemplateInfo]:
 
     templates: list[TemplateInfo] = []
     for path in sorted(LATEX_ROOT.iterdir(), key=lambda p: p.name):
+        if path.name.startswith("_"):
+            continue
         if not path.is_dir() or not (path / "main.tex").exists():
             continue
         meta = TEMPLATE_METADATA.get(path.name, {})

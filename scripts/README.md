@@ -1,76 +1,104 @@
 # Scripts
 
-- `start_web.sh` / `stop_web.sh` — run the FastAPI backend + React frontend (see below).
-- `build_apip_paper.sh` — compile the APIP paper in `papers/apip/` to PDF.
+```
+scripts/
+  lib/latex_build.sh      shared LaTeX build engine — every build.sh wraps this
+  papers/<name>/          one directory per paper in papers/
+  templates/<conference>/ one directory per conference template in templates/latex/
+  web/                    start/stop the product's backend + frontend
+  new-paper.sh            scaffold a new paper (papers/ + scripts/papers/ together)
+  build_deck.py           regenerate docs/research_paper_workspace.pptx
+```
 
-## Build the APIP paper
+`scripts/papers/` mirrors `papers/`. Adding a paper means adding both, which is
+what `new-paper.sh` is for.
+
+## Build a paper
 
 ```bash
-./scripts/build_apip_paper.sh          # Linux / macOS / WSL
+bash scripts/papers/apip/build.sh          # → papers/apip/latex/main.pdf
 ```
 
 ```bat
-scripts\build_apip_paper.bat           :: Windows cmd.exe
+scripts\papers\apip\build.bat              :: Windows cmd.exe
 ```
 
-Runs `pdflatex → bibtex → pdflatex → pdflatex` in `papers/apip/` and writes
-`papers/apip/main.pdf`, then reports the page count plus any undefined
-references, undefined citations, or overfull boxes from `main.log`.
+Runs `pdflatex → bibtex → pdflatex → pdflatex`, then reports the page count plus
+any undefined references, undefined citations, or overfull boxes from `main.log`.
 
 | Flag | Effect |
 | --- | --- |
-| `-c`, `--clean` | Delete `.aux/.bbl/.blg/.log/.out` before building — use after editing `references.bib` or renaming a `\label` |
+| `-c`, `--clean` | Delete `.aux/.bbl/.blg/.log/.out` first — use after editing `references.bib` or renaming a `\label` |
 | `-q`, `--quiet` | Hide pdflatex/bibtex chatter; print only the summary |
-| `-s DIR`, `--src DIR` | Build a different paper directory instead of `papers/apip` |
+| `-s DIR`, `--src DIR` | Build a different directory |
 | `-h`, `--help` | Usage text |
 
-Both scripts take the same flags. `IEEEtran.cls` and `IEEEtran.bst` are
-vendored in `papers/apip/`, so no IEEE TeX Live package is needed — only
-`pdflatex` and `bibtex`.
+Every `build.sh` under `papers/` and `templates/` takes these same flags — they
+come from `lib/latex_build.sh`, so a fix there reaches all of them at once. The
+`.bat` is standalone (batch has no `source`) and must be updated separately.
 
-On Linux, as with the `script/latex/*` build scripts, host auto-install is off
-by default; set `LATEX_AUTO_INSTALL=1` to let the script `apt-get` TeX Live.
-The `.bat` has no auto-install equivalent (that path is apt-specific) — install
-[MiKTeX](https://miktex.org) or TeX Live for Windows first.
+## Build a conference template
+
+```bash
+bash scripts/templates/ieee/build.sh       # → templates/latex/ieee/main.pdf
+```
+
+These compile the empty skeletons in `templates/latex/`, which is how you check a
+style file still works after updating it. Per-template notes:
+
+- **neurips** — downloads `neurips_<year>.sty` on first build. Bump `STYLE_YEAR`
+  and `STYLE_URL` in its `build.sh` annually.
+- **aaai** — always cleans aux files first; a stale `main.aux` triggers duplicate
+  `\bibstyle` errors under `aaai2026.bst`.
+- **acm** / **aaai** — refuse to build if their vendored `.cls`/`.sty` is missing,
+  with the download URL in the error.
+
+## Add a paper
+
+```bash
+bash scripts/new-paper.sh <slug> [conference]     # conference defaults to ieee
+```
+
+Creates `papers/<slug>/{manuscript,latex,figures,deck}/` seeded from
+`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh`. Figures
+resolve through `\graphicspath` in `main.tex`, so drop images straight into
+`papers/<slug>/figures/` and reference them by bare filename.
+
+## TeX Live
+
+Host auto-install is off by default. Set `LATEX_AUTO_INSTALL=1` to let a script
+`apt-get` TeX Live, or build with `LATEX_SANDBOX=docker`. On Windows install
+[MiKTeX](https://miktex.org) or TeX Live first — the `.bat` has no auto-install
+path, since that escape hatch is apt-specific.
 
 # Web Stack Runbook
 
-These helper scripts start/stop the FastAPI backend (`docserver`) and React frontend (`web/`).
+`scripts/web/` starts and stops the FastAPI backend (`docserver`) and the React
+frontend (`web/`).
 
 ## Prerequisites
 
-- Python 3.12 environment with `uv` (preferred) or `python` + dependencies installed via `uv sync`/`pip install -r requirements`.
-- Node.js + npm (for the Vite dev server) already bootstrapped in `web/` (`npm install`).
-- Ports `8000` (backend) and `5173` (frontend) available locally.
+- Python 3.12 with `uv` (preferred), or `python` plus deps from `uv sync`.
+- Node.js + npm, already bootstrapped in `web/` (`npm install`).
+- Ports `8000` (backend) and `5173` (frontend) free.
 
-## Start both services
-
-```bash
-./scripts/start_web.sh
-```
-
-What it does:
-
-1. Ensures no existing PID files are running.
-2. Launches `uvicorn docserver.main:app --port 8000` with `PYTHONPATH=src` so FastAPI can import the new modules.
-3. Launches `npm run dev -- --host 0.0.0.0 --port 5173` inside `web/`.
-4. Writes logs to `logs/backend.log` and `logs/frontend.log`; PIDs stored under `logs/.backend.pid` and `logs/.frontend.pid`.
-
-## Stop both services
+## Start and stop
 
 ```bash
-./scripts/stop_web.sh
+./scripts/web/start.sh
+./scripts/web/stop.sh
 ```
 
-The stop script:
-
-- Reads each PID file, sends `SIGTERM`, waits up to ~5 seconds, and escalates to `SIGKILL` if needed.
-- Cleans up PID files whether or not processes are running.
+`start.sh` checks for stale PID files, launches `uvicorn docserver.main:app` on
+:8000 with `PYTHONPATH=src`, launches `npm run dev` on :5173, and writes logs and
+PIDs under `logs/`. `stop.sh` sends `SIGTERM` to each PID, waits ~5 seconds, then
+escalates to `SIGKILL`, cleaning up PID files either way.
 
 ## Troubleshooting
 
-- **“Failed to fetch” in the UI:** confirm the backend started successfully (`tail -f logs/backend.log`). If the backend crashed because it could not import modules, ensure you ran `./scripts/start_web.sh` (ensures backend imports via `PYTHONPATH=src`).
-- Frontend dev server listens on `5173` with `VITE_API_BASE` pointing at `http://localhost:8000`.
-- Use the UI’s “Delete” button or call `DELETE /documents/{id}` if a workspace needs to be removed.
-- **Ports already in use:** stop other processes on 8000/5173 or edit the scripts to use alternate ports (keeping frontend `VITE_API_BASE` in sync).
-- **Permission denied:** run `chmod +x scripts/start_web.sh scripts/stop_web.sh` once.
+- **"Failed to fetch" in the UI:** check the backend started (`tail -f logs/backend.log`).
+  Always launch via `start.sh` — it sets the `PYTHONPATH=src` the imports need.
+- **Ports already in use:** free 8000/5173, or edit the scripts (keep the
+  frontend's `VITE_API_BASE` in sync).
+- **Permission denied:** `chmod +x scripts/web/start.sh scripts/web/stop.sh`.
+- Use the UI's Delete button or `DELETE /documents/{id}` to remove a workspace.

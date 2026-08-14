@@ -1,0 +1,75 @@
+% =============================================================================
+% IEEE Conference Paper Template
+% Document class: IEEEtran (conference mode)
+%
+% Compilation:
+%   pdflatex main.tex
+%   bibtex main
+%   pdflatex main.tex
+%   pdflatex main.tex
+%
+% Structure:
+%   main.tex              -- root document (this file)
+%   sections/abstract.tex -- abstract
+%   sections/introduction.tex
+%   sections/related_work.tex
+%   sections/conclusion.tex
+%   references.bib        -- bibliography entries
+% =============================================================================
+
+\documentclass[conference]{IEEEtran}
+
+% ---------------- Packages ----------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}           % improved citation handling for IEEE style
+\usepackage{amsmath,amssymb,amsfonts}
+% \usepackage{algorithmic}  % uncomment when adding algorithm blocks (requires texlive-science)
+\usepackage{graphicx}
+% Figure search path. Listed in order so a template builds in place
+% (templates/latex/<conf>/) and a paper seeded from it by scripts/new-paper.sh
+% builds too (papers/<slug>/latex/), preferring the paper's own figures/.
+\graphicspath{{figures/}{../figures/}{../../assets/figures/}{../../../templates/assets/figures/}}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}       % clickable links (load last, before cleveref)
+
+% ------------------------------------------
+
+\begin{document}
+
+% ---------------- Title block ----------------
+\title{Paper Title Goes Here}
+
+\author{%
+  \IEEEauthorblockN{First Author}
+  \IEEEauthorblockA{%
+    \textit{Department of Computer Science}\\
+    \textit{University Name}\\
+    City, Country\\
+    first.author@university.edu}
+  \and
+  \IEEEauthorblockN{Second Author}
+  \IEEEauthorblockA{%
+    \textit{Department of Electrical Engineering}\\
+    \textit{University Name}\\
+    City, Country\\
+    second.author@university.edu}
+}
+
+\maketitle
+
+% ---------------- Abstract ----------------
+\input{sections/abstract}
+
+% ---------------- Body sections ----------------
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/figures}
+\input{sections/conclusion}
+
+% ---------------- References ----------------
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

@@ -8,3 +8,21 @@ __pycache__/
 documents/
 logs/
 web/dist/
+
+# LaTeX build artifacts (papers/ and templates/ alike)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc
+**/main.log
+**/main.pdf
+
+# ...except the vendored author kits, which ship reference PDFs
+!templates/latex/_vendor/**
+!templates/bibtex/**
