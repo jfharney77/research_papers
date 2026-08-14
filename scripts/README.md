@@ -6,7 +6,11 @@
 ## Build the APIP paper
 
 ```bash
-./scripts/build_apip_paper.sh
+./scripts/build_apip_paper.sh          # Linux / macOS / WSL
+```
+
+```bat
+scripts\build_apip_paper.bat           :: Windows cmd.exe
 ```
 
 Runs `pdflatex → bibtex → pdflatex → pdflatex` in `papers/apip/` and writes
@@ -20,10 +24,14 @@ references, undefined citations, or overfull boxes from `main.log`.
 | `-s DIR`, `--src DIR` | Build a different paper directory instead of `papers/apip` |
 | `-h`, `--help` | Usage text |
 
-`IEEEtran.cls` and `IEEEtran.bst` are vendored in `papers/apip/`, so no IEEE
-TeX Live package is needed — only `pdflatex` and `bibtex`. As with the
-`script/latex/*` build scripts, host auto-install is off by default; set
-`LATEX_AUTO_INSTALL=1` to let the script `apt-get` TeX Live.
+Both scripts take the same flags. `IEEEtran.cls` and `IEEEtran.bst` are
+vendored in `papers/apip/`, so no IEEE TeX Live package is needed — only
+`pdflatex` and `bibtex`.
+
+On Linux, as with the `script/latex/*` build scripts, host auto-install is off
+by default; set `LATEX_AUTO_INSTALL=1` to let the script `apt-get` TeX Live.
+The `.bat` has no auto-install equivalent (that path is apt-specific) — install
+[MiKTeX](https://miktex.org) or TeX Live for Windows first.
 
 # Web Stack Runbook
 
