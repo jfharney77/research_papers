@@ -232,7 +232,12 @@ def _build_from_docx(*, docx_path: Document, source_path: Path, workspace: Path,
     (references_dir / "references.bib").write_text(bib_content)
     manifest.references_warning = references_warning
 
-    _rewrite_main(template_workspace, manifest.sections, title=manifest.title)
+    _rewrite_main(
+        template_workspace,
+        manifest.sections,
+        title=manifest.title,
+        has_references="@" in bib_content,
+    )
 
     return manifest
 
@@ -318,7 +323,13 @@ _TITLE_RE = re.compile(r"\\title\{[^}]*\}")
 _BIB_RE = re.compile(r"^\s*\\bibliography(style)?\{")
 
 
-def _rewrite_main(template_workspace: Path, sections: list[SectionEntry], *, title: str | None = None) -> None:
+def _rewrite_main(
+    template_workspace: Path,
+    sections: list[SectionEntry],
+    *,
+    title: str | None = None,
+    has_references: bool = True,
+) -> None:
     """Rewrite main.tex so the compiled PDF holds only the user's content.
 
     The template body carries placeholder ``\\input{sections/...}`` lines (Lorem
@@ -360,6 +371,17 @@ def _rewrite_main(template_workspace: Path, sections: list[SectionEntry], *, tit
         section_inputs.append(f"\\input{{sections/{entry.slug}}}\n")
     section_inputs.append("% ---- End auto-generated sections ----\n")
     section_block = "".join(section_inputs)
+
+    # An empty references.bib makes bibtex emit \begin{thebibliography}{} with no
+    # \bibitem, which pdflatex rejects outright ("Something's wrong--perhaps a
+    # missing \item") and the build dies. When nothing could be extracted, comment
+    # the bibliography commands out so the document still compiles; uncomment them
+    # once references.bib has entries.
+    if not has_references:
+        cleaned_lines = [
+            f"% [no references extracted] {line}" if _BIB_RE.match(line) else line
+            for line in cleaned_lines
+        ]
 
     # Splice the user's sections in just before the bibliography so the body comes
     # before the references; fall back to appending at the end of the body.

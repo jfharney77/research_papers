@@ -157,7 +157,15 @@ latex_build() {
 
     echo ""
     echo "[2/4] bibtex (bibliography) ..."
-    _run bibtex main
+    # bibtex exits nonzero when a document has no \cite commands or no
+    # \bibdata — normal for a draft with the bibliography not yet wired up, and
+    # not a reason to abort a document that otherwise compiles. Report and
+    # continue; genuine .bib syntax errors still surface in main.blg and as
+    # undefined citations in the summary below.
+    if ! _run bibtex main; then
+        echo "[WARN] bibtex reported errors (see ${LATEX_SRC}/main.blg)."
+        echo "       Expected when the document has no citations yet."
+    fi
 
     echo ""
     echo "[3/4] pdflatex (second pass -- resolving citations) ..."
