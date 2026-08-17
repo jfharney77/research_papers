@@ -1,0 +1,43 @@
+% =============================================================================
+% Placeholder macros for testbed results.
+%
+% Every empirical number from the apip_simulations testbeds enters the paper
+% through a macro defined here, so results can be dropped in as runs complete
+% without touching section prose. \pending{} renders a visible red placeholder;
+% replace the macro bodies (and delete \pending) when real values land.
+%
+% Source of truth: /home/john/fable5/apip_simulations (runs/<id>/outcome.json,
+% metrics.py bootstrap CIs). Do not hand-edit numbers into section files.
+% =============================================================================
+
+\newcommand{\pending}[1]{\textcolor{red}{[#1]}}
+
+% ---- Headline positional claims (τ³ + pooled) ----
+\newcommand{\ttrOraclePct}{\pending{X\%}}        % APIP TTR as % of oracle (B4)
+\newcommand{\ttrRandomPct}{\pending{Y\%}}        % B3 random-tier TTR as % of oracle
+\newcommand{\attrAccuracy}{\pending{Z}}          % attribution accuracy excl. abstentions
+\newcommand{\attrAbstention}{\pending{W\%}}      % abstention rate
+
+% ---- τ³-bench drift experiment ----
+\newcommand{\tauDetectLag}{\pending{$n$}}        % ticks, injection -> detection
+\newcommand{\tauTTRapip}{\pending{$a \pm b$}}    % APIP TTR, ticks (bootstrap CI)
+\newcommand{\tauTTRbtwo}{\pending{$c \pm d$}}    % B2 always-Tier-1 TTR
+\newcommand{\tauBtwoRegressPct}{\pending{R\%}}   % B2 regression rate under deepening ladder
+\newcommand{\tauCitationJudgeAgree}{\pending{$\kappa$}} % judge-human agreement, citation metric
+
+% ---- ChatDev experiments ----
+\newcommand{\creepDetectTick}{\pending{$t$}}     % alignment creep, drift-trigger detection tick
+\newcommand{\britAggLag}{\pending{$n_1$}}        % brittleness detection lag, aggregate-only
+\newcommand{\britDisaggLag}{\pending{$n_2$}}     % brittleness detection lag, disaggregated
+\newcommand{\meshPeerDegradation}{\pending{$\Delta$}}   % peer metric drop after insertion
+\newcommand{\meshOnboardAttenuation}{\pending{$A\%$}}   % attenuation under scoped onboarding
+
+% ---- CoffeeBench ----
+\newcommand{\coffeeSeeds}{\pending{$k$}}         % seeds actually run (3--5)
+\newcommand{\coffeeCOneOutcome}{\pending{outcome}} % C1 exit outcome / abstention finding
+
+% ---- Detection statistics (S1/S2, already measured on the mock) ----
+\newcommand{\cleanFalseBreachBefore}{75\%}       % single-gate clean-run breach rate (measured)
+\newcommand{\cleanFalseBreachAfter}{30\%}        % two-gate clean-run breach rate (measured)
+\newcommand{\groupFalseAlarmsBefore}{71}         % group-level false alarms per 700 ticks (measured)
+\newcommand{\groupFalseAlarmsAfter}{0}           % after power floors (measured)

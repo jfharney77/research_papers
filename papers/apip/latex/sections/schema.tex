@@ -14,8 +14,10 @@ YAML, JSON, or DSL implementations are straightforward.
   \centering
   \caption{Formal APIP schema fields. New fields relative to a basic PIP
            schema are \texttt{kirkpatrick\_levels}, the
-           \texttt{exogenous\_disruption} failure mode, and
-           \texttt{mesh\_context}.}
+           \texttt{exogenous\_disruption} failure mode,
+           \texttt{mesh\_context}, and the attribution-provenance fields
+           \texttt{attribution\_confidence}, \texttt{mapping\_table\_hash},
+           and \texttt{environment\_provenance}.}
   \label{tab:schema}
   \footnotesize
   \begin{tabular}{@{}L{4.2cm}L{1.8cm}L{10.4cm}@{}}
@@ -37,9 +39,22 @@ YAML, JSON, or DSL implementations are straightforward.
     \texttt{failure\_mode} & enum &
       One of: \texttt{behavioral\_drift} $|$ \texttt{input\_brittleness} $|$
       \texttt{alignment\_creep} $|$ \texttt{tool\_misuse} $|$
-      \texttt{exogenous\_disruption}. \\
+      \texttt{exogenous\_disruption} $|$ \texttt{abstain}, plus the
+      out-of-scope extension value \texttt{adversarial\_subversion}
+      (Section~\ref{sec:taxonomy}). \\
     \texttt{cause\_attribution\_report} & string &
       Reference to the structured cause attribution document. \\
+    \texttt{attribution\_confidence} & number &
+      Confidence score emitted by the attribution funnel
+      (Section~\ref{subsubsec:funnel}); \texttt{abstain} is recorded when
+      below the frozen threshold. \\
+    \texttt{mapping\_table\_hash} & string &
+      Hash of the frozen trace-label-to-taxonomy mapping table active for
+      this APIP, making post-hoc edits to attribution rules detectable. \\
+    \texttt{environment\_provenance} & object &
+      Version pins for the agent's environment at trigger time (model
+      fingerprints, knowledge-base/corpus versions, external dependency
+      commits), copied into the record rather than referenced. \\
     \texttt{kirkpatrick\_levels} & object &
       Baseline and target values for Levels 1--4 evaluation at each
       check-in. \\
@@ -57,8 +72,9 @@ YAML, JSON, or DSL implementations are straightforward.
       Scheduled check-in timestamps and recorded metric snapshots with
       Kirkpatrick level assessments. \\
     \texttt{exit\_outcome} & enum &
-      One of: \texttt{resolved} $|$ \texttt{extended} $|$
-      \texttt{escalated}. \\
+      One of: \texttt{resolved} $|$ \texttt{regressed} $|$ \texttt{timeout}
+      $|$ \texttt{recalibrated} $|$ \texttt{retired}
+      (Section~\ref{subsec:exit}). \\
     \texttt{exit\_evaluated\_at} & datetime &
       Timestamp of the formal exit evaluation. \\
     \texttt{owner} & string &
@@ -81,6 +97,13 @@ contract at deployment time, without which the APIP trigger and exit evaluation
 phases cannot be operationalized. The \texttt{kirkpatrick\_levels} field
 captures the multi-level evaluation data at each check-in, enabling post-hoc
 analysis of whether interventions produced superficial or durable improvement.
+The \texttt{mapping\_table\_hash} and \texttt{environment\_provenance} fields
+extend the visibility mechanisms of Kolt et al.~\cite{kolt2024visibility} from
+identity linkage to \emph{decision-rule} linkage: an auditor can verify not
+only which agent and operator acted, but that the attribution rules and
+environment versions cited by the record are the ones that were actually in
+force---which is what converts a pre-registration claim from an assertion into
+a checkable property.
 The \texttt{mesh\_context} field, described further in
 Section~\ref{subsec:mesh}, supports cause attribution in multi-agent
 deployments.

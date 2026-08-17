@@ -29,11 +29,14 @@ to select an intervention tier autonomously, and LLM-as-judge approaches in
 particular have been found inadequate for modeling causal
 dependencies~\cite{ma2025attribution}. Second, these methods attribute individual
 failed trajectories, whereas APIP requires a window-level failure-mode
-classification; the aggregation layer that maps a distribution of
-trajectory-level attributions onto the Section~\ref{sec:taxonomy} taxonomy---and
-onto repair-oriented root-cause categories more
-generally~\cite{ma2025lifecycle}---is, to our knowledge, unaddressed. Closing
-that gap would substantially reduce APIP initiation cost and is a natural bridge
+classification. The three-stage funnel of Section~\ref{subsubsec:funnel} is a
+first instantiation of the aggregation layer that maps a distribution of
+trace-level labels onto the Section~\ref{sec:taxonomy} taxonomy---and onto
+repair-oriented root-cause categories more
+generally~\cite{ma2025lifecycle}---but its accuracy ceiling and its behavior
+outside the injected failure modes it was evaluated on
+(Section~\ref{subsec:eval-attribution}) remain open. Raising that ceiling
+would substantially reduce APIP initiation cost and is a natural bridge
 between this framework and the attribution literature.
 
 \subsection{Multi-Agent Mesh Deployments: The New Hire Problem}
@@ -54,8 +57,11 @@ individual performance of peer agents, declines. The APIP framework triggers on
 the peer agents, whose metrics have crossed threshold. Cause attribution,
 however, fails to find an intrinsic failure mode: the peer agents have not
 drifted, their retrieval is fresh, their alignment is intact. The root cause is
-exogenous---and the single-agent APIP has no mechanism to represent or address
-it.
+exogenous---and a purely single-agent APIP would have no mechanism to represent
+or address it. Section~\ref{subsec:eval-chatdev} demonstrates this dynamic
+empirically and evaluates a first mitigation; what follows supplies the
+theoretical account of \emph{why} it occurs, and what remains open after the
+demonstration.
 
 Kim et al.~\cite{kim2025scaling} provide direct empirical support: their large
 controlled study of multi-agent scaling found performance change relative to
@@ -130,30 +136,31 @@ mitigates the disruptiveness of the transition process.
 
 From the APIP perspective, mesh disruption creates a causal attribution
 failure: the underperforming agents' APIPs cannot be resolved because the root
-cause is not remediable at the agent level. This motivates two extensions to
-the framework. First, a mesh-aware cause attribution
-category---\texttt{exogenous\_disruption}---should be added to the failure mode
-taxonomy (reflected in the schema in Table~\ref{tab:schema}), with a
-corresponding diagnosis protocol that includes analysis of shared context
-composition and peer agent behavioral change events. Second, a mesh onboarding
-protocol is needed: a structured introduction process for new agents that
-includes context scoping (isolating the new agent's context contributions
-during a probationary window), behavioral contract alignment across the mesh,
-and regression monitoring on peer agents during the introduction
-period---analogous to the 30-60-90 day structured onboarding plans documented
-in the newcomer socialization literature~\cite{bauer2025newcomer,kammeyer2013support}.
+cause is not remediable at the agent level. The framework as evaluated already
+incorporates the two extensions this motivates: the
+\texttt{exogenous\_disruption} failure mode
+(Section~\ref{sec:taxonomy}, Table~\ref{tab:schema}), whose diagnosis keys on
+peer-role concentration coincident with a mesh change event, and the
+scoped-context onboarding protocol---context scoping during a probationary
+window, behavioral contract alignment across the mesh, and regression
+monitoring on peers during introduction, analogous to the 30-60-90 day
+structured onboarding plans in the newcomer socialization
+literature~\cite{bauer2025newcomer,kammeyer2013support}---whose attenuation of
+peer degradation Section~\ref{subsec:eval-chatdev} measures.
 
-We identify the formal treatment of agent mesh disruption as a significant open
-problem at the intersection of multi-agent coordination, information-theoretic
-resource allocation, and AI governance. The mechanism design framing is
-particularly productive: mesh disruption can be modeled as a congestion
+What the demonstration does not settle is the open problem. First,
+\emph{mechanism separation}: the four hypothesized mechanisms above all
+predict the same aggregate signature, and our experiment establishes that the
+externality exists and can be attenuated, not which mechanism carries it.
+Second, \emph{scale}: a five-to-six-role mesh with one insertion is the
+smallest interesting case; whether attribution remains tractable as meshes
+grow is unresolved---Krishnan~\cite{krishnan2025mcp} notes that even with
+standardized context protocols such as MCP, tracing causality across hundreds
+of agents exceeds current tooling. The mechanism design framing remains
+productive for both questions: mesh disruption can be modeled as a congestion
 externality in shared context space, with the APIP framework providing the
-remediation layer once the externality is detected.
-Krishnan~\cite{krishnan2025mcp} notes that even with standardized context
-protocols such as MCP, tracing causality across hundreds of agents exceeds
-current tooling---confirming that the attribution failure we describe is a
-documented practical constraint. A full formal treatment is reserved for a
-companion paper.
+remediation layer once the externality is detected. A full formal treatment is
+reserved for a companion paper.
 
 \subsection{Organizational Ownership of the APIP Process}
 \label{subsec:ownership}

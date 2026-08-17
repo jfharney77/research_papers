@@ -14,20 +14,34 @@ recovery from superficial metric improvement.
 
 The APIP framework addresses a genuine gap in current practice: the absence of
 structured, documented, and measurable remediation protocols for
-underperforming production agents. Through a hypothetical case study, we have
-shown that unstructured remediation creates avoidable regression risk through
-failure mode misclassification, and that the APIP's cause attribution phase
-provides a direct mitigation. The formal schema provides a foundation for
+underperforming production agents. Across three live multi-agent
+environments, we have shown that unstructured remediation creates avoidable
+regression risk through failure mode misclassification---the fixed-Tier-1
+baseline's measured patch-then-regress dynamic under deepening drift---and
+that the APIP's cause attribution phase provides a direct, measurable
+mitigation, with attribution quality reported as a confusion matrix with
+honest abstention rather than asserted. The evaluation also surfaced
+protocol-level findings the framework now incorporates: statistical
+discipline in the trigger phase (without which realistic contracts alarm on
+noise), and the \texttt{recalibrated} and \texttt{retired} exit outcomes
+(without which legitimate environmental change and unrecoverable agents have
+no honest terminal state). The formal schema provides a foundation for
 tooling integration and the audit trail documentation increasingly required by
-AI governance frameworks~\cite{brundage2020trustworthy,eu2024aiact,wachter2017counterfactual}.
+AI governance frameworks~\cite{brundage2020trustworthy,eu2024aiact,wachter2017counterfactual};
+the evaluation harness, run artifacts, environment version pins, and the
+frozen attribution mapping table are released alongside this paper, so that
+its pre-registration claims are checkable rather than asserted.
 
 We have identified behavioral contract specification, scalable causal
 attribution, multi-agent mesh extension, and organizational ownership as the
 primary open problems for future work. The mesh disruption problem in
 particular---where a locally high-performing new agent degrades peer agent
-performance through shared context space dynamics---reveals a causal
-attribution failure mode that motivates a companion extension of this framework
-to multi-agent deployments. By grounding mesh disruption analysis in Event
+performance through shared context space dynamics---is demonstrated
+empirically here, together with a scoped-context onboarding protocol that
+attenuates it; separating the mechanisms that carry the externality, and
+scaling attribution beyond small meshes, motivate a companion extension of
+this framework to multi-agent deployments. By grounding mesh disruption
+analysis in Event
 System Theory~\cite{morgeson2015event}, team membership change
 research~\cite{summers2012team,trainer2020membership}, Transactive Memory
 Systems~\cite{ren2011transactive,wegner1987transactive}, and empirical

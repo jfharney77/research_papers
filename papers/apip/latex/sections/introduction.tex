@@ -57,17 +57,27 @@ We make the following contributions:
   \item We introduce the Agent Performance Improvement Plan (APIP) as a
         formalized post-deployment remediation lifecycle protocol, grounded in
         organizational management and training evaluation research.
-  \item We develop a four-category taxonomy of agent failure modes that maps
-        onto APIP cause-finding procedures.
+  \item We develop a five-category taxonomy of agent failure modes that maps
+        onto APIP cause-finding procedures, together with a published
+        deterministic mapping from trace-level failure annotations
+        (MAST~\cite{cemri2025mast}) and disaggregation signatures onto taxonomy
+        categories and intervention tiers.
   \item We propose a three-tier intervention hierarchy---prompt-level,
         retrieval-level, and model-level---with escalation criteria, and connect
         the evaluation of these interventions to Kirkpatrick's multi-level
         evaluation framework.
   \item We formalize the APIP as a declarative schema to support tooling
         integration and audit trail generation.
-  \item We motivate and illustrate the framework through a hypothetical
-        customer service agent deployment scenario.
-  \item We identify the mesh disruption problem---where a locally optimal new
-        agent degrades peer performance---as a critical open problem, framing it
-        through Event System Theory and the team membership change literature.
+  \item We evaluate the full protocol in three live multi-agent environments
+        spanning customer service, software engineering, and economic
+        operations, scoring detection lag, attribution accuracy (as a confusion
+        matrix against injected ground truth, with abstention as a scored
+        outcome), and oracle-relative time-to-resolution against a four-condition
+        baseline family. The same contract/trigger/tier/exit machinery governs
+        all three domains, which is itself evidence for the generality of the
+        behavioral contract abstraction.
+  \item We demonstrate the mesh disruption problem---where a locally optimal
+        new agent degrades peer performance---empirically, framing it through
+        Event System Theory and the team membership change literature, and we
+        evaluate a scoped-context onboarding protocol as its mitigation.
 \end{itemize}

@@ -13,8 +13,11 @@ billing FAQ documents. At deployment, Aria achieved a task completion rate of
 87\% and a CSAT score of 4.3 out of 5.0. All numerical values in this
 section---performance thresholds, check-in days, observed metric
 movements---are illustrative parameter choices rather than empirical
-measurements, selected to be consistent with the simulation in
-Section~\ref{sec:simulation}.
+measurements. The scenario is not left hypothetical: the
+$\tau^2$-bench drift experiment in Section~\ref{subsec:eval-tau} reproduces
+this failure mode end-to-end with deterministic ground truth---a policy
+corpus that goes stale while the world's ground truth moves---and measures
+what this section can only narrate.
 
 \subsection{The Degradation Event}
 \label{subsec:degradation-event}
@@ -84,3 +87,9 @@ requirement embedded in the intervention plan prevents the cascading failure
 that occurred in the ad-hoc scenario. Fifth, the Kirkpatrick-level evaluation
 at check-ins provides confidence that recovery is durable rather than
 superficial.
+
+Each of these claims is testable, and Section~\ref{sec:simulation} tests them:
+the ad-hoc responder of Section~\ref{subsec:degradation-event} becomes the
+fixed-Tier-1 baseline condition (B2), whose patch-then-regress dynamic is
+measured rather than narrated, and Aria's trigger metric---the policy citation
+error rate---is the drift experiment's judge-scored detection metric.

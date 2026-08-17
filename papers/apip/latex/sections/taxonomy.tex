@@ -6,8 +6,12 @@
 \label{sec:taxonomy}
 
 A critical prerequisite to structured remediation is structured cause-finding.
-We propose a four-category taxonomy of agent failure modes relevant to
-customer-facing agents. These categories are not mutually exclusive, but they
+We propose a five-category taxonomy of agent failure modes relevant to
+customer-facing agents: four intrinsic modes---behavioral drift, input
+brittleness, alignment creep, and tool misuse---plus one exogenous mode,
+mesh disruption (\texttt{exogenous\_disruption}), in which the failing agent is
+not the cause of its own degradation
+(Section~\ref{subsec:mesh}). These categories are not mutually exclusive, but they
 suggest distinct remediation pathways, which is the operationally important
 property for APIP design. Following Kirkpatrick's~\cite{kirkpatrick1994evaluating}
 insight that evaluation should be hierarchical, we note that each failure mode
@@ -49,6 +53,14 @@ consequently to a different intervention tier.
     action errors, silent failures in downstream integrations, over- or
     under-use of tool surface. Kirkpatrick Level 3 (Behavior) failure. &
     Tier 1 (prompt) or Tier 3 (fine-tune) \\
+    \addlinespace
+    Exogenous Disruption &
+    Peer agents degrade after a mesh change event (e.g.\ a new agent enters);
+    no intrinsic failure mode found in the degraded agents. Signals:
+    degradation concentrated in peer roles, onset coincident with a
+    mesh-composition event. Kirkpatrick Level 4 (Results) failure at the
+    system level. &
+    Mesh protocol (Sec.~\ref{subsec:mesh}), not an agent-level tier \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -90,14 +102,78 @@ to invoke a necessary tool produces a qualitatively different class of failure
 than a purely conversational agent---one with potentially significant downstream
 consequences.
 
-A fifth category, \textbf{Adversarial Subversion}, captures failures whose
+\textbf{Exogenous Disruption} is the taxonomy's escape hatch: the case in which
+cause attribution over a degraded agent correctly concludes that \emph{no}
+intrinsic failure mode explains the degradation, because the cause lies in a
+change to the agent's mesh environment---most prominently the introduction of a
+new, individually competent peer agent. Its signature is structural rather than
+behavioral: degradation concentrated in peer roles, coincident with a
+mesh-composition event, with the degraded agents' own traces annotating clean.
+Because no agent-level intervention addresses the cause, its remediation is a
+mesh-level protocol rather than a tier
+(Section~\ref{subsec:mesh}); misclassifying it as an intrinsic mode and
+applying an agent-level fix is precisely the tier-mismatch error the APIP is
+designed to prevent.
+
+\subsection{From Trace Labels to Taxonomy Categories}
+\label{subsec:mast-mapping}
+
+The taxonomy is only operational if a degradation window can be classified into
+it by procedure rather than intuition. We publish the deterministic mapping we
+use (Table~\ref{tab:mast-mapping}): cause attribution combines a trace-level
+failure label distribution from MAST~\cite{cemri2025mast} with a
+\emph{disaggregation signature}---how the degradation distributes across task
+categories, agent roles, and time---to select an APIP failure mode and
+intervention tier. The mapping is frozen before any evaluated run
+(Section~\ref{sec:simulation}); below-confidence combinations \emph{abstain},
+and abstentions are logged and scored as attribution failures rather than
+silently resolved.
+
+\begin{table}[t]
+  \centering
+  \caption{Published MAST-to-APIP mapping. Note the two rows sharing a MAST
+           cluster but differing on disaggregation signature: trace labels
+           alone cannot select a tier, which is why the taxonomy is
+           two-level.}
+  \label{tab:mast-mapping}
+  \footnotesize
+  \begin{tabular}{@{}L{2.2cm}L{2.6cm}L{1.5cm}L{0.7cm}@{}}
+    \toprule
+    \textbf{MAST cluster} & \textbf{Disaggregation signature} &
+    \textbf{APIP mode} & \textbf{Tier} \\
+    \midrule
+    Verification / termination failures &
+    Uniform across categories; tool-error rate elevated &
+    \texttt{tool\_misuse} & 1, esc.\ 3 \\
+    \addlinespace
+    Specification / design failures &
+    Concentrated in one task category or segment &
+    \texttt{input\_brittleness} & 1, esc.\ 3 \\
+    \addlinespace
+    Specification / design failures &
+    Uniform; entity/citation errors rising over time &
+    \texttt{behavioral\_drift} & 2 \\
+    \addlinespace
+    Inter-agent misalignment &
+    Concentrated in \emph{peer} roles after a mesh change event &
+    \texttt{exogenous\_disruption} & mesh \\
+    \addlinespace
+    (no dominant MAST mode) &
+    Slow uniform decline; review/flag rates falling &
+    \texttt{alignment\_creep} & 1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+A further category, \textbf{Adversarial Subversion}, captures failures whose
 proximate cause is an adaptive attack rather than capability or value drift.
 Recent work demonstrates that frontier models can embed prompt injections in
 their outputs that consistently evade diverse monitors, and that
 resampling-based protocols can amplify rather than suppress such
 injections~\cite{schoen2025stress,bhatt2025ctrlz}. We treat adversarial
-subversion as a separate category because its remediation pathway diverges from
-the other four: prompt revision, retrieval refresh, and fine-tuning each address
+subversion as a separate, out-of-scope category because its remediation
+pathway diverges from the five above: prompt revision, retrieval refresh, and
+fine-tuning each address
 symptoms but not the underlying adversarial dynamic. Effective response requires
 architectural changes---monitor diversification, defer-to-trusted protocols, or
 reduced action authority---drawn from the AI Control literature (discussed in

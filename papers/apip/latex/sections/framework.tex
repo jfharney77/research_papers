@@ -59,6 +59,35 @@ absolute level. Both are necessary; the former catches severe degradation, the
 latter catches gradual drift that may not breach an absolute floor for some
 time.
 
+\subsubsection{Statistical discipline of the trigger}
+\label{subsubsec:trigger-stats}
+
+Implementing the trigger phase against live agents exposed a failure mode of
+the naive design that we consider a finding in its own right. Thresholds must
+be \emph{derived}, not hand-picked: each contract metric's envelope is
+estimated from a calibration window as mean $\pm\, k\sigma$ (with $k$
+reported), which preempts the objection that thresholds were chosen so that
+triggers would fire where desired. Even then, a single-gate rule---compare a
+rolling mean against the derived floor, across the 15--25 metrics and
+disaggregated splits a realistic contract monitors---breached in
+\cleanFalseBreachBefore{} of \emph{clean, zero-injection} runs, because a
+small calibration sample is treated as exact and the per-tick tests are
+uncorrected. A breach must therefore pass two gates: the degradation must be
+at least the contract's $k\sigma$ (it matters), and it must survive
+Benjamini--Hochberg adjustment across the metric family against the correct
+null (it is real). Disaggregated groups additionally require a minimum
+per-group episode count (a power floor); under-powered groups receive no
+envelope, and the exclusion is recorded rather than silent. Finally, the
+detector's significance level is swept on clean-arm runs only and then
+frozen before any evaluated window---clean data carries no information about
+where triggers \emph{should} fire, so this calibration does not compromise
+pre-registration. Together these changes reduced clean-run breaches to
+\cleanFalseBreachAfter{} and group-level false alarms from
+\groupFalseAlarmsBefore{} to \groupFalseAlarmsAfter{} per 700 ticks in our
+harness (Section~\ref{sec:simulation}). A trigger phase without this
+discipline initiates APIPs on noise, and every downstream phase inherits the
+error.
+
 \subsection{Phase 2: Cause Attribution}
 \label{subsec:cause-attribution}
 
@@ -98,9 +127,32 @@ permits~\cite{ma2025attribution,agenttrace2026,zhu2026agentdebugx}, with a
 qualified human reviewer adjudicating the resulting evidence; (3) retrieval
 audit if behavioral drift is suspected; (4) tool invocation log analysis if tool
 misuse is suspected; and (5) a structured classification of the failure into the
-four-category taxonomy. The phase closes with a written cause attribution report
+five-category taxonomy. The phase closes with a written cause attribution report
 recording the evidence examined, any automated attribution outputs, and the
 adjudicated classification; this report becomes part of the APIP record.
+
+\subsubsection{A measurable instantiation: the three-stage funnel}
+\label{subsubsec:funnel}
+
+We instantiate this process as a three-stage funnel whose output can be scored
+against ground truth. \emph{Stage 1 (disaggregation)}: every contract metric is
+split by task category, agent role, and (where available) user segment,
+producing a disaggregation signature vector. \emph{Stage 2 (trace labeling)}: a
+MAST annotator~\cite{cemri2025mast} labels a sample of failing traces; the
+judge model is required to differ from the agent's backbone model---preferably
+by model family---to avoid the circularity of a judge sharing the failure modes
+it is meant to detect. \emph{Stage 3 (aggregation)}: the published
+deterministic mapping (Table~\ref{tab:mast-mapping}) combines the signature
+and the label distribution into a \texttt{failure\_mode} with a confidence
+score; below-threshold confidence returns \texttt{abstain}, which is logged
+and scored as an attribution failure. The mapping table is hashed into every
+run manifest and frozen before evaluated runs, making post-hoc edits
+detectable. This funnel is the aggregation layer between trajectory-level
+attribution and window-level failure-mode classification whose absence
+Section~\ref{subsec:attribution-scale} discusses; because its output is a
+discrete classification, its quality can be reported as a confusion matrix
+against injected ground truth (Section~\ref{sec:simulation}), with abstention
+rate reported alongside---never instead of---accuracy.
 
 \subsection{Phase 3: Intervention Planning and the Tier Model}
 \label{subsec:tiers}
@@ -160,12 +212,25 @@ three check-ins at 25\%, 50\%, and 75\% of elapsed time.
 \subsection{Phase 5: Exit Evaluation}
 \label{subsec:exit}
 
-At the close of the remediation window, a formal exit evaluation determines one
-of three outcomes: \emph{Resolution} (the agent has returned to within the
-behavioral contract envelope and the APIP is closed), \emph{Extension} (the
-agent shows improvement but has not yet reached the threshold; the APIP window
-is extended with modified parameters), or \emph{Escalation} (the agent has not
-recovered and more fundamental intervention---including potential model
-replacement or agent retirement---is warranted). The evaluation record becomes
-part of the organizational AI audit trail---providing governance documentation
-and institutional memory for future deployments.
+At the close of the remediation window, a formal exit evaluation records one
+of five outcomes. \emph{Resolved}: all contract metrics have returned to
+within the behavioral envelope and the APIP is closed. \emph{Regressed}: the
+envelope was restored but breached again within the observation window---a
+distinct outcome from never recovering, because it is the signature of a
+tier-mismatched intervention that suppressed symptoms without addressing
+cause. \emph{Timeout}: the window expired without durable recovery; more
+fundamental intervention is warranted, escalating through the tier model up to
+and including \emph{retirement} of the agent when the exit evaluation
+concludes the agent cannot be returned to contract at acceptable cost.
+\emph{Recalibrated}: cause attribution concluded that the \emph{environment}
+legitimately changed---the degradation reflects a moved goalpost rather than
+an agent failure---and the correct response is to re-baseline the behavioral
+contract rather than intervene on the agent. We deliberately do not score
+recalibration as a resolution: it closes the APIP without claiming the agent
+recovered, and conflating the two would let contract re-baselining masquerade
+as remediation success. (Window \emph{extension} with modified parameters
+remains available, but we treat it as an in-protocol decision at a check-in
+rather than an exit outcome, so that every APIP terminates in exactly one of
+the five states above.) The evaluation record becomes part of the
+organizational AI audit trail---providing governance documentation and
+institutional memory for future deployments.

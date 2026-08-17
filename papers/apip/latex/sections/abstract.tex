@@ -10,16 +10,24 @@ research projects that unchecked behavioral drift reduces task success by
 (APIP): a lifecycle protocol adapted from organizational management that
 governs the remediation of underperforming agents. Drawing on human PIP
 structure and Kirkpatrick's four-level evaluation framework, the APIP defines
-trigger thresholds, a four-category failure mode taxonomy, a tiered
-intervention hierarchy, a bounded remediation window with check-ins, and exit
-criteria. A discrete-event simulation across all four failure modes shows that
-tier-mismatched ad-hoc remediation extends time-to-resolution by
-$2.1\times$, validating the APIP's cause attribution requirement. We formalize
-a declarative schema meeting AI governance traceability standards (Kolt et
-al., FAccT 2024; EU AI Act), and ground extension to multi-agent
-meshes---where a locally optimal new agent degrades peer performance through
-context disruption (Kim et al., 2025)---in Event System Theory and team
-coordination research.
+statistically disciplined trigger thresholds, a five-category failure mode
+taxonomy, a measurable cause-attribution pipeline, a tiered intervention
+hierarchy, a bounded remediation window with check-ins, and exit criteria. We
+evaluate the protocol in three live multi-agent environments spanning customer
+service ($\tau^2$-bench), software engineering (ChatDev), and economic
+operations (CoffeeBench), injecting each failure mode with known ground truth
+and scoring the full pipeline against no-action, fixed-tier, random-tier, and
+oracle baselines. APIP-governed remediation achieves \ttrOraclePct{} of oracle
+time-to-resolution versus \ttrRandomPct{} for random-tier selection, and the
+attribution pipeline identifies the injected failure mode with accuracy
+\attrAccuracy{} while abstaining honestly in \attrAbstention{} of cases---to
+our knowledge the first attribution confusion matrix reported for a
+remediation protocol. We formalize a declarative schema meeting AI governance
+traceability standards (Kolt et al., FAccT 2024; EU AI Act), and demonstrate
+the mesh disruption failure mode---where a locally optimal new agent degrades
+peer performance through context disruption (Kim et al., 2025)---together with
+a scoped-context onboarding protocol that attenuates it, grounded in Event
+System Theory and team coordination research.
 \end{abstract}
 
 \begin{IEEEkeywords}
