@@ -1,0 +1,24 @@
+\section{1  Introduction}
+
+Organizations are increasingly utilizing conversational agents as their main customer interfaces, managing tasks such as support tickets, returns, and billing disputes at scale.~The evaluation prior to release is now well-equipped with standardized benchmarks [9], red-teaming [5,11], and reinforcement learning from human feedback (RLHF) alignment [10], creating a robust pre-deployment lifecycle. However, there is a noticeable lack of a culture focused on post-deployment remediation. ~A comprehensive study of deployed agents found that many either fail or do not perform as expected, yet there is limited understanding of how organizations react in these situations [25].
+
+Ad-hoc responses to degraded agents --- including hallucinations about policies cited, failure in a new product category, and changes in tone --- are standard. Typically, engineers will ``fix'' individual prompts, product managers will create service requests (tickets), and occasionally the system will be rolled back. There is no structure to how this occurs; there is no formalized way to document and evaluate how well the fixes worked. Agents either recover through informal means or they are quietly removed.
+
+While this may seem like a minor operational issue, the lack of formal remediation for degraded agents represents a substantial governance risk as AI becomes more responsible for decisions with greater consequences, and regulatory frameworks such as the European Union's AI Act require documentation and human oversight of deployed AI systems [4]. Wachter et al. [14] have pointed out that traceability of the decision-making process is required for accountability in automated decision-making systems which can be provided by formalized remediation processes. Furthermore, the lack of formal remediation creates unnecessary regression loops; decreases operator trust; and limits organizations' ability to determine when an agent has failed to such a degree that it would be better to retire the agent.
+
+We recommend using a performance improvement plan (PIP) as a model for structuring your remedial actions; we suggest using the PIP because it is an established tool in organizational HR and can be used as a useful template for remedying underperforming agents. A PIP includes a number of elements which are common to all accountability protocols: a triggering condition, a means of identifying the causes of failure, a limited time frame within which corrective action can take place, regular check-ins with the agent to monitor progress toward goals and/or compliance with requirements, and an explicit definition of when the agent has sufficiently recovered to allow their reintegration into normal operations or when they will no longer be able to continue performing the required job functions. Additionally, in the field of organizational behavior, Kirkpatrick's [7] four-level model for evaluating training programs---reaction, learning, behavior, results---is a useful complement to the above-mentioned PIP model, providing a framework by which you can evaluate if the remedial actions taken were successful in producing lasting positive changes in both individual and aggregate system behaviors.
+
+We make the following contributions:
+
+We introduce the Agent Performance Improvement Plan (APIP) as a formalized post-deployment remediation lifecycle protocol, grounded in organizational management and training evaluation research.
+
+We develop a four-category taxonomy of agent failure modes that maps onto APIP cause-finding procedures.
+
+We propose a three-tier intervention hierarchy---prompt-level, retrieval-level, and model-level---with escalation criteria, and connect the evaluation of these interventions to Kirkpatrick's multi-level evaluation framework.
+
+We formalize the APIP as a declarative schema to support tooling integration and audit trail generation.
+
+We motivate and illustrate the framework through a hypothetical customer service agent deployment scenario.
+
+We identify the mesh disruption problem---where a locally optimal new agent degrades peer performance---as a critical open problem, framing it through Event System Theory and the team membership change literature.
+

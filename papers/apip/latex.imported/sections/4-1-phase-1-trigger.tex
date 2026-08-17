@@ -1,0 +1,8 @@
+\subsection{4.1  Phase 1: Trigger}
+
+An APIP is initiated when an agent's performance crosses a pre-specified trigger threshold on one or more monitored metrics. This presupposes the existence of a behavioral contract---a formal specification of the performance envelope the agent is expected to maintain at deployment time. The behavioral contract is a deliberate design artifact that most teams currently skip, delegating performance expectations to informal organizational memory.
+
+A minimal behavioral contract specifies task surface, success metrics and measurement methodology, acceptable performance ranges, escalation policy, and human review integration points. Trigger conditions are threshold crossings on these metrics---e.g., task completion rate below 82\% over a 7-day window.
+
+Two trigger modalities are relevant: absolute threshold triggers, which fire when a metric crosses a fixed floor, and relative drift triggers, which fire when a metric declines significantly from its recent baseline regardless of absolute level. Both are necessary; the former catches severe degradation, the latter catches gradual drift that may not breach an absolute floor for some time.
+

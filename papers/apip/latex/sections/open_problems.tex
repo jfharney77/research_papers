@@ -16,11 +16,25 @@ deployment time is a significant open problem.
 \subsection{Causal Attribution at Scale}
 \label{subsec:attribution-scale}
 
-Cause attribution currently requires human review of sampled failures, which
-does not scale to high-volume deployments. LLM-as-judge pipelines or
-specialized classifiers trained on labeled failure cases would substantially
-reduce APIP initiation cost---an active area with connections to automated root
-cause analysis in SRE.
+Cause attribution as specified in Section~\ref{subsec:cause-attribution} retains
+a human adjudication step, which does not scale to high-volume deployments.
+Automated failure attribution is an active and fast-moving area: causal-inference
+frameworks report up to 36.2\% step-level accuracy using Shapley-based blame
+assignment and causal discovery---against under 15\% for prior state-of-the-art
+correlation-based methods~\cite{ma2025attribution,zhang2025whichagent}---and
+causal-graph tracing offers low-latency localization suitable for production
+use~\cite{agenttrace2026}. Two gaps keep human adjudication in the loop for now.
+First, absolute step-level accuracy remains well below the reliability required
+to select an intervention tier autonomously, and LLM-as-judge approaches in
+particular have been found inadequate for modeling causal
+dependencies~\cite{ma2025attribution}. Second, these methods attribute individual
+failed trajectories, whereas APIP requires a window-level failure-mode
+classification; the aggregation layer that maps a distribution of
+trajectory-level attributions onto the Section~\ref{sec:taxonomy} taxonomy---and
+onto repair-oriented root-cause categories more
+generally~\cite{ma2025lifecycle}---is, to our knowledge, unaddressed. Closing
+that gap would substantially reduce APIP initiation cost and is a natural bridge
+between this framework and the attribution literature.
 
 \subsection{Multi-Agent Mesh Deployments: The New Hire Problem}
 \label{subsec:mesh}

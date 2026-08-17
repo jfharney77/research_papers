@@ -1,0 +1,8 @@
+\subsection{7.2  Failure Mode Simulation Parameters}
+
+Table 3 summarizes the simulation parameters for each failure mode scenario. Injection intensity controls the magnitude of degradation per tick. Detection tick is the first tick at which an APIP trigger fires. Resolution tick is the first tick at which all behavioral contract metrics return within threshold following intervention. Time-to-resolution (TTR) is the difference between detection and resolution ticks. The APIP column shows TTR under structured remediation; the Ad-hoc column shows TTR when tier-mismatched intervention is applied (mirroring the Section 6.1 scenario).
+
+* Detect tick delayed to 24 due to aggregate metric masking; disaggregated billing\_dispute category fails at tick 10. \dag{} Ad-hoc responders in this scenario did not apply an intervention; the failure persisted until an unrelated model update resolved it at tick 55.
+
+Table 3: Failure mode simulation parameters and time-to-resolution comparison (n=30 runs each, mean $\pm$ std dev).
+

@@ -24,6 +24,23 @@ agent drift across 12 measurable dimensions, projecting a 42\% task success
 reduction for unchecked drift via simulation. The APIP addresses what all three
 leave open: a structured remediation protocol once degradation is identified.
 
+Debugging toolkits have recently begun to close a detection-to-recovery loop at
+the level of a single failed execution. AgentDebugX~\cite{zhu2026agentdebugx}
+organizes debugging as a cycle of detection, attribution, recovery, and rerun,
+verifies each repair by re-executing the failed trajectory, and maintains a
+shared corpus of diagnosed failures. The APIP operates one level above such
+tooling, and the two compose. A successful rerun verifies an instance; in the
+terms of Section~\ref{subsec:kirkpatrick}, this is Level 1/2 evidence rather
+than evidence of durable recovery against the behavioral contract. A run-level
+loop also does not decide whether an aggregate degradation warrants intervention
+at all, when to escalate intervention tiers, or when an agent should be retired
+rather than repaired, and it produces no governance record of those decisions.
+Within an APIP, repair tooling of this kind is a natural executor for Tier 1 and
+Tier 2 interventions during the remediation window, while the APIP supplies the
+trigger discipline of the behavioral contract, the bounded window with formal
+exit evaluation, and the audit trail required by the frameworks in
+Section~\ref{subsec:governance}.
+
 \subsection{The Performance Improvement Plan as a Structural Template}
 \label{subsec:pip-template}
 

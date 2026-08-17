@@ -1,0 +1,104 @@
+% =============================================================================
+% IEEE Conference Paper Template
+% Document class: IEEEtran (conference mode)
+%
+% Compilation:
+%   pdflatex main.tex
+%   bibtex main
+%   pdflatex main.tex
+%   pdflatex main.tex
+%
+% Structure:
+%   main.tex              -- root document (this file)
+%   sections/abstract.tex -- abstract
+%   sections/introduction.tex
+%   sections/related_work.tex
+%   sections/conclusion.tex
+%   references.bib        -- bibliography entries
+% =============================================================================
+
+\documentclass[conference]{IEEEtran}
+
+% ---------------- Packages ----------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}           % improved citation handling for IEEE style
+\usepackage{amsmath,amssymb,amsfonts}
+% \usepackage{algorithmic}  % uncomment when adding algorithm blocks (requires texlive-science)
+\usepackage{graphicx}
+% Figure search path. Listed in order so a template builds in place
+% (templates/latex/<conf>/) and a paper seeded from it by scripts/new-paper.sh
+% builds too (papers/<slug>/latex/), preferring the paper's own figures/.
+\graphicspath{{figures/}{../figures/}{../../assets/figures/}{../../../templates/assets/figures/}}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}       % clickable links (load last, before cleveref)
+
+% ------------------------------------------
+
+\begin{document}
+
+% ---------------- Title block ----------------
+\title{Apip Paper V9 2}
+
+\author{%
+  \IEEEauthorblockN{First Author}
+  \IEEEauthorblockA{%
+    \textit{Department of Computer Science}\\
+    \textit{University Name}\\
+    City, Country\\
+    first.author@university.edu}
+  \and
+  \IEEEauthorblockN{Second Author}
+  \IEEEauthorblockA{%
+    \textit{Department of Electrical Engineering}\\
+    \textit{University Name}\\
+    City, Country\\
+    second.author@university.edu}
+}
+
+\maketitle
+
+% ---------------- Abstract ----------------
+
+% ---------------- Body sections ----------------
+
+% ---------------- References ----------------
+% [no references extracted] \bibliographystyle{IEEEtran}
+% [no references extracted] \bibliography{references}
+% ---- Auto-generated sections ----
+\input{sections/section-1}
+\input{sections/1-introduction}
+\input{sections/2-background-and-related-work}
+\input{sections/2-1-agent-evaluation-and-the-deployment-gap}
+\input{sections/2-2-the-performance-improvement-plan-as-a-structural-template}
+\input{sections/2-3-kirkpatricks-four-level-evaluation-framework}
+\input{sections/2-4-ai-governance-and-documentation-requirements}
+\input{sections/section-8}
+\input{sections/2-team-dynamics-membership-change-and-coordination}
+\input{sections/3-a-taxonomy-of-agent-failure-modes}
+\input{sections/4-the-apip-framework}
+\input{sections/4-1-phase-1-trigger}
+\input{sections/4-2-phase-2-cause-attribution}
+\input{sections/4-3-phase-3-intervention-planning-and-the-tier-model}
+\input{sections/4-4-phase-4-remediation-window-and-check-in-cadence}
+\input{sections/4-5-phase-5-exit-evaluation}
+\input{sections/5-formal-apip-schema}
+\input{sections/6-illustrative-case-study-aria-at-retailco}
+\input{sections/6-1-the-degradation-event}
+\input{sections/6-2-apip-application}
+\input{sections/6-3-lessons-from-the-case-study}
+\input{sections/7-simulation-based-evaluation}
+\input{sections/7-1-simulation-design}
+\input{sections/7-2-failure-mode-simulation-parameters}
+\input{sections/7-3-operational-cost-metrics}
+\input{sections/7-4-key-findings}
+\input{sections/7-5-simulation-limitations}
+\input{sections/8-open-problems-and-future-directions}
+\input{sections/8-1-behavioral-contract-specification}
+\input{sections/8-2-causal-attribution-at-scale}
+\input{sections/8-3-multi-agent-mesh-deployments-the-new-hire-problem}
+\input{sections/8-4-organizational-ownership-of-the-apip-process}
+\input{sections/9-conclusion}
+% ---- End auto-generated sections ----
+\end{document}

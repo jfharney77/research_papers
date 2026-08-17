@@ -1,0 +1,8 @@
+\section{5  Formal APIP Schema}
+
+We formalize the APIP as a declarative schema to enable tooling integration and audit trail generation. The schema uses a notation analogous to JSON Schema; YAML, JSON, or DSL implementations are straightforward.
+
+Table 2: Formal APIP schema fields. New fields relative to a basic PIP schema are highlighted: kirkpatrick\_levels, exogenous\_disruption failure mode, and mesh\_context.
+
+The schema is intentionally minimal at the field level but requires structured sub-schemas for interventions and check-ins to preserve audit trail integrity. The behavioral\_contract\_ref field is architecturally critical: it enforces the discipline of writing a behavioral contract at deployment time, without which the APIP trigger and exit evaluation phases cannot be operationalized. The kirkpatrick\_levels field captures the multi-level evaluation data at each check-in, enabling post-hoc analysis of whether interventions produced superficial or durable improvement. The mesh\_context field, described further in Section 7.3, supports cause attribution in multi-agent deployments.
+

@@ -1,0 +1,10 @@
+\subsection{6.2  APIP Application}
+
+Under the APIP framework, the scenario unfolds differently. RetailCo's behavioral contract for Aria specifies trigger conditions including: task completion rate below 82\% (7-day rolling), CSAT below 3.8 (7-day rolling), and policy citation error rate above 5\% (measured via weekly human review sample of 50 conversations). The policy citation error rate trigger fires at week 10.
+
+Phase 2 cause attribution identifies the failure as behavioral drift: the RAG index is stale relative to the current policy and product catalog. The failure is not attributable to model capability, prompt constraints, or tool configuration. The cause attribution report notes that the system prompt intervention applied in the ad-hoc scenario was a misclassification of failure mode.
+
+Phase 3 intervention planning selects Tier 2: RAG index refresh for the returns policy document and product catalog additions. The intervention plan specifies a regression test suite to be run before re-deployment, including coverage of the discount constraint behavior.
+
+A 14-day remediation window is opened with check-ins at days 4, 7, and 11. Following Kirkpatrick's framework, the day 4 check-in evaluates at multiple levels: Level 2 (does Aria now cite the correct policy?), Level 3 (has the pattern of escalation-triggering responses changed?), and Level 4 (is CSAT recovering?). The policy citation error rate has dropped to below 2\% following the index refresh. At day 14, the exit evaluation confirms resolution: task completion has returned to 86\%, CSAT to 4.2, and policy citation errors to 1.5\%. The APIP is closed with outcome: resolved. The full APIP record---cause attribution report, intervention specification, regression test results, Kirkpatrick-level check-in assessments, and metric snapshots---is stored in RetailCo's AI audit trail.
+

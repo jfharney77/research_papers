@@ -1,0 +1,6 @@
+\subsection{6.1  The Degradation Event}
+
+Ninety days post-deployment, RetailCo's customer support team began noticing an increase in escalation requests from customers who had interacted with Aria. An informal audit revealed that Aria was consistently citing an outdated version of the returns policy---specifically, citing a 30-day return window that had been extended to 45 days in a policy update three weeks prior. Additionally, a new product line launched six weeks post-deployment was producing a high rate of ``I don't have information about that product'' responses, reflecting a RAG index that had not been refreshed.
+
+In the absence of a formal APIP process, the response was: a developer updated the system prompt to include the new return window figure (a Tier 1 intervention applied to a Tier 2 problem), and a ticket was filed to update the RAG index. The system prompt change was deployed without a regression test, inadvertently overriding a constraint that prevented Aria from offering unsolicited discounts. Over the following week, discount offer rates tripled, producing a measurable revenue impact before the issue was detected.
+

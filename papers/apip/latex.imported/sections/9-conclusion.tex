@@ -1,0 +1,74 @@
+\section{9  Conclusion}
+
+We have introduced the Agent Performance Improvement Plan (APIP) as a structured post-deployment remediation framework for customer-facing AI agents. The framework adapts the human PIP's lifecycle primitives---trigger, cause attribution, tiered intervention, remediation window, exit evaluation---while acknowledging that agents cannot self-direct improvement. We ground the evaluation discipline in Kirkpatrick's four-level model to distinguish durable recovery from superficial metric improvement.
+
+The APIP framework addresses a genuine gap in current practice: the absence of structured, documented, and measurable remediation protocols for underperforming production agents. Through a hypothetical case study, we have shown that unstructured remediation creates avoidable regression risk through failure mode misclassification, and that the APIP's cause attribution phase provides a direct mitigation. The formal schema provides a foundation for tooling integration and the audit trail documentation increasingly required by AI governance frameworks [3, 4, 14].
+
+We have identified behavioral contract specification, scalable causal attribution, multi-agent mesh extension, and organizational ownership as the primary open problems for future work. The mesh disruption problem in particular---where a locally high-performing new agent degrades peer agent performance through shared context space dynamics---reveals a causal attribution failure mode that motivates a companion extension of this framework to multi-agent deployments. By grounding mesh disruption analysis in Event System Theory [16], team membership change research [20, 21], Transactive Memory Systems [18, 23], and empirical multi-agent scaling findings [28], we bridge organizational behavior and multi-agent AI. The APIP serves as the remediation complement to drift detection (Rath [24]) and production diagnosis (Pan et al. [25]): detection identifies that an agent is failing; the APIP governs what to do next.
+
+Our central argument is simple: deployed agents should be treated as subjects of ongoing accountability rather than as static shipped artifacts. The discipline of structured remediation---trigger, diagnose, intervene, evaluate---is not new. It is well-established in software reliability engineering, in organizational management, and in clinical practice. The AI field has the opportunity to adopt it deliberately, before regulatory requirements make adoption mandatory.
+
+References
+
+[1] Anthropic. (2023). Constitutional AI: Harmlessness from AI feedback. arXiv preprint arXiv:2212.08073.
+
+[2] Bauer, T.N., Erdogan, B., Ellis, A.M., Truxillo, D.M., Brady, G.M., \& Bodner, T. (2025). New horizons for newcomer organizational socialization: A review, meta-analysis, and future research directions. Journal of Management, 51(1).
+
+[3] Brundage, M., et al. (2020). Toward trustworthy AI development: Mechanisms for supporting verifiable claims. arXiv preprint arXiv:2004.07213.
+
+[4] European Parliament and Council. (2024). Regulation on Artificial Intelligence (EU AI Act). Official Journal of the European Union.
+
+[5] Ganguli, D., et al. (2022). Red teaming language models to reduce harms: Methods, scaling behaviors, and lessons learned. arXiv preprint arXiv:2209.07858.
+
+[6] Hendrycks, D., et al. (2021). Aligning AI with shared human values. arXiv preprint arXiv:2008.02275.
+
+[7] Kirkpatrick, D.L. (1994). Evaluating Training Programs: The Four Levels. San Francisco: Berrett-Koehler.
+
+[8] Kirkpatrick, J.D. \& Kirkpatrick, W.K. (2016). Kirkpatrick's Four Levels of Training Evaluation. Association for Talent Development.
+
+[9] Liang, P., et al. (2022). Holistic evaluation of language models. arXiv preprint arXiv:2211.09110.
+
+[10] Ouyang, L., et al. (2022). Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems, 35.
+
+[11] Perez, E., et al. (2022). Red teaming language models with language models. arXiv preprint arXiv:2202.03286.
+
+[12] Ribeiro, M.T., et al. (2020). Beyond accuracy: Behavioral testing of NLP models with CheckList. Proceedings of ACL 2020.
+
+[13] Kammeyer-Mueller, J.D., Wanberg, C.R., Rubenstein, A., \& Song, Z. (2013). Support, undermining, and newcomer socialization: Fitting in during the first 90 days. Academy of Management Journal, 56, 1104--1124.
+
+[14] Wachter, S., Mittelstadt, B., \& Russell, C. (2017). Counterfactual explanations without opening the black box: Automated decisions and the GDPR. Harvard Journal of Law \& Technology, 31(2).
+
+[15] Lewis, K., Belliveau, M., Herndon, B., \& Keller, J. (2007). Group cognition, membership change, and performance: Investigating the benefits and detriments of collective knowledge. Organizational Behavior and Human Decision Processes, 103(2), 159--178.
+
+[16] Morgeson, F.P., Mitchell, T.R., \& Liu, D. (2015). Event system theory: An event-oriented approach to the organizational sciences. Academy of Management Review, 40(4), 515--537.
+
+[17] Liang, D.W., Moreland, R.L., \& Argote, L. (1995). Group versus individual training and group performance: The mediating role of transactive memory. Personality and Social Psychology Bulletin, 21, 384--393.
+
+[18] Ren, Y. \& Argote, L. (2011). Transactive memory systems 1985--2010: An integrative framework of key dimensions, antecedents, and consequences. Academy of Management Annals, 5(1), 189--229.
+
+[19] Strizver, S.D. \& Ployhart, R.E. (2024). Conceptualizing team disruption through an event-system framework. Group \& Organization Management.
+
+[20] Summers, J.K., Humphrey, S.E., \& Ferris, G.R. (2012). Team member change, flux in coordination, and performance: Effects of strategic core roles, information transfer, and cognitive ability. Academy of Management Journal, 55(2), 314--338.
+
+[21] Trainer, H.M., Jones, J.M., Pendergraft, J.G., Maupin, C.K., \& Carter, D.R. (2020). Team membership change ``events'': A review and reconceptualization. Group \& Organization Management, 45(2), 219--267.
+
+[22] Wegner, D.M. (1987). Transactive memory: A contemporary analysis of the group mind. In B. Mullen \& G.R. Goethals (Eds.), Theories of Group Behavior (pp. 185--208). Springer.
+
+[23] Moreland, R.L. \& Argote, L. (2003). Transactive memory in dynamic organizations. In R. Peterson \& E.A. Mannix (Eds.), Understanding the Dynamic Organization (pp. 135--162). Erlbaum.
+
+[24] Rath, A. (2026). Agent drift: Quantifying behavioral degradation in multi-agent LLM systems. arXiv:2601.04170.
+
+[25] Pan, M.Z., Arabzadeh, N., \& Ellis, M. (2025). Measuring agents in production. arXiv:2512.04123.
+
+[26] Kolt, N., Heim, L., \& Anderljung, M. (2024). Visibility into AI agents. FAccT '24. ACM. doi:10.1145/3630106.3658948.
+
+[27] Sapra, G., et al. (2025). AgentCompass: Towards reliable evaluation of agentic workflows in production. arXiv:2509.14647.
+
+[28] Kim, Y., et al. (2025). Towards a science of scaling agent systems. arXiv:2512.08296.
+
+[29] Fu, T., et al. (2026). Multi-agent memory from a computer architecture perspective. arXiv:2603.10062.
+
+[30] Krishnan, N. (2025). Advancing multi-agent systems through model context protocol. arXiv:2504.21030.
+
+[31] Varma, S., et al. (2025). Detecting silent failures in multi-agentic AI trajectories. arXiv:2511.04032.
+

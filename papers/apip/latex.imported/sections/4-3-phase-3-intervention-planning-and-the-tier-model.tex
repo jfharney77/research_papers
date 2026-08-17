@@ -1,0 +1,10 @@
+\subsection{4.3  Phase 3: Intervention Planning and the Tier Model}
+
+Interventions are organized into three tiers of increasing cost, disruption, and required lead time. The cause attribution output selects the appropriate starting tier; escalation to higher tiers is permitted if lower tiers prove insufficient within the remediation window.
+
+Tier 1 --- Prompt-Level Interventions. Prompt-level interventions modify the system prompt, few-shot examples, or instruction set: constraint injection, persona adjustment, example replacement, context restructuring. Tier 1 is fastest to implement, least disruptive, and easiest to roll back. It is the appropriate first response to alignment creep and many instances of input brittleness.
+
+Tier 2 --- Retrieval and Context Interventions. Tier 2 interventions modify the agent's information environment: updating RAG indices, revising knowledge bases, modifying tool schemas, adjusting context injection pipelines. They address behavioral drift caused by world-state divergence and tool misuse from stale tool descriptions. They carry moderate cost and require contract validation before re-deployment.
+
+Tier 3 --- Model-Level Interventions. Tier 3 interventions modify the underlying model: fine-tuning, DPO, or replacement. These carry the highest cost and regression risk. They are warranted when lower tiers are exhausted, when the failure mode is embedded in model weights, or when the overall performance profile cannot be returned to contract range through prompting or retrieval adjustments.
+

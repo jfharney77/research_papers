@@ -1,0 +1,4 @@
+\subsection{7.5  Simulation Limitations}
+
+The simulation uses deterministic scoring functions calibrated to reflect realistic production ranges, but does not use a live language model. Token consumption, latency, and CSAT values are modeled as parameterized functions of degradation intensity rather than measured from actual LLM inference. The failure mode injection schedule is scripted rather than emergent. These constraints are intentional---controlled injection enables clean comparison between APIP and ad-hoc conditions---but mean the absolute metric values should be interpreted as illustrative rather than empirically validated. Future work will replace the scoring functions with a sandboxed LLM backend to produce empirically grounded measurements. The simulation codebase is released alongside this paper to enable community extension and replication.
+
