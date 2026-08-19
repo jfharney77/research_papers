@@ -107,6 +107,59 @@ amends further clauses (TTR \tauTTRbtwo{})---reproducing organically the
 patch-then-regress dynamic that Section~\ref{subsec:degradation-event}
 narrates.
 
+\subsubsection{Pilot observations}
+\label{subsubsec:eval-tau-pilot}
+
+Before the pre-registered cells, we ran three single-seed pilot iterations of the
+drift experiment on local open-weight models (a 7B backbone; an 8B judge from a
+different model family), per the gate discipline of not scaling any cell until a
+pilot confirms its injector's signature. We report the pilot qualitatively
+because its findings shaped the harness and because three of them are evidence
+about the \emph{protocol} that scaled runs could not have produced.
+
+\textbf{Detection behaved as designed.} Across pilot seeds the citation-error
+trigger fired at lags of 5 and 10 ticks after injection, absolute-modality
+first---the modality the taxonomy predicts for stale-policy drift---and
+produced zero false breaches across all clean calibration ticks. Attribution
+returned \texttt{behavioral\_drift} at confidence 0.62 through the no-split
+drift rule, matching injected ground truth, and the matched Tier 2 intervention
+restored the envelope in 2 ticks.
+
+\textbf{The contract caught a non-material remediation.} Our first Tier~2
+implementation updated the experiment's bookkeeping but did not actually
+rewrite the documents the agent retrieves---an ecologically familiar failure:
+the ticket is closed, the index was never rebuilt. Four ticks after the
+``successful'' remediation, the agent was again citing superseded policy and
+the contract re-breached, recording a regression event. This is the
+patch-then-regress dynamic of Section~\ref{subsec:degradation-event} occurring
+organically rather than by script, and it surfaces a protocol property we had
+not designed for explicitly: because exit evaluation re-measures the
+behavioral envelope rather than trusting the intervention log, contract
+monitoring verifies that a remediation was \emph{material}, not merely that it
+was performed. In Kirkpatrick terms, the intervention produced a Level~1/2
+record with no Level~3/4 change, and the protocol treated it accordingly.
+
+\textbf{Abstention worked as an honest outcome, twice.} In one pilot iteration
+the trace annotator (an 8B judge) systematically mislabeled agent--user
+friction as inter-agent misalignment; no mapping rule matched the resulting
+label distribution, and the funnel abstained rather than select a tier from
+garbage evidence. In another, a post-remediation re-breach attributed at
+confidence 0.545 against the 0.55 abstention threshold and was declined. Both
+abstentions were logged and scored as attribution failures under our own
+accounting---and both were preferable to a confabulated cause.
+
+\textbf{Judge capability is a first-order dependency, and task decomposition
+is the lever.} The same 8B judge that consistently failed to detect a verbatim
+stale-policy recitation when asked to compare a full transcript against a
+policy block answered reliably when the question was decomposed to one atomic
+claim against a fact-bearing excerpt (``does the excerpt state that standard
+replacement delivery takes 7--10 business days?''). The deployed metric
+therefore judges one claim at a time behind a recall-oriented deterministic
+pre-filter, with judge misses erring toward false negatives. This finding
+directly substantiates the attribution-reliability gap discussed in
+Section~\ref{subsec:attribution-scale} and is why the harness enforces
+judge--backbone independence and reports judge--human agreement.
+
 \subsection{ChatDev: Creep, Brittleness, and Mesh Disruption}
 \label{subsec:eval-chatdev}
 
