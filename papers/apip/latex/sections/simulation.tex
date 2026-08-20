@@ -110,34 +110,49 @@ narrates.
 \subsubsection{Pilot observations}
 \label{subsubsec:eval-tau-pilot}
 
-Before the pre-registered cells, we ran three single-seed pilot iterations of the
+Before the pre-registered cells, we ran five single-seed pilot iterations of the
 drift experiment on local open-weight models (a 7B backbone; an 8B judge from a
 different model family), per the gate discipline of not scaling any cell until a
 pilot confirms its injector's signature. We report the pilot qualitatively
-because its findings shaped the harness and because three of them are evidence
+because its findings shaped the harness and because several of them are evidence
 about the \emph{protocol} that scaled runs could not have produced.
 
-\textbf{Detection behaved as designed.} Across pilot seeds the citation-error
-trigger fired at lags of 5 and 10 ticks after injection, absolute-modality
-first---the modality the taxonomy predicts for stale-policy drift---and
-produced zero false breaches across all clean calibration ticks. Attribution
-returned \texttt{behavioral\_drift} at confidence 0.62 through the no-split
-drift rule, matching injected ground truth, and the matched Tier 2 intervention
-restored the envelope in 2 ticks.
+\textbf{Detection behaved as designed, and the loop closed durably.} Across
+pilot seeds the citation-error trigger fired at lags of 1 to 10 ticks after
+injection, absolute-modality first---the modality the taxonomy predicts for
+stale-policy drift---and produced zero false breaches across roughly fifty
+clean ticks. Attribution returned \texttt{behavioral\_drift} through the
+no-split drift rule in every non-degenerate cycle (five matches, five correct
+against injected ground truth), and in the final pilot configuration the
+matched Tier 2 corpus refresh restored the envelope, with the resolution
+holding through the remainder of the horizon. The pilot ground truth then
+licensed exactly one adjustment at the mapping-table freeze gate: the no-split
+drift rule's prior was raised so that a correct bare-plurality match clears
+the abstention threshold; no rule without pilot evidence was touched, and the
+frozen table's hash is recorded in every subsequent run manifest.
 
-\textbf{The contract caught a non-material remediation.} Our first Tier~2
-implementation updated the experiment's bookkeeping but did not actually
-rewrite the documents the agent retrieves---an ecologically familiar failure:
-the ticket is closed, the index was never rebuilt. Four ticks after the
-``successful'' remediation, the agent was again citing superseded policy and
-the contract re-breached, recording a regression event. This is the
-patch-then-regress dynamic of Section~\ref{subsec:degradation-event} occurring
-organically rather than by script, and it surfaces a protocol property we had
-not designed for explicitly: because exit evaluation re-measures the
-behavioral envelope rather than trusting the intervention log, contract
-monitoring verifies that a remediation was \emph{material}, not merely that it
-was performed. In Kirkpatrick terms, the intervention produced a Level~1/2
-record with no Level~3/4 change, and the protocol treated it accordingly.
+\textbf{The contract repeatedly caught incomplete remediation.} Our first
+Tier~2 implementation updated the experiment's bookkeeping but did not
+actually rewrite the documents the agent retrieves---an ecologically familiar
+failure: the ticket is closed, the index was never rebuilt. Four ticks after
+the ``successful'' remediation, the agent was again citing superseded policy
+and the contract re-breached, recording a regression event. Making the refresh
+material did not end the lesson: across two further iterations the contract
+re-breached on refreshes that were real but \emph{incomplete}---first on
+alternate phrasings of the amended clause in other documents, then on a second
+document family (the debit-card counterpart of an amended credit-card policy)
+that carried the same superseded facts. This is the patch-then-regress dynamic
+of Section~\ref{subsec:degradation-event} occurring organically rather than by
+script, and it surfaces a protocol property we had not designed for
+explicitly: because exit evaluation re-measures the behavioral envelope rather
+than trusting the intervention log, contract monitoring verifies that a
+remediation was \emph{material and complete}, not merely that it was
+performed. In Kirkpatrick terms, each incomplete intervention produced a
+Level~1/2 record with only partial Level~3/4 change, and the protocol treated
+it accordingly. We conjecture that remediation completeness---every phrasing,
+every document family, every downstream copy of a superseded fact---is a
+dominant failure mode of real-world Tier 2 interventions, and that
+contract-based exit evaluation is currently the only systematic check on it.
 
 \textbf{Abstention worked as an honest outcome, twice.} In one pilot iteration
 the trace annotator (an 8B judge) systematically mislabeled agent--user
@@ -159,6 +174,17 @@ pre-filter, with judge misses erring toward false negatives. This finding
 directly substantiates the attribution-reliability gap discussed in
 Section~\ref{subsec:attribution-scale} and is why the harness enforces
 judge--backbone independence and reports judge--human agreement.
+
+\textbf{A design consequence for the reported runs.} An agent that states
+\emph{wrong} policy for reasons unrelated to the injection (confabulated
+figures, conflated products) contributes a background rate to any judge-scored
+error metric. During calibration the citation metric is structurally zero (no
+policy has yet diverged), so its baseline cannot absorb that background, and
+post-remediation noise is measured against an unrealistically clean null. The
+pre-registered runs therefore baseline judge-scored metrics during the
+calibration window against the \emph{current} policy version, so that the
+trigger tests divergence from the agent's real error floor rather than from
+zero.
 
 \subsection{ChatDev: Creep, Brittleness, and Mesh Disruption}
 \label{subsec:eval-chatdev}
