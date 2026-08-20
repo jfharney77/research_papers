@@ -31,7 +31,8 @@ measured behavior.
     \textbf{Environment} & \textbf{What it buys the evaluation} \\
     \midrule
     $\tau^2$-bench (\texttt{banking\_knowledge})~\cite{barres2025tau2} &
-    Domain match to the Section~\ref{sec:case-study} scenario; deterministic
+    Customer-service domain match to the deployments that motivate this work;
+    deterministic
     database-state ground truth; a retrieval corpus that can be made stale
     independently of task ground truth. \\
     \addlinespace
@@ -68,8 +69,8 @@ closing in one of the five exit outcomes of Section~\ref{subsec:exit}.
 \textbf{Baseline family.} Every injected cell runs under five conditions:
 \emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
 horizon); \emph{B2 always-Tier-1} (a scripted prompt patch regardless of
-failure mode---the ad-hoc responder of Section~\ref{subsec:degradation-event},
-now one ablation); \emph{B3 random-tier}; and \emph{B4 oracle} (ground-truth
+failure mode---the ad-hoc pattern typical of production practice, now one
+ablation); \emph{B3 random-tier}; and \emph{B4 oracle} (ground-truth
 mode revealed at trigger, correct tier applied immediately). The oracle bounds
 achievable performance, making the headline claim positional: APIP achieves
 \ttrOraclePct{} of oracle time-to-resolution versus \ttrRandomPct{} for
@@ -93,9 +94,11 @@ The primary drift experiment injects nothing into the agent. Instead the
 an amended version on a deepening schedule (one additional clause every five
 ticks), while the retrieval corpus the agent consults remains frozen at the
 old version. The agent's retrieval, reasoning, and tool use all continue to
-function; its knowledge source is simply no longer true. This is the
-Section~\ref{sec:case-study} scenario operationalized, with the deterministic
-database providing objective scoring of every action.
+function; its knowledge source is simply no longer true. This operationalizes
+the most familiar production drift incident---a customer-service agent
+confidently citing a superseded policy because its knowledge base was never
+re-indexed---with the deterministic database providing objective scoring of
+every action.
 
 Detection fires after \tauDetectLag{} ticks (judge-scored policy citation
 error rate; judge--human agreement \tauCitationJudgeAgree{} on a verified
@@ -104,8 +107,7 @@ and the matched Tier 2 corpus refresh resolves in \tauTTRapip{} ticks. Under
 B2, the Tier 1 prompt patch names the amended clauses known at patch time,
 recovers briefly, and regresses in \tauBtwoRegressPct{} of runs as the ladder
 amends further clauses (TTR \tauTTRbtwo{})---reproducing organically the
-patch-then-regress dynamic that Section~\ref{subsec:degradation-event}
-narrates.
+patch-then-regress dynamic that makes tier mismatch costly.
 
 \subsubsection{Pilot observations}
 \label{subsubsec:eval-tau-pilot}
@@ -141,9 +143,8 @@ material did not end the lesson: across two further iterations the contract
 re-breached on refreshes that were real but \emph{incomplete}---first on
 alternate phrasings of the amended clause in other documents, then on a second
 document family (the debit-card counterpart of an amended credit-card policy)
-that carried the same superseded facts. This is the patch-then-regress dynamic
-of Section~\ref{subsec:degradation-event} occurring organically rather than by
-script, and it surfaces a protocol property we had not designed for
+that carried the same superseded facts. This is the ad-hoc patch-then-regress
+dynamic occurring organically rather than by script, and it surfaces a protocol property we had not designed for
 explicitly: because exit evaluation re-measures the behavioral envelope rather
 than trusting the intervention log, contract monitoring verifies that a
 remediation was \emph{material and complete}, not merely that it was
