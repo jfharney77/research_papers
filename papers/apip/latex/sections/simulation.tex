@@ -42,10 +42,11 @@ measured behavior.
     alignment creep, disaggregated brittleness detection, and mesh
     disruption. \\
     \addlinespace
-    CoffeeBench~\cite{sakana2026coffeebench} &
+    CoffeeBench~\cite{sakana2026coffeebench} \emph{(specified; not run)} &
     Persistent simulated time and a world that evolves without injection:
-    \emph{naturally occurring} degradation, answering the objection that
-    injected drift merely mirrors its own schedule. \\
+    \emph{naturally occurring} degradation, which would answer the objection
+    that injected drift merely mirrors its own schedule
+    (Section~\ref{subsec:eval-coffee}). \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -195,31 +196,68 @@ reviews brief'' $\to$ ``avoid blocking progress'' $\to$ ``approve unless
 catastrophic''). The Reviewer's own flag rate \emph{improves} while downstream
 test pass rate decays---the agent whose role is catching failures is the one
 degrading, and no absolute floor is crossed. Detection is possible only
-through the drift modality (tick \creepDetectTick), and the signature
-(no dominant trace-level failure mode; falling review-flag rate) maps to
-\texttt{alignment\_creep} and a Tier 1 charter re-injection.
+through the drift modality, and in our runs it fired at a lag of 0--1 ticks
+while \emph{no} absolute floor was ever crossed---build success held at 1.00
+throughout---which is the taxonomy's prediction for creep made concrete. The
+signature (no dominant trace-level failure mode; falling review engagement)
+maps through the frozen table to \texttt{alignment\_creep} and a Tier 1
+charter re-injection. In the completed cycle attribution returned
+\texttt{alignment\_creep} at confidence 0.73, the restored charter recovered
+reviewer engagement to its calibration band within a single tick, and the
+recovery held for twelve ticks with no regression (TTR 17).
 
-\textbf{Input brittleness} strips the Programmer's GUI exemplars: GUI-category
-success collapses while aggregate success dips only modestly. Aggregate-only
-monitoring detects the failure after \britAggLag{} ticks; disaggregated
-contract monitoring detects it after \britDisaggLag{}. The gap is the direct,
-measured form of the masking argument in Section~\ref{sec:taxonomy}, with the
-caveat that disaggregated envelopes require per-group power floors
-(Section~\ref{subsubsec:trigger-stats}) to avoid trading masked failures for
-false alarms.
+Two protocol behaviours are worth recording. First, the funnel
+\emph{abstained} while only one rung of the ladder had landed: a single step
+is genuinely ambiguous evidence, and it committed only once the ramp became
+distinguishable---honest abstention that then recovers, rather than abstention
+as a dead end. Second, an earlier iteration attributed the degradation to
+\texttt{input\_brittleness} and applied Tier 1, which happens to be creep's
+matched remediation; the wrong diagnosis administered the right treatment and
+erased the injection. Tier correctness and mode correctness are separable, and
+only the latter is what the taxonomy claims to deliver.
+
+\textbf{Input brittleness} strips the Programmer's GUI competence for
+GUI-category tasks only. Measured against a clean arm, judge-scored
+requirement coverage on the targeted category fell from 1.00 to 0.27 while an
+untargeted control category was untouched at 1.00---the category-scoped damage
+the aggregate-versus-disaggregated comparison depends on.
+
+The consequence is best stated as statistical power rather than a single
+detection lag. Required sample size scales as $1/\text{effect}^2$, and a
+category holding share $s$ of the batch dilutes its own collapse to $s\times$
+the effect in the aggregate; aggregate-only monitoring therefore needs
+$1/s^{2}$ times as many episodes to see the same failure. At the 20\% GUI
+share of our task mix that is a factor of 25. With our measured effects,
+detecting the collapse takes roughly four episodes within the affected group
+and roughly one hundred in the aggregate series. Aggregate-only monitoring is
+thus not merely slower, as the framing in Section~\ref{sec:taxonomy}
+suggests: at realistic batch sizes it is under-powered to see the failure at
+all. This also sets the batch size any disaggregated claim requires, since a
+group below the contract's power floor receives no envelope
+(Section~\ref{subsubsec:trigger-stats}).
 
 \textbf{Mesh disruption} inserts a Documentation Specialist agent between
-Programmer and Reviewer at the injection tick. The new agent performs its own
-task well by judge assessment, yet peer metrics degrade by
-\meshPeerDegradation{} as it consumes shared context budget and shifts the
-input distribution of Reviewer and Tester. Attribution over the degraded
-peers correctly finds no intrinsic failure mode and returns
-\texttt{exogenous\_disruption}---the empirical form of the attribution failure
-that Section~\ref{subsec:mesh} predicts. We then evaluate the mitigation that
-section proposes: reintroducing the new agent under a scoped-context
-onboarding protocol (its outputs quarantined from peer context during a
-probationary window, then released gradually) attenuates peer degradation by
-\meshOnboardAttenuation{} relative to naive insertion.
+Programmer and Reviewer at the injection tick. The new agent documents the
+Programmer's code and writes the documented version back into the shared code
+context, so the Reviewer and Tester operate on a shifted, longer input
+distribution. \emph{This experiment returned a null result.} The insertion
+executed correctly---the specialist appeared in every post-injection episode,
+produced real documentation, and its output propagated into all downstream
+phases---yet no peer metric moved: build success held at 1.00, reviewer
+engagement stayed inside its calibration band, and tool errors remained at
+zero. No contract breach occurred, so no APIP cycle opened and the
+scoped-context onboarding protocol could not be evaluated: there was no
+disruption to mitigate.
+
+We read this as a precondition finding rather than a refutation. ChatDev
+constructs each phase's prompt afresh from templates, so there is no
+\emph{bounded} shared context that a new agent can crowd; the
+context-crowding mechanism of Section~\ref{subsec:mesh} is structurally
+unavailable in this environment. What we could test---distributional shift in
+shared state---did not by itself degrade peers. The phenomenon therefore
+appears to require an architecture with a bounded or evicting shared context,
+which we state as the concrete precondition for future work rather than
+leaving the mechanism list untested.
 
 \subsection{Attribution Quality Across All Cells}
 \label{subsec:eval-attribution}
@@ -234,21 +272,25 @@ every case by construction can achieve any accuracy figure demanded of it.
 Only APIP-condition runs enter the matrix: B2 and B3 do not attribute, and
 including B4 would render the matrix perfectly diagonal by fiat.
 
-\subsection{CoffeeBench: Naturally Occurring Degradation}
+\subsection{CoffeeBench: Designed but Not Run}
 \label{subsec:eval-coffee}
 
-CoffeeBench places six agent-operated coffee firms in a persistent economic
-simulation with genuine elapsed time. Its role in the evaluation is deliberately
-narrow and deliberately irreplaceable: with no injection at all, contract
-metrics drift as the world evolves, and the protocol must distinguish
-degradation that warrants intervention from legitimate environmental
-change---the \texttt{recalibrated} exit outcome
-(Section~\ref{subsec:exit}) exists because of this environment. With
-\coffeeSeeds{} seeds (the environment's cost bounds replication), the
-no-injection scenario yields \coffeeCOneOutcome; we treat abstention or
-re-baselining here as a legitimate, reportable result rather than a failure to
-find a culprit. Economic collapse (bankruptcy) exercises the \texttt{retired}
-outcome.
+CoffeeBench places six agent-operated firms in a persistent economic simulation
+with genuine elapsed time, and its role in the design is deliberately narrow
+and deliberately irreplaceable: with no injection at all, contract metrics
+drift as the world evolves, so the protocol must distinguish degradation that
+warrants intervention from legitimate environmental change---the
+\texttt{recalibrated} exit outcome of Section~\ref{subsec:exit} exists
+because of it, and economic collapse would exercise \texttt{retired}.
+
+We specify this arm but did not run it. A single run costs roughly \$250 in
+inference, its 90-day horizon is not truncatable (the documented idle-drift
+onset spans days 25--66 and the scheduled demand surge falls on days 40--53),
+and substituting cheaper models for all six firms would break comparability
+with the published baselines the comparison depends on. We therefore report
+the naturally-occurring-degradation question as open. This is the sharpest
+remaining limitation of the evaluation: our injected arms cannot by themselves
+answer the objection that scheduled degradation mirrors its own schedule.
 
 \subsection{Findings}
 \label{subsec:eval-findings}
@@ -269,9 +311,22 @@ for the framework as a whole.
 \subsection{Limitations}
 \label{subsec:eval-limitations}
 
-Injection schedules in $\tau^2$-bench and ChatDev remain scripted; CoffeeBench
-is the sole source of emergent degradation and supports only
-\coffeeSeeds{} seeds. Two contract metrics (policy citation error rate,
+Injection schedules in $\tau^2$-bench and ChatDev remain scripted, and the
+one environment that would have supplied emergent degradation was not run
+(Section~\ref{subsec:eval-coffee}).
+
+A second limitation surfaced during backbone selection and is, we think,
+a finding in its own right. Stale-corpus drift is only observable to the extent
+that the agent actually restates policy: measuring how often each candidate
+backbone asserted any of the amended facts, one model did so in 3.3\% of clean
+episodes and another in 37.5\%. On the former, the citation trigger fired once
+in twenty-eight post-injection ticks---detection driven by a single episode
+rather than a trend. Susceptibility to this failure mode is therefore
+model-dependent and inversely related to how readily a model commits to
+specifics; a cautious model is both less exposed and harder to monitor. This
+strengthens rather than weakens the behavioral-contract argument: which metric
+carries signal for a given agent is an empirical question that must be settled
+by measurement at deployment time, not assumed. Two contract metrics (policy citation error rate,
 requirement coverage) depend on an LLM judge; we report judge--human agreement
 on a verified sample and enforce judge/backbone independence, but judge error
 remains a bounded unknown. Environment versions are pinned and recorded in
