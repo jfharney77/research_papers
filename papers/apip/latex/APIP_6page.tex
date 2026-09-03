@@ -275,9 +275,22 @@ feed APIP triggers, and the schema reserves the
 \section{The APIP Framework}
 \label{sec:framework}
 
-We now describe the APIP as a structured lifecycle protocol of five phases:
-Trigger, Cause Attribution, Intervention Planning, Remediation Window, and Exit
-Evaluation.
+We now describe the APIP as a structured lifecycle protocol of five phases
+(Fig.~\ref{fig:lifecycle}): Trigger, Cause Attribution, Intervention Planning,
+Remediation Window, and Exit Evaluation.
+
+\begin{figure}[t]
+  \centering
+  \scriptsize
+  \setlength{\fboxsep}{2pt}
+  \fbox{1. Trigger}\,$\rightarrow$\,\fbox{2. Attribution}\,$\rightarrow$\,\fbox{3. Plan}\,$\rightarrow$\,\fbox{4. Window}\,$\rightarrow$\,\fbox{5. Exit}
+  \caption{The five-phase APIP lifecycle. A two-gate contract breach opens a
+  cycle; attribution returns a failure mode or abstains rather than guess a
+  tier; the matched tier runs in a bounded window with check-ins at 25/50/75\%;
+  exit is \code{resolved}, \code{timeout}, \code{regressed},
+  \code{recalibrated}, or \code{retired}, and a re-breach reopens Phase~1.}
+  \label{fig:lifecycle}
+\end{figure}
 
 \subsection{Phase 1: Trigger}
 \label{sec:trigger}
@@ -323,22 +336,13 @@ misdiagnosis is the primary source of avoidable regression: prompt engineering
 applied to a retrieval freshness problem, for instance, consumes engineering
 cycles with no improvement.
 
-This is distinct from, and composes with, automated failure attribution, which
-localizes the responsible agent or step within a single failed trajectory
-\cite{ma2025attribution, zhang2025, agenttrace2026}. APIP Phase 2 operates one
-level of aggregation above, classifying a window-level degradation into a
+This composes with, rather than duplicates, automated failure attribution,
+which localizes the responsible agent or step within a single failed trajectory
+\cite{zhu2026, ma2025attribution, zhang2025, agenttrace2026}. Phase 2 operates
+one level of aggregation above, classifying a window-level degradation into a
 remediation-oriented category to select a tier; trajectory-level outputs are
 natural evidence inputs, but localizing the failing step falls short of
-diagnosing the underlying cause---the gap the mandatory taxonomy classification
-closes at the deployment level.
-
-The process should include disaggregated performance analysis to isolate
-failure locus; human-adjudicated analysis of sampled failure cases, applying
-automated trajectory-level attribution where tooling permits \cite{zhu2026,
-ma2025attribution, agenttrace2026}; retrieval audit if drift is suspected; tool
-invocation log analysis if misuse is suspected; and structured classification
-into the taxonomy, closing with a written cause attribution report that becomes
-part of the APIP record.
+diagnosing the cause---the gap mandatory taxonomy classification closes.
 
 \subsubsection{A measurable instantiation: the three-stage funnel}
 \label{sec:funnel}
@@ -379,42 +383,41 @@ Duration is calibrated to the tier---7--14 days for Tier 1, 30--60 for Tier
 Check-ins review performance against the recovery trajectory at multiple
 Kirkpatrick levels---flagging interventions that improve surface metrics
 without Level 3/4 change as potentially superficial---and act as early
-warnings: no improvement at the first check-in triggers tier escalation rather
-than waiting for expiry. A recommended cadence is 25\%, 50\%, and 75\% of
-elapsed time.
+warnings: no improvement at the first check-in escalates the tier rather than
+waiting for expiry.
 
 \subsection{Phase 5: Exit Evaluation}
 \label{sec:exit}
 
-At window close, a formal exit evaluation records one of five outcomes:
-\emph{resolved} (all contract metrics returned to envelope); \emph{regressed}
-(envelope restored but breached again---the signature of a tier-mismatched
-intervention that suppressed symptoms); \emph{timeout} (window expired without durable
-recovery; more fundamental intervention warranted); \emph{retired} (the agent
-cannot be returned to contract at acceptable cost); and \emph{recalibrated}
-(attribution concluded the \emph{environment} legitimately changed---a moved
-goalpost---so the contract is re-baselined rather than the agent treated). We
-deliberately do not score recalibration as a resolution: conflating the two
-would let re-baselining masquerade as remediation success. Window
-\emph{extension} is an in-protocol check-in decision, not an exit outcome, so
-every APIP terminates in exactly one of the five states; the record becomes
-part of the organizational AI audit trail.
+At window close a formal exit evaluation records one of the five outcomes of
+Fig.~\ref{fig:lifecycle}. Three carry argumentative weight. \emph{Regressed}
+---envelope restored, then breached again---is the signature of a
+tier-mismatched intervention that suppressed symptoms, and naming it as an
+outcome is what makes that failure visible rather than counted as a success.
+\emph{Recalibrated} records that attribution concluded the \emph{environment}
+legitimately moved, so the contract is re-baselined rather than the agent
+treated; we deliberately do not score it as a resolution, since conflating the
+two would let re-baselining masquerade as remediation. \emph{Retired} closes
+the agent out when it cannot be returned to contract at acceptable cost. Window
+\emph{extension} is an in-protocol check-in decision, not an exit, so every
+APIP terminates in exactly one of the five states and the record joins the
+organizational audit trail.
 
 \subsection{The APIP Record as a Declarative Schema}
 \label{sec:schema}
 
-Each APIP is recorded as an instance of a declarative schema (full field
+Each APIP is recorded as an instance of a declarative schema (full
 specification in supplementary material). Four field groups do architectural
-work: \code{behavioral\_contract\_ref} enforces writing a contract at
-deployment time, without which trigger and exit cannot be operationalized;
-\code{kirkpatrick\_levels} captures multi-level check-in data, enabling
+work: \code{behavioral\_contract\_ref} forces a contract to exist at deployment
+time, without which trigger and exit cannot be operationalized;
+\code{kirkpatrick\_levels} captures check-in data at every level, enabling
 post-hoc analysis of superficial versus durable improvement;
 \code{mapping\_table\_hash} and \code{environment\_provenance} extend the
 visibility mechanisms of Kolt et al.\ \cite{kolt2024} to \emph{decision-rule}
-linkage---an auditor can verify the attribution rules and environment versions
-actually in force, converting pre-registration from assertion to checkable
-property; and \code{mesh\_context} (Section~\ref{sec:mesh}) supports
-multi-agent cause attribution.
+linkage, letting an auditor verify which attribution rules and environment
+versions were actually in force and so converting pre-registration from
+assertion into checkable property; and \code{mesh\_context}
+(Section~\ref{sec:mesh}) supports multi-agent attribution.
 
 % =====================================================================
 \section{Evaluation in Two Live Multi-Agent Environments}
@@ -442,8 +445,8 @@ written once and reused unmodified. Each run proceeds in ticks: a calibration
 window derives every contract threshold as mean $\pm\,k\sigma$
 (Section~\ref{sec:trigger}); failure modes are injected on a pre-registered
 schedule; both trigger modalities evaluate at every tick; breaches pass through
-the attribution funnel; and the selected intervention runs in a bounded window
-with check-ins at 25/50/75\%, closing in one of the five exit outcomes.
+the attribution funnel; and the selected intervention runs the bounded window
+of Fig.~\ref{fig:lifecycle} to one of its five exits.
 
 \textbf{Baseline family.} The drift cell runs under four conditions:
 \emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
