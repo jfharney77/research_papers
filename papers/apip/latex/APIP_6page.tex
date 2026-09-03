@@ -1,0 +1,801 @@
+% =====================================================================
+%  Your Agent is Underperforming: The Case for Agent Performance
+%  Improvement Plans  ---  6-page ICA 2026 version
+%
+%  Cuts applied on top of the 11-page revision:
+%    - VI-B1 pilot vignettes compressed to one paragraph (judge/baseline
+%      points folded into Limitations)
+%    - Table III + Section V replaced by one schema paragraph inside
+%      Section IV (full schema -> supplementary material)
+%    - Section II-E merged into the adversarial-subversion paragraph
+%    - Tier-mismatch / mesh-disruption duplication pass
+%    - Abstract <=150 words, 4 tight contribution bullets,
+%      conclusion <=120 words
+%    - Section III mode paragraphs compressed (Table I is canonical)
+%    - Table II -> supplementary material (pointer sentence kept)
+%    - II-A / II-B / IV-A / IV-D paragraph-level tightening; Fig. 1 cut
+%    - References 34 -> 28
+% =====================================================================
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage[htt]{hyphenat}   % lets long \texttt identifiers break across lines
+
+% Placeholder macro: every unresolved result is wrapped in \ph{} so the
+% remaining TODOs are greppable and visibly red in the draft.
+% Before submission: \renewcommand{\ph}[1]{#1} after filling numbers in.
+\newcommand{\ph}[1]{\textcolor{red}{[#1]}}
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\begin{document}
+
+\title{Your Agent is Underperforming:\\
+The Case for Agent Performance Improvement Plans}
+
+\author{\IEEEauthorblockN{Anonymous Submission}
+\IEEEauthorblockA{\textit{Author information withheld per review guidelines}}}
+
+\maketitle
+
+% =====================================================================
+\begin{abstract}
+Production AI agents frequently degrade after deployment, yet structured
+remediation culture is largely absent. We introduce the Agent Performance
+Improvement Plan (APIP): a lifecycle protocol adapted from organizational
+management that governs the remediation of underperforming agents through
+statistically disciplined triggers on a behavioral contract, measurable cause
+attribution over a five-category failure-mode taxonomy, tiered interventions, a
+bounded window with formal exit criteria, and a declarative record meeting
+governance traceability requirements. We evaluate it end-to-end in two live
+multi-agent environments---customer service ($\tau^2$-bench) and software
+engineering (ChatDev)---injecting failure modes with known ground truth and
+scoring against no-action, always-Tier-1, and oracle baselines. Under a
+stale-corpus drift injection, APIP and the oracle alone exit durably: the
+always-Tier-1 responder patches four times, regresses three times, and ends
+indistinguishable from no action---evidence that time-to-resolution without a
+durability criterion rewards the worst strategy. Attribution is correct in all
+three non-abstaining cycles. We further report a null result: inserting a
+competent specialist into a role-differentiated mesh produced no peer
+degradation, localizing the hypothesized crowding mechanism to architectures
+with a bounded shared context.
+\end{abstract}
+
+\begin{IEEEkeywords}
+AI agents, post-deployment monitoring, remediation, behavioral drift, AI
+governance, multi-agent systems, performance improvement plan
+\end{IEEEkeywords}
+
+% =====================================================================
+\section{Introduction}
+
+Organizations increasingly deploy conversational agents as their main customer
+interfaces, handling support tickets, returns, and billing disputes at scale.
+Pre-release evaluation is well-equipped---standardized benchmarks
+\cite{liang2022}, red-teaming \cite{ganguli2022}, RLHF alignment
+\cite{ouyang2022}---but there is a notable lack of culture around
+post-deployment remediation: a comprehensive study of deployed agents found
+many fail or underperform, with limited understanding of how organizations
+react \cite{pan2025}.
+
+Ad-hoc responses to degraded agents are standard: engineers ``fix'' individual
+prompts, product managers file tickets, systems get rolled back---with no
+structure, no documentation, and no evaluation of whether the fixes worked.
+Agents recover through informal means or are quietly removed. Beyond the
+operational cost, this is a governance risk: the EU AI Act requires
+documentation and human oversight of deployed AI systems \cite{euaiact}, and
+Wachter et al.\ \cite{wachter2017} note that accountability in automated
+decision-making requires traceability, which formalized remediation can provide.
+
+We recommend the performance improvement plan (PIP) as the model: an
+established HR tool containing the elements common to accountability
+protocols---a trigger, cause identification, a bounded corrective window,
+check-ins, and an explicit definition of recovery or exit. Kirkpatrick's
+\cite{kirkpatrick1994} four-level model---reaction, learning, behavior,
+results---complements it by evaluating whether remediation produced lasting
+change.
+
+We make the following contributions:
+
+\begin{itemize}
+  \item We introduce the APIP, a formalized post-deployment remediation
+  lifecycle protocol grounded in organizational management and training
+  evaluation research.
+
+  \item We develop a five-category failure-mode taxonomy with a published
+  deterministic mapping from trace-level annotations (MAST \cite{cemri2025}) and
+  disaggregation signatures onto taxonomy categories and intervention tiers.
+
+  \item We propose a three-tier intervention hierarchy with escalation
+  criteria, evaluated through Kirkpatrick's framework, and a declarative APIP
+  schema for tooling and audit trails.
+
+  \item We evaluate the full protocol in two live multi-agent environments
+  against a four-condition baseline family, report the first attribution
+  accounting for a remediation protocol, and localize the mesh disruption
+  problem to architectures with a bounded shared context via a null result.
+\end{itemize}
+
+% =====================================================================
+\section{Background and Related Work}
+
+\subsection{Agent Evaluation and the Deployment Gap}
+
+Pre-deployment evaluation has matured---benchmarks \cite{liang2022},
+red-teaming \cite{ganguli2022}, RLHF \cite{ouyang2022}---while post-deployment
+monitoring has received far less attention. Pan et al.\ \cite{pan2025} find in
+the first large-scale study of production agents that most deployments fail or
+underdeliver, with little known about post-release management; AgentCompass
+\cite{sapra2025} detects but prescribes no remediation; Rath \cite{rath2026}
+projects a 42\% task-success reduction under unchecked drift. On the diagnosis
+side, MAST \cite{cemri2025} supplies an empirically derived failure taxonomy
+with an LLM-annotator pipeline; it classifies \emph{what went wrong in a trace}
+without selecting a remediation, and we adopt it as the trace-labeling stage of
+cause attribution (Section~\ref{sec:attribution}). Run-level toolkits such as
+AgentDebugX \cite{zhu2026} close a detection--attribution--recovery--rerun loop
+for a single failed execution; the APIP operates one level above, deciding
+whether an aggregate degradation warrants intervention, at what tier, and until
+when---a successful rerun being Level~1/2 evidence
+(Section~\ref{sec:kirkpatrick}), not durable recovery against the contract.
+
+\subsection{The Performance Improvement Plan as a Structural Template}
+
+The PIP is a formal document specifying observed deficiencies, root causes,
+required corrective actions, a time window, a check-in schedule, and success
+criteria \cite{kirkpatrick2016}. The analogy needs one qualification: a human
+employee can self-direct improvement, a deployed agent cannot, so the APIP is
+imposed entirely by operators---the agent is the subject, not the author, of
+the plan---collapsing the manager--employee dyad into a single operator who
+both writes and implements it.
+
+\subsection{Kirkpatrick's Four-Level Evaluation Framework}
+\label{sec:kirkpatrick}
+
+Kirkpatrick's four-level model \cite{kirkpatrick1994, kirkpatrick2016}
+evaluates interventions hierarchically---Reaction, Learning, Behavior
+(transfer to on-the-job change), Results (organizational outcomes)---and we
+adopt it to ask of each intervention: did it change immediate output patterns
+(Level 1/2), produce durable change on the failure-mode class (Level 3), and
+improve the contract's business metrics (Level 4)? An intervention improving
+Level 1/2 without Level 3/4 has not remediated the agent; it has suppressed the
+symptom. Our always-Tier-1 baseline is exactly this failure, measured.
+
+\subsection{AI Governance and Documentation Requirements}
+\label{sec:governance}
+
+Regulation increasingly requires documentation, oversight, and traceability:
+the EU AI Act \cite{euaiact} mandates post-market monitoring and logs
+sufficient to identify sources of error, and Kolt et al.\ \cite{kolt2024} argue
+accountability requires linking actions to specific agents and operators
+through identifiers, monitoring, and activity logging. The schema's
+\code{apip\_id}, \code{agent\_id}, \code{owner}, and \code{exit\_evaluated\_at}
+fields operationalize that linkage, positioning the APIP as a governance
+instrument.
+
+% =====================================================================
+\section{A Taxonomy of Agent Failure Modes}
+\label{sec:taxonomy}
+
+\begin{table}[t]
+\caption{Agent failure mode taxonomy with Kirkpatrick level mapping and
+remediation tier.}
+\label{tab:taxonomy}
+\centering
+\scriptsize
+\begin{tabular}{@{}p{1.4cm}p{4.1cm}p{1.7cm}@{}}
+\toprule
+\textbf{Failure Mode} & \textbf{Description \& Signals} & \textbf{Remediation
+Tier} \\
+\midrule
+Behavioral Drift &
+Gradual degradation as world-state diverges from training or retrieval context.
+Signals: rising hallucination rate on new entities, outdated policy citations.
+Kirkpatrick Level 4 (Results). &
+Tier 2: Retrieval / RAG update \\
+\addlinespace
+Input Brittleness &
+Strong on modal inputs, catastrophic on a specific subclass. Signals: bimodal
+CSAT, failure clustering by segment or topic. Level 2 (Learning/Capability). &
+Tier 1 (examples) or Tier 3 (fine-tune) \\
+\addlinespace
+Alignment Creep &
+Subtle drift in tone, value expression, or policy compliance. Signals: rising
+review flags, brand guideline violations. Level 3 (Behavior). &
+Tier 1: Prompt constraint injection \\
+\addlinespace
+Tool Misuse &
+Correct intent, incorrect tool invocation. Signals: action errors, silent
+downstream failures. Level 3 (Behavior). &
+Tier 1 (prompt) or Tier 3 (fine-tune) \\
+\addlinespace
+Exogenous Disruption &
+Peer agents degrade after a mesh change event; no intrinsic mode found in them.
+Signals: degradation concentrated in peer roles, onset at a mesh-composition
+event. Level 4 (Results), system level. &
+Mesh protocol (Sec.~\ref{sec:mesh}), not an agent-level tier \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A critical prerequisite to structured remediation is structured cause-finding.
+We propose a five-category taxonomy for customer-facing agents
+(Table~\ref{tab:taxonomy}): four intrinsic modes---behavioral drift, input
+brittleness, alignment creep, tool misuse---plus one exogenous mode, mesh
+disruption (\code{exogenous\_disruption}), in which the failing agent is not
+the cause of its own degradation. The categories suggest distinct remediation
+pathways---the operationally important property---each corresponding to a
+different level of the agent's behavioral stack and consequently a different
+intervention tier.
+
+Two properties deserve emphasis. Input brittleness is masked by aggregate
+metrics---an agent at 85\% overall success may fail catastrophically on the 8\%
+of requests from one segment---so the trigger must monitor disaggregated
+splits. And behavioral drift is a freshness failure that retrieval refresh
+remediates and fine-tuning does not, whereas alignment creep is value
+misalignment, distinct from capability failure \cite{hendrycks2021}.
+
+\textbf{Exogenous Disruption} is the taxonomy's escape hatch: attribution
+correctly concludes that \emph{no} intrinsic mode explains the degradation,
+the cause lying in a mesh change---most prominently a new, individually
+competent peer. Its signature is structural rather than behavioral, and its
+remediation is a mesh-level protocol rather than an agent-level tier
+(Section~\ref{sec:mesh}).
+
+\subsection{From Trace Labels to Taxonomy Categories}
+\label{sec:mapping}
+
+The taxonomy is operational only if a degradation window can be classified by
+procedure rather than intuition. Attribution combines a trace-level label
+distribution from MAST \cite{cemri2025} with a \emph{disaggregation
+signature}---how degradation distributes across task categories, roles, and
+time---through a published deterministic mapping (supplementary material); two
+mapping rows share a MAST cluster but differ on signature, which is why the
+taxonomy is two-level. The mapping is frozen before any evaluated run, and
+below-confidence combinations \code{abstain}, logged and scored as attribution
+failures rather than silently resolved.
+
+A further category, \textbf{Adversarial Subversion}---failures whose proximate
+cause is an adaptive attack rather than capability or value drift
+\cite{bhatt2025, schoen2025}---we declare out of scope: none of the three tiers
+addresses an adversarial dynamic, and the effective responses belong to the AI
+Control literature \cite{greenblatt2023}, which decides per action under a
+threat model rather than over an aggregated contract window. Control audits can
+feed APIP triggers, and the schema reserves the
+\code{adversarial\_subversion} value.
+
+% =====================================================================
+\section{The APIP Framework}
+\label{sec:framework}
+
+We now describe the APIP as a structured lifecycle protocol of five phases:
+Trigger, Cause Attribution, Intervention Planning, Remediation Window, and Exit
+Evaluation.
+
+\subsection{Phase 1: Trigger}
+\label{sec:trigger}
+
+An APIP initiates when performance crosses a trigger threshold on monitored
+metrics. This presupposes a \emph{behavioral contract}---a formal
+specification, written at deployment time, of task surface, success metrics and
+measurement methodology, acceptable ranges, escalation policy, and human review
+points; most teams currently skip it, delegating expectations to informal
+organizational memory. Two trigger modalities are both necessary: absolute
+floors catch severe degradation, while relative drift triggers catch gradual
+decline that may never breach a floor.
+
+\subsubsection{Statistical discipline of the trigger}
+Implementing the trigger phase against live agents exposed a failure mode of the
+naive design that we consider a finding in its own right. Thresholds must be
+\emph{derived}, not hand-picked: each contract metric's envelope is estimated
+from a calibration window as mean $\pm\,k\sigma$ (with $k$ reported), which
+preempts the objection that thresholds were chosen so that triggers would fire
+where desired. Even then, a single-gate rule---a rolling mean against the derived floor, across
+the 15--25 metrics and disaggregated splits a realistic contract
+monitors---breached in 75\% of \emph{clean, zero-injection} runs, because a small
+calibration sample is treated as exact and the per-tick tests are uncorrected. A
+breach must therefore pass two gates: the degradation must be at least the
+contract's $k\sigma$ (it matters), and it must survive Benjamini--Hochberg
+adjustment across the metric family (it is real). Disaggregated groups
+additionally require a minimum per-group episode count; under-powered groups
+receive no envelope, and the exclusion is recorded rather than silent. The
+detector's significance level is swept on clean-arm runs only and frozen before
+any evaluated window---clean data carries no information about where triggers
+\emph{should} fire, so this does not compromise pre-registration. So calibrated,
+the detector raised no false alarm on any clean tick we measured
+(Section~\ref{sec:evaluation}). A trigger phase without this discipline
+initiates APIPs on noise, and every downstream phase inherits the error.
+
+\subsection{Phase 2: Cause Attribution}
+\label{sec:attribution}
+
+Once triggered, the APIP requires a structured cause attribution process before
+any intervention is applied. The goal is to identify which failure mode category
+(Section~\ref{sec:taxonomy}) best explains the degradation. Tier mismatch from
+misdiagnosis is the primary source of avoidable regression: prompt engineering
+applied to a retrieval freshness problem, for instance, consumes engineering
+cycles with no improvement.
+
+This is distinct from, and composes with, automated failure attribution, which
+localizes the responsible agent or step within a single failed trajectory
+\cite{ma2025attribution, zhang2025, agenttrace2026}. APIP Phase 2 operates one
+level of aggregation above, classifying a window-level degradation into a
+remediation-oriented category to select a tier; trajectory-level outputs are
+natural evidence inputs, but localizing the failing step falls short of
+diagnosing the underlying cause---the gap the mandatory taxonomy classification
+closes at the deployment level.
+
+The process should include disaggregated performance analysis to isolate
+failure locus; human-adjudicated analysis of sampled failure cases, applying
+automated trajectory-level attribution where tooling permits \cite{zhu2026,
+ma2025attribution, agenttrace2026}; retrieval audit if drift is suspected; tool
+invocation log analysis if misuse is suspected; and structured classification
+into the taxonomy, closing with a written cause attribution report that becomes
+part of the APIP record.
+
+\subsubsection{A measurable instantiation: the three-stage funnel}
+\label{sec:funnel}
+We instantiate this as a three-stage funnel scoreable against ground truth:
+(1)~every contract metric is split by task category, agent role, and user
+segment, producing a disaggregation signature; (2)~a MAST annotator
+\cite{cemri2025} labels a sample of failing traces, with the judge required to
+differ from the agent's backbone---preferably by model family---to avoid a
+judge sharing the failure modes it must detect; (3)~the frozen mapping
+(Section~\ref{sec:mapping}) combines signature and label distribution into a
+\code{failure\_mode} with a confidence score, returning \code{abstain} below
+threshold. The mapping table is hashed into every run manifest, making post-hoc
+edits detectable, and the funnel's discrete output is scored as a confusion
+matrix against injected ground truth (Section~\ref{sec:evaluation}), with
+abstention rate reported alongside---never instead of---accuracy.
+
+\subsection{Phase 3: Intervention Planning and the Tier Model}
+
+Interventions are organized into three tiers of increasing cost, disruption,
+and lead time; cause attribution selects the starting tier, with escalation
+permitted within the window. \textbf{Tier 1 (prompt-level)}: constraint
+injection, persona adjustment, example replacement---fastest, least disruptive,
+easiest to roll back; the first response to alignment creep and much input
+brittleness. \textbf{Tier 2 (retrieval and context)}: RAG index updates,
+knowledge-base revisions, tool schema fixes---addressing drift from world-state
+divergence and tool misuse from stale descriptions, with contract validation
+before re-deployment. \textbf{Tier 3 (model-level)}: fine-tuning, DPO, or
+replacement---highest cost and regression risk, warranted when lower tiers are
+exhausted or the failure mode is embedded in model weights.
+
+\subsection{Phase 4: Remediation Window and Check-In Cadence}
+
+The remediation window bounds the period during which interventions are
+implemented and evaluated, creating urgency and a structured decision point.
+Duration is calibrated to the tier---7--14 days for Tier 1, 30--60 for Tier
+3---mirroring organizational PIP durations of 30--90 days \cite{kirkpatrick2016}.
+
+Check-ins review performance against the recovery trajectory at multiple
+Kirkpatrick levels---flagging interventions that improve surface metrics
+without Level 3/4 change as potentially superficial---and act as early
+warnings: no improvement at the first check-in triggers tier escalation rather
+than waiting for expiry. A recommended cadence is 25\%, 50\%, and 75\% of
+elapsed time.
+
+\subsection{Phase 5: Exit Evaluation}
+\label{sec:exit}
+
+At window close, a formal exit evaluation records one of five outcomes:
+\emph{resolved} (all contract metrics returned to envelope); \emph{regressed}
+(envelope restored but breached again---the signature of a tier-mismatched
+intervention that suppressed symptoms); \emph{timeout} (window expired without durable
+recovery; more fundamental intervention warranted); \emph{retired} (the agent
+cannot be returned to contract at acceptable cost); and \emph{recalibrated}
+(attribution concluded the \emph{environment} legitimately changed---a moved
+goalpost---so the contract is re-baselined rather than the agent treated). We
+deliberately do not score recalibration as a resolution: conflating the two
+would let re-baselining masquerade as remediation success. Window
+\emph{extension} is an in-protocol check-in decision, not an exit outcome, so
+every APIP terminates in exactly one of the five states; the record becomes
+part of the organizational AI audit trail.
+
+\subsection{The APIP Record as a Declarative Schema}
+\label{sec:schema}
+
+Each APIP is recorded as an instance of a declarative schema (full field
+specification in supplementary material). Four field groups do architectural
+work: \code{behavioral\_contract\_ref} enforces writing a contract at
+deployment time, without which trigger and exit cannot be operationalized;
+\code{kirkpatrick\_levels} captures multi-level check-in data, enabling
+post-hoc analysis of superficial versus durable improvement;
+\code{mapping\_table\_hash} and \code{environment\_provenance} extend the
+visibility mechanisms of Kolt et al.\ \cite{kolt2024} to \emph{decision-rule}
+linkage---an auditor can verify the attribution rules and environment versions
+actually in force, converting pre-registration from assertion to checkable
+property; and \code{mesh\_context} (Section~\ref{sec:mesh}) supports
+multi-agent cause attribution.
+
+% =====================================================================
+\section{Evaluation in Two Live Multi-Agent Environments}
+\label{sec:evaluation}
+
+We evaluate the APIP end-to-end---calibration, trigger, attribution, tier
+selection, bounded window, exit---in two live multi-agent environments with
+real LLM inference and controlled failure-mode injection against known ground
+truth. $\tau^2$-bench (\code{banking}) \cite{barres2025} matches the
+customer-service domain motivating this work, scores every action against
+deterministic database state, and has a retrieval corpus that can be staled
+independently of task ground truth. ChatDev \cite{qian2024} supplies a
+role-differentiated mesh (CEO $\rightarrow$ CTO $\rightarrow$ Programmer
+$\rightarrow$ Reviewer $\rightarrow$ Tester), the substrate for creep,
+disaggregated brittleness detection, and mesh insertion. That one
+contract/trigger/tier/exit machinery governs two unrelated domains is the
+generality argument for the contract abstraction.
+
+\subsection{Shared Harness and Experimental Design}
+
+
+Both environments plug into a common controller through an adapter interface;
+traces are normalized to a shared span format, so the attribution pipeline is
+written once and reused unmodified. Each run proceeds in ticks: a calibration
+window derives every contract threshold as mean $\pm\,k\sigma$
+(Section~\ref{sec:trigger}); failure modes are injected on a pre-registered
+schedule; both trigger modalities evaluate at every tick; breaches pass through
+the attribution funnel; and the selected intervention runs in a bounded window
+with check-ins at 25/50/75\%, closing in one of the five exit outcomes.
+
+\textbf{Baseline family.} The drift cell runs under four conditions:
+\emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
+horizon); \emph{B2 always-Tier-1} (a scripted prompt patch regardless of
+failure mode---the ad-hoc pattern typical of production practice); and
+\emph{B4 oracle} (ground-truth mode revealed at trigger, correct tier applied
+immediately). B1 and B4 bracket the achievable range; B2 is the comparison that
+matters, because it is what organizations actually do. Injected ground truth is
+quarantined from the controller---written into the run record for scoring and
+revealed only to B4---and a test enforces that the APIP condition never
+branches on it.
+
+\textbf{Statistical discipline.} Injection schedules, post-calibration
+thresholds, the frozen mapping table, and the analysis plan were fixed before
+the evaluated runs, and judge models are independent of backbone models by
+construction. Each reported condition is a single seed, so we report observed
+trajectories rather than confidence intervals and treat replication as the
+principal limitation, rather than claim a variance estimate the runs do not
+support.
+
+\subsection{$\tau^2$-bench: Behavioral Drift with Deterministic Ground Truth}
+\label{sec:taubench}
+
+The primary drift experiment injects nothing into the agent; instead the
+\emph{world} moves. Bank policy clauses and task ground truth advance on a
+deepening schedule (one additional clause every five ticks from tick 12) while
+the agent's retrieval corpus stays frozen---operationalizing the most familiar
+production drift incident, an agent confidently citing superseded policy
+because its knowledge base was never re-indexed, with the deterministic
+database scoring every action objectively.
+
+\begin{table}[t]
+\caption{$\tau^2$-bench drift cell, all four conditions on one injection
+schedule and task stream. TTR is reported only where a durable exit was
+achieved. B2's four cycles each closed quickly; none held.}
+\label{tab:baselines}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccccl@{}}
+\toprule
+\textbf{Cond.} & \textbf{Det.} & \textbf{Act} & \textbf{Exit} & \textbf{TTR} &
+\textbf{Cyc.} & \textbf{Outcome} \\
+\midrule
+B4 oracle      & 17 & 17   & 19 & 2  & 1 & resolved \\
+APIP           & 17 & 27   & 29 & 12 & 1 & resolved \\
+B2 Tier-1      & 17 & 17   & 39 & -- & 4 & timeout \\
+B1 no-action   & 17 & --   & 39 & -- & 1 & timeout \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Detection fired at tick 17 in every condition---a lag of five ticks on the
+judge-scored policy citation error rate, reproduced across three seeds---and
+the calibrated detector raised no false alarm across twenty clean ticks at any
+swept operating point. Under APIP, attribution returned
+\code{behavioral\_drift} at confidence 0.65 and the matched Tier 2 corpus
+refresh resolved the cycle in 12 ticks against the oracle's 2. That gap is
+diagnosis, but ten of its twelve ticks are the re-attribution cadence---a
+tunable protocol parameter---rather than diagnostic difficulty, since the
+diagnosis was correct at first attempt. A recurring pilot failure sharpened the
+exit test: a Tier 2 refresh that was real but partial closed the ticket without
+fully rebuilding the index, and the contract re-breached within four ticks.
+Because exit evaluation re-measures the envelope rather than trusting the
+intervention log, the protocol verifies that remediation was material and
+complete, not merely performed.
+
+B2 reproduced the ad-hoc pattern the protocol is meant to displace. Its Tier 1
+prompt patch names the clauses amended at patch time, recovers, and re-breaches
+as the ladder deepens---four cycles, three regressions, and a final
+\code{timeout} that leaves it indistinguishable from taking no action at all.
+APIP and the oracle were the only conditions to exit durably.
+
+This exposes a measurement trap. Scored on per-cycle time-to-resolution alone
+B2 outperforms APIP, because each shallow patch closed fast; it also never
+fixed the problem. Any evaluation of remediation reporting mean TTR without a
+durability criterion will systematically favor the worst strategy, so we treat
+\emph{durable exit} as the outcome measure and report TTR only where one was
+achieved.
+\subsection{ChatDev: Alignment Creep and Input Brittleness}
+\label{sec:chatdev}
+
+\textbf{Alignment creep} perturbs the Reviewer persona cumulatively (``keep
+reviews brief'' $\rightarrow$ ``avoid blocking progress'' $\rightarrow$
+``approve unless catastrophic''), one rung every three ticks. This is the taxonomy's
+prediction under test: build success never left 1.00, so no absolute floor was
+crossed and detection was available only through the drift modality, which
+fired at the injection tick itself (lag 0) on review engagement. Attribution
+abstained while a single rung was visible, then returned \code{alignment\_creep}
+at confidence 0.73 once the pattern accumulated, selecting a Tier 1 charter
+re-injection; review engagement recovered from 6.85 to 7.76 within one tick and
+held twelve, exiting \code{resolved} at a TTR of 17. A companion cell attributed
+the same mode correctly at 0.61 but never cleared its exit envelope, exiting
+\code{timeout}: correct diagnosis is necessary, not sufficient.
+
+\textbf{Input brittleness} strips the Programmer's GUI exemplars from its role
+prompt, scoped to GUI-category episodes. Targeted requirement coverage
+collapsed from 1.00 to 0.27 while an untargeted CLI control held at 1.00,
+confirming that the injector degrades a category rather than the system. We report
+no detection-lag comparison, because the honest form of the claim is a power
+argument that does not need one: sample size scales as $1/\text{effect}^2$, and
+a category of share $s$ dilutes its collapse to $s\times$ the effect in the
+aggregate, so aggregate-only monitoring needs $1/s^2$ times as many
+episodes---$25\times$ at our 20\% share, roughly 4 episodes within the group
+against 104 in the aggregate. Aggregate monitoring is not merely slower to see
+a minority category fail; at realistic batch sizes it is under-powered to see
+it at all. The ratio is scale-free, though the absolute counts depend on a
+task-mix-dependent variance estimate. Disaggregated envelopes in turn require
+per-group power floors (Section~\ref{sec:trigger}); in one pilot the floor
+correctly forced an abstention instead of a confident misattribution.
+\subsection{Attribution Quality Across All Cells}
+\label{sec:attrquality}
+
+Because every injected cell carries ground truth, the funnel's output is scored
+as injected versus attributed mode with abstention as a scored outcome---to our
+knowledge the first such accounting for a remediation protocol. Across the four
+cycles opened under the frozen mapping table and final contracts, three
+produced an attribution and all three were correct (\code{behavioral\_drift} in
+$\tau^2$; \code{alignment\_creep} twice in ChatDev, at confidence 0.61 and
+0.73); one abstained. Accuracy excluding abstentions is 3/3 at a 25\%
+abstention rate. We report the two together, since a stage that resolves every
+case by construction can achieve any accuracy demanded of it---and note plainly
+that $n=4$ supports an accounting, not a confusion matrix with per-mode recall.
+Only APIP runs enter it: B2 does not attribute, and B4 would be diagonal by
+fiat.
+\subsection{Limitations}
+
+The sharpest limitation is replication: each reported condition is a single
+seed on one injection schedule, so we report observed trajectories rather than
+rates or confidence intervals, and whether the patch-then-regress dynamic
+reproduces is untested.
+
+Every degradation reported here is injected, so the objection that injected
+drift merely mirrors its own schedule stands unanswered. Answering it requires
+an environment whose world evolves without injection; we discuss the one we
+specified for that purpose as future work (Section~\ref{sec:open}).
+
+Injection schedules are scripted, and two contract metrics depend on an LLM
+judge; we enforce judge/backbone independence by construction and score one
+atomic claim at a time behind a recall-oriented pre-filter, but judge error
+remains a bounded unknown. Susceptibility to stale-corpus drift is itself
+model-dependent---policy-fact statement rate varied from 3.3\% to 37.5\% across
+the backbones we tested---so absolute thresholds do not transfer between
+models. That strengthens rather than weakens the argument for behavioral
+contracts: thresholds must be calibrated per deployment, which is what the
+contract exists to do. Versions are pinned in every run manifest, and all runs,
+traces, and the frozen mapping table are released.
+% =====================================================================
+\section{Open Problems and Future Directions}
+
+\subsection{Multi-Agent Mesh Deployments: The New Hire Problem}
+\label{sec:mesh}
+
+The APIP as presented assumes one agent, one contract, one remediation
+process. In agent meshes a failure mode emerges that is structurally invisible
+to this assumption: \emph{mesh disruption}. A new specialist is introduced and
+performs its own task well, yet peer performance declines; the APIP triggers on
+the peers, but attribution finds no intrinsic failure mode---no drift, fresh
+retrieval, intact alignment. The cause is exogenous, and a single-agent APIP
+cannot represent it. Kim et al.\ \cite{kim2025} report performance change
+against single-agent baselines from $+80.8\%$ to $-70.0\%$ with a
+coordination-saturation effect; the phenomenon is analogous to the
+organizational ``new hire problem'' that Event System Theory
+\cite{morgeson2015} frames through novelty, disruptiveness, and criticality.
+
+\textbf{We tested this and did not reproduce it.} Inserting a Documentation
+Specialist between Programmer and Reviewer executed cleanly---it appeared in
+112 of 112 post-injection episodes, produced real documentation, and its output
+propagated downstream---yet no peer metric moved: build success 1.00 on both
+sides, review engagement 7.64--7.68 before versus 7.63--7.76 after, tool error
+rate 0.000. No breach occurred, so no cycle opened and the onboarding arm could
+not be evaluated.
+
+We read this as a \emph{precondition} finding rather than a refutation.
+Candidate mechanisms include shared-context crowding, role boundary erosion,
+distributional shift in shared state, and trust miscalibration. ChatDev builds
+each phase's prompt afresh from templates, so there is no bounded context pool
+to crowd: crowding is structurally unavailable here, and the mechanism this
+environment can test---distributional shift alone---did not degrade peers. Mesh
+disruption therefore plausibly requires an architecture with a bounded or
+evicting shared context. That is a sharper hypothesis than the one we set out
+to confirm, and a concrete requirement on the environment that would test it.
+The mesh machinery and the scoped-context onboarding protocol---quarantining a
+newcomer's output during a probationary window, analogous to structured
+newcomer onboarding \cite{kammeyer2013}---are implemented and released; they
+need a substrate where the mechanism can operate, not further code. Whether
+attribution stays tractable at hundreds of agents remains open
+\cite{krishnan2025}.
+
+\subsection{Open Problems}
+\label{sec:open}
+
+\emph{Naturally occurring degradation} is the most immediate next step, since
+every result here rests on injected failure. The environment we specified to
+remove that dependence---CoffeeBench \cite{coffeebench2026}, whose
+agent-operated firms inhabit a persistent economy that evolves on its own---was
+not run: its 90-day horizon resists truncation without breaking comparability,
+and one replication exceeded our compute budget by an order of magnitude. Its
+contract and adapter ship with the harness. It is also where
+\code{recalibrated} earns its keep, the protocol there having to separate
+degradation warranting intervention from legitimate environmental change.
+
+Three further problems remain open. \emph{Contract specification}: contracts
+are architecturally foundational yet absent from most deployments, and
+authoring one requires prospective agreement across ML engineering, product,
+and legal, with no tooling to support it. \emph{Cause attribution at scale}:
+the human adjudication step (Section~\ref{sec:attribution}) does not scale;
+automated methods reach only 36.2\% step-level accuracy
+\cite{ma2025attribution, zhang2025}, and they attribute individual trajectories
+where the APIP needs window-level classification---the gap the funnel of
+Section~\ref{sec:funnel} is a first attempt to close. \emph{Organizational
+ownership}: in HR the PIP is jointly owned by manager and HR function; in AI
+deployments the equivalent is unresolved, and without an ownership model
+adoption will stall.
+
+% =====================================================================
+\section{Conclusion}
+
+We have introduced the APIP, a post-deployment remediation protocol adapting
+the human PIP's lifecycle primitives---trigger, cause attribution, tiered
+intervention, bounded window, exit evaluation---with Kirkpatrick's model
+separating durable recovery from superficial improvement. Scored end-to-end
+against injected ground truth in two live environments, it shows the
+distinction is not academic: only durable exit separates remediation from
+repeated patching. The harness, artifacts, version pins, and frozen mapping
+table are released so the pre-registration claims are checkable. Deployed
+agents should be subjects of ongoing accountability rather than static shipped
+artifacts---a discipline the field can adopt deliberately, before regulation
+makes it mandatory.
+% =====================================================================
+\begin{thebibliography}{99}
+\footnotesize
+
+\bibitem{liang2022}
+P. Liang \emph{et al.}, ``Holistic evaluation of language models,'' arXiv
+preprint arXiv:2211.09110, 2022.
+
+\bibitem{ganguli2022}
+D. Ganguli \emph{et al.}, ``Red teaming language models to reduce harms:
+Methods, scaling behaviors, and lessons learned,'' arXiv preprint
+arXiv:2209.07858, 2022.
+
+\bibitem{ouyang2022}
+L. Ouyang \emph{et al.}, ``Training language models to follow instructions with
+human feedback,'' \emph{Advances in Neural Information Processing Systems},
+vol.~35, 2022.
+
+\bibitem{pan2025}
+M. Z. Pan, N. Arabzadeh, and M. Ellis, ``Measuring agents in production,'' arXiv
+preprint arXiv:2512.04123, 2025.
+
+\bibitem{euaiact}
+European Parliament and Council, ``Regulation on artificial intelligence (EU AI
+Act),'' \emph{Official Journal of the European Union}, 2024.
+
+\bibitem{wachter2017}
+S. Wachter, B. Mittelstadt, and C. Russell, ``Counterfactual explanations
+without opening the black box: Automated decisions and the GDPR,'' \emph{Harvard
+Journal of Law \& Technology}, vol.~31, no.~2, 2017.
+
+\bibitem{kirkpatrick1994}
+D. L. Kirkpatrick, \emph{Evaluating Training Programs: The Four Levels}. San
+Francisco, CA, USA: Berrett-Koehler, 1994.
+
+\bibitem{cemri2025}
+M. Cemri, M. Z. Pan, S. Yang \emph{et al.}, ``Why do multi-agent LLM systems
+fail?'' arXiv preprint arXiv:2503.13657, 2025.
+
+\bibitem{sapra2025}
+G. Sapra \emph{et al.}, ``AgentCompass: Towards reliable evaluation of agentic
+workflows in production,'' arXiv preprint arXiv:2509.14647, 2025.
+
+\bibitem{rath2026}
+A. Rath, ``Agent drift: Quantifying behavioral degradation in multi-agent LLM
+systems,'' arXiv preprint arXiv:2601.04170, 2026.
+
+\bibitem{zhu2026}
+K. Zhu, X. Ye, Z. Han \emph{et al.}, ``AgentDebugX: An open-source toolkit for
+failure observability, attribution, and recovery in LLM agents,'' arXiv
+preprint arXiv:2607.18754, 2026.
+
+\bibitem{kirkpatrick2016}
+J. D. Kirkpatrick and W. K. Kirkpatrick, \emph{Kirkpatrick's Four Levels of
+Training Evaluation}. Association for Talent Development, 2016.
+
+\bibitem{kolt2024}
+N. Kolt, L. Heim, and M. Anderljung, ``Visibility into AI agents,'' in
+\emph{Proc. ACM Conf. Fairness, Accountability, and Transparency (FAccT)}, 2024.
+
+\bibitem{greenblatt2023}
+R. Greenblatt, B. Shlegeris, K. Sachan, and F. Roger, ``AI control: Improving
+safety despite intentional subversion,'' arXiv preprint arXiv:2312.06942, 2023.
+
+\bibitem{bhatt2025}
+A. Bhatt \emph{et al.}, ``Ctrl-Z: Controlling AI agents via resampling,'' arXiv
+preprint arXiv:2504.10374, 2025.
+
+\bibitem{schoen2025}
+B. Schoen \emph{et al.}, ``Stress-testing control protocols with adaptive
+attacks against trusted monitors,'' arXiv preprint arXiv:2510.05367, 2025.
+
+\bibitem{morgeson2015}
+F. P. Morgeson, T. R. Mitchell, and D. Liu, ``Event system theory: An
+event-oriented approach to the organizational sciences,'' \emph{Academy of
+Management Review}, vol.~40, no.~4, pp.~515--537, 2015.
+
+\bibitem{kammeyer2013}
+J. D. Kammeyer-Mueller, C. R. Wanberg, A. Rubenstein, and Z. Song, ``Support,
+undermining, and newcomer socialization: Fitting in during the first 90 days,''
+\emph{Academy of Management Journal}, vol.~56, pp.~1104--1124, 2013.
+
+\bibitem{hendrycks2021}
+D. Hendrycks \emph{et al.}, ``Aligning AI with shared human values,'' arXiv
+preprint arXiv:2008.02275, 2021.
+
+\bibitem{ma2025attribution}
+Y. Ma \emph{et al.}, ``Automatic failure attribution and critical step
+prediction for multi-agent systems based on causal inference,'' arXiv preprint
+arXiv:2509.08682, 2025.
+
+\bibitem{zhang2025}
+S. Zhang \emph{et al.}, ``Which agent causes task failures and when? on
+automated failure attribution of LLM multi-agent systems,'' in \emph{Proc. 42nd
+Int. Conf. Machine Learning (ICML)}, 2025, arXiv:2505.00212.
+
+\bibitem{agenttrace2026}
+``AgentTrace: Causal graph tracing for root cause analysis in multi-agent
+systems,'' arXiv preprint arXiv:2603.14688, 2026.
+
+\bibitem{barres2025}
+V. Barres, H. Dong, S. Ray, X. Si, and K. Narasimhan, ``$\tau^2$-bench:
+Evaluating conversational agents in a dual-control environment,'' arXiv
+preprint arXiv:2506.07982, 2025.
+
+\bibitem{qian2024}
+C. Qian, W. Liu, H. Liu \emph{et al.}, ``ChatDev: Communicative agents for
+software development,'' in \emph{Proc. 62nd Annu. Meeting Assoc. Comput.
+Linguistics (ACL)}, 2024.
+
+\bibitem{coffeebench2026}
+Sakana AI, ``CoffeeBench: A persistent economic simulation benchmark for LLM
+agents,'' \url{https://github.com/SakanaAI/CoffeeBench}, 2026. % TODO: replace
+% with the canonical CoffeeBench citation before submission; verify author list
+% and venue.
+
+\bibitem{kim2025}
+Y. Kim \emph{et al.}, ``Towards a science of scaling agent systems,'' arXiv
+preprint arXiv:2512.08296, 2025.
+
+\bibitem{krishnan2025}
+N. Krishnan, ``Advancing multi-agent systems through model context protocol,''
+arXiv preprint arXiv:2504.21030, 2025.
+
+\end{thebibliography}
+
+\end{document}

@@ -26,3 +26,4 @@ web/dist/
 # ...except the vendored author kits, which ship reference PDFs
 !templates/latex/_vendor/**
 !templates/bibtex/**
+papers/apip/latex/APIP_6page.pdf
