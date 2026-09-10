@@ -54,19 +54,30 @@ The build path compiles LaTeX derived from untrusted uploads, so it runs in a sa
 
 ## Building LaTeX Papers
 
-Papers and conference templates each get a build script. All of them wrap
-`scripts/lib/latex_build.sh` and share its flags (`-c/--clean`, `-q/--quiet`, `-s/--src`, `-h/--help`),
-so a fix to the engine reaches every one:
+Papers and conference templates each get a build script, in two flavors that
+mirror each other. **If using WSL (or Linux/macOS), call the `build.sh`
+wrappers; if using Windows (cmd.exe / PowerShell), call the `build.bat`
+wrappers.** The `.sh` scripts all wrap `scripts/lib/latex_build.sh` and the
+`.bat` scripts all wrap `scripts\lib\latex_build.bat`, sharing the same flags
+(`-c/--clean`, `-q/--quiet`, `-s/--src`, `-h/--help`), so a fix to an engine
+reaches every wrapper on that side:
 
 ```bash
+# WSL / Linux / macOS
 bash scripts/papers/apip/build.sh          # a paper  → papers/apip/latex/main.pdf
 bash scripts/papers/apip/run_sim.sh        # its simulation on :8100
+```
+
+```bat
+:: Windows
+scripts\papers\apip\build.bat              :: a paper  → papers\apip\latex\main.pdf
+scripts\papers\apip\run_sim.bat            :: its simulation on :8100
 ```
 
 Conference template skeletons (use these to verify a style file still compiles):
 
 ```bash
-# Run from repo root — scripts auto-resolve paths
+# WSL — run from repo root; scripts auto-resolve paths
 bash scripts/templates/ieee/build.sh
 bash scripts/templates/neurips/build.sh
 bash scripts/templates/acm/build.sh
@@ -76,9 +87,17 @@ bash scripts/templates/aaai/build.sh
 bash scripts/templates/ieee/build.sh /custom/path/to/templates/latex/ieee
 ```
 
+```bat
+:: Windows — same four, same flags
+scripts\templates\ieee\build.bat
+scripts\templates\neurips\build.bat
+scripts\templates\acm\build.bat
+scripts\templates\aaai\build.bat
+```
+
 All scripts run the standard 4-step pipeline: `pdflatex → bibtex → pdflatex → pdflatex`. The AAAI script also cleans auxiliary files (`.aux`, `.bbl`, `.blg`) before each build.
 
-**Requirements:** `pdflatex`, `bibtex`, TeX Live packages. Host auto-install is **disabled by default** — set `LATEX_AUTO_INSTALL=1` to allow the scripts to `apt-get install` TeX Live, or build with `LATEX_SANDBOX=docker`. When invoked through the doc server, builds always run under the sandbox.
+**Requirements:** `pdflatex`, `bibtex`, TeX Live packages. On WSL, host auto-install is **disabled by default** — set `LATEX_AUTO_INSTALL=1` to allow the scripts to `apt-get install` TeX Live, or build with `LATEX_SANDBOX=docker`. On Windows, install MiKTeX or TeX Live for Windows yourself — the `.bat` scripts have no auto-install path (that escape hatch is apt-specific). When invoked through the doc server, builds always run under the sandbox.
 
 **NeurIPS:** The style file (`neurips_2025.sty`) is auto-downloaded from the NeurIPS website on first build. Update `STYLE_YEAR` and `STYLE_URL` at the top of `scripts/templates/neurips/build.sh` annually.
 

@@ -20,8 +20,9 @@ web/dist/
 *.out
 *.synctex.gz
 *.toc
-**/main.log
+*.log
 **/main.pdf
+papers/**/*.pdf
 
 # ...except the vendored author kits, which ship reference PDFs
 !templates/latex/_vendor/**

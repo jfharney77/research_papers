@@ -16,9 +16,11 @@
 #   papers/<slug>/figures/
 #   papers/<slug>/deck/
 #   scripts/papers/<slug>/build.sh
+#   scripts/papers/<slug>/build.bat
 #
-# The generated build.sh is a wrapper over scripts/lib/latex_build.sh, so it
-# inherits --clean, --quiet, --src, --help and the main.log warning report.
+# The generated build.sh/build.bat are wrappers over scripts/lib/latex_build.sh
+# and scripts/lib/latex_build.bat, so they inherit --clean, --quiet, --src,
+# --help and the main.log warning report.
 # =============================================================================
 set -euo pipefail
 
@@ -88,6 +90,21 @@ latex_build
 EOF
 chmod +x "${SCRIPT_DIR}/build.sh"
 
+echo "[INFO] Creating scripts/papers/${SLUG}/build.bat ..."
+cat > "${SCRIPT_DIR}/build.bat" <<EOF
+@echo off
+rem build.bat -- Compile the ${SLUG} paper (papers\\${SLUG}\\latex) to PDF
+rem Seeded from the ${CONFERENCE} template. Thin wrapper over scripts\\lib\\latex_build.bat.
+setlocal
+for %%I in ("%~dp0..\\..\\..") do set "REPO_ROOT=%%~fI"
+set "LATEX_NAME=${SLUG} paper"
+set "LATEX_SRC=%REPO_ROOT%\\papers\\${SLUG}\\latex"
+call "%~dp0..\\..\\lib\\latex_build.bat" %*
+exit /b %errorlevel%
+EOF
+# cmd.exe needs CRLF -- with bare LF, goto label lookups can fail.
+sed -i 's/$/\r/' "${SCRIPT_DIR}/build.bat"
+
 # Keep the empty content dirs in git.
 for d in manuscript figures deck; do touch "${PAPER_DIR}/${d}/.gitkeep"; done
 
@@ -95,6 +112,7 @@ echo ""
 echo "Created:"
 echo "  papers/${SLUG}/{manuscript,latex,figures,deck}/"
 echo "  scripts/papers/${SLUG}/build.sh"
+echo "  scripts/papers/${SLUG}/build.bat"
 echo ""
 echo "Next: drop your .docx in papers/${SLUG}/manuscript/, then run"
 echo "  bash scripts/papers/${SLUG}/build.sh"

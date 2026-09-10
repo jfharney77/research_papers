@@ -2,7 +2,8 @@
 
 ```
 scripts/
-  lib/latex_build.sh      shared LaTeX build engine — every build.sh wraps this
+  lib/latex_build.sh      shared LaTeX build engine (WSL) — every build.sh wraps this
+  lib/latex_build.bat     shared LaTeX build engine (Windows) — every build.bat wraps this
   papers/<name>/          one directory per paper in papers/
   templates/<conference>/ one directory per conference template in templates/latex/
   web/                    start/stop the product's backend + frontend
@@ -35,19 +36,24 @@ any undefined references, undefined citations, or overfull boxes from `main.log`
 
 Every `build.sh` under `papers/` and `templates/` takes these same flags — they
 come from `lib/latex_build.sh`, so a fix there reaches all of them at once. The
-`.bat` is standalone (batch has no `source`) and must be updated separately.
+`.bat` scripts mirror this exactly: every `build.bat` is a thin wrapper that
+`call`s `lib\latex_build.bat`, so the Windows side also has one engine to fix.
 
 ## Build a conference template
 
 ```bash
-bash scripts/templates/ieee/build.sh       # → templates/latex/ieee/main.pdf
+bash scripts/templates/ieee/build.sh       # WSL → templates/latex/ieee/main.pdf
+```
+
+```bat
+scripts\templates\ieee\build.bat           :: Windows cmd.exe
 ```
 
 These compile the empty skeletons in `templates/latex/`, which is how you check a
 style file still works after updating it. Per-template notes:
 
 - **neurips** — downloads `neurips_<year>.sty` on first build. Bump `STYLE_YEAR`
-  and `STYLE_URL` in its `build.sh` annually.
+  and `STYLE_URL` in its `build.sh` **and** `build.bat` annually.
 - **aaai** — always cleans aux files first; a stale `main.aux` triggers duplicate
   `\bibstyle` errors under `aaai2026.bst`.
 - **acm** / **aaai** — refuse to build if their vendored `.cls`/`.sty` is missing,
@@ -60,7 +66,8 @@ bash scripts/new-paper.sh <slug> [conference]     # conference defaults to ieee
 ```
 
 Creates `papers/<slug>/{manuscript,latex,figures,deck}/` seeded from
-`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh`. Figures
+`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh` and
+`build.bat` (`new-paper.bat` is the cmd.exe equivalent). Figures
 resolve through `\graphicspath` in `main.tex`, so drop images straight into
 `papers/<slug>/figures/` and reference them by bare filename.
 
@@ -88,6 +95,15 @@ frontend (`web/`).
 ./scripts/web/start.sh
 ./scripts/web/stop.sh
 ```
+
+```bat
+scripts\web\start.bat              :: Windows cmd.exe
+scripts\web\stop.bat
+```
+
+The `.bat` pair does the same job but tracks the services by port instead of
+PID file: `start.bat` refuses to start if 8000/5173 are already listening, and
+`stop.bat` kills whatever holds those ports (`taskkill /T`).
 
 `start.sh` checks for stale PID files, launches `uvicorn docserver.main:app` on
 :8000 with `PYTHONPATH=src`, launches `npm run dev` on :5173, and writes logs and

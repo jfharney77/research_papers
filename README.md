@@ -57,11 +57,11 @@ research_papers/
 │   └── research/               #     conference deadlines, notes, reviews
 │
 ├── scripts/                    # build + run, mirroring papers/ and templates/
-│   ├── lib/latex_build.sh      #     the one build engine; every build.sh wraps it
-│   ├── papers/<slug>/          #     build.sh (+ run_sim.sh, build.bat) per paper
-│   ├── templates/<conference>/ #     build.sh per conference skeleton
-│   ├── web/                    #     start.sh / stop.sh for the product
-│   └── new-paper.sh            #     scaffold papers/<slug> + scripts/papers/<slug>
+│   ├── lib/                    #     the build engines: latex_build.sh (WSL) + .bat (Windows)
+│   ├── papers/<slug>/          #     build.sh + build.bat (+ run_sim) per paper
+│   ├── templates/<conference>/ #     build.sh + build.bat per conference skeleton
+│   ├── web/                    #     start / stop the product (.sh WSL, .bat Windows)
+│   └── new-paper.sh|.bat       #     scaffold papers/<slug> + scripts/papers/<slug>
 │
 ├── src/                        # the product: docbuilder, docserver, critic
 ├── web/                        # the product's React/Vite UI
@@ -118,14 +118,27 @@ bibtex --version
 
 ## Building
 
-Every build — papers and conference skeletons alike — goes through one script,
-`scripts/lib/latex_build.sh`. The per-target `build.sh` files are thin wrappers
-over it, so they all behave the same and all take the same flags.
+Every build — papers and conference skeletons alike — goes through one shared
+engine, with per-target thin wrappers over it. Which wrapper you call depends on
+where you are working:
+
+**If using WSL (or Linux/macOS)** — run the `build.sh` wrappers, which share
+`scripts/lib/latex_build.sh`:
 
 ```bash
 bash scripts/papers/apip/build.sh          # a paper     → papers/apip/latex/main.pdf
 bash scripts/templates/ieee/build.sh       # a skeleton  → templates/latex/ieee/main.pdf
 ```
+
+**If using Windows (cmd.exe / PowerShell)** — run the `build.bat` wrappers,
+which share `scripts\lib\latex_build.bat`:
+
+```bat
+scripts\papers\apip\build.bat              :: a paper     → papers\apip\latex\main.pdf
+scripts\templates\ieee\build.bat           :: a skeleton  → templates\latex\ieee\main.pdf
+```
+
+Both sides take the same flags and print the same summary.
 
 | Flag | Effect |
 | --- | --- |
@@ -147,11 +160,11 @@ It then prints the page count and any undefined references, undefined citations,
 or overfull boxes found in `main.log`. On failure, check `main.log` (LaTeX errors)
 and `main.blg` (BibTeX errors) in the source directory.
 
-**Windows:** only the APIP paper ships a batch equivalent,
-`scripts\papers\apip\build.bat`. It takes the same flags but is standalone —
-batch has no `source`, so it does not share the engine and must be updated
-separately. Install [MiKTeX](https://miktex.org) or TeX Live for Windows first;
-there is no auto-install path (that escape hatch is apt-specific).
+**Windows requirements:** install [MiKTeX](https://miktex.org) or
+[TeX Live for Windows](https://tug.org/texlive) first and make sure `pdflatex`
+and `bibtex` are on `PATH`; there is no auto-install path (that escape hatch is
+apt-specific). The NeurIPS style auto-download uses `curl` + PowerShell, both
+standard on Windows 10+.
 
 ### Per-conference notes
 
@@ -202,13 +215,19 @@ is needed.
 ### A new paper
 
 ```bash
-bash scripts/new-paper.sh <slug> [conference]     # conference defaults to ieee
+bash scripts/new-paper.sh <slug> [conference]     # WSL — conference defaults to ieee
 ```
 
-Creates `papers/<slug>/{manuscript,latex,figures,deck}/` seeded from
-`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh`. Drop your
-`.docx` in `manuscript/`, put images in `figures/` (referenced by bare filename
-via `\graphicspath`), and build with `bash scripts/papers/<slug>/build.sh`.
+```bat
+scripts\new-paper.bat <slug> [conference]         :: Windows
+```
+
+Either one creates `papers/<slug>/{manuscript,latex,figures,deck}/` seeded from
+`templates/latex/<conference>/`, plus `scripts/papers/<slug>/build.sh` **and**
+`build.bat`. Drop your `.docx` in `manuscript/`, put images in `figures/`
+(referenced by bare filename via `\graphicspath`), and build with
+`bash scripts/papers/<slug>/build.sh` (WSL) or
+`scripts\papers\<slug>\build.bat` (Windows).
 
 ### A new section
 
