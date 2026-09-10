@@ -48,25 +48,26 @@ The Case for Agent Performance Improvement Plans}
 
 % =====================================================================
 \begin{abstract}
-Production AI agents frequently degrade after deployment, yet structured
-remediation culture is largely absent. We introduce the Agent Performance
-Improvement Plan (APIP): a lifecycle protocol adapted from organizational
-management that governs the remediation of underperforming agents through
-statistically disciplined triggers on a behavioral contract, measurable cause
-attribution over a five-category failure-mode taxonomy, tiered interventions, a
-bounded window with formal exit criteria, and a declarative record meeting
+Agents degrade in production. Unlike pre-release evaluation, the response to
+that degradation has no standard form. This paper presents the Agent Performance
+Improvement Plan (APIP), which adapts a management protocol for
+underperforming employees into a remediation lifecycle for agents. It combines
+statistically
+disciplined triggers on a behavioral contract, measurable cause attribution
+over a five-category failure-mode taxonomy, tiered interventions, a bounded
+window with formal exit criteria, and a declarative record that meets
 governance traceability requirements. We evaluate it end-to-end in two live
-multi-agent environments---customer service ($\tau^2$-bench) and software
-engineering (ChatDev)---injecting failure modes with known ground truth and
+multi-agent environments, customer service ($\tau^2$-bench) and software
+engineering (ChatDev), by injecting failure modes with known ground truth and
 scoring against no-action, always-Tier-1, and oracle baselines. Under a
-stale-corpus drift injection, APIP and the oracle alone exit durably: the
+stale-corpus drift injection, only APIP and the oracle exit durably. The
 always-Tier-1 responder patches four times, regresses three times, and ends
-indistinguishable from no action---evidence that time-to-resolution without a
-durability criterion rewards the worst strategy. Attribution is correct in all
-three non-abstaining cycles. We further report a null result: inserting a
+indistinguishable from no action, which shows that time-to-resolution without
+a durability criterion rewards the worst strategy. Attribution is correct in
+all three non-abstaining cycles. We also report a null result: inserting a
 competent specialist into a role-differentiated mesh produced no peer
-degradation, localizing the hypothesized crowding mechanism to architectures
-with a bounded shared context.
+degradation, which localizes the hypothesized crowding mechanism to
+architectures with a bounded shared context.
 \end{abstract}
 
 \begin{IEEEkeywords}
