@@ -27,6 +27,18 @@
 %    - conclusion swaps the call-to-action for the B2 result
 %    - \ph{} draft macro removed (no remaining uses)
 %    - bibliography at \scriptsize: load-bearing, \footnotesize -> 7 pages
+%
+%  Collaborator pass v3 (APIP_6page_SUBMIT_v3.tex, 2026-09-11) merged in:
+%    - oracle baseline renamed B4 -> B3 throughout (only three baselines)
+%    - adds a Declaration on Generative AI ahead of the references
+%    - citations: AgentCompass -> kartik2025 (correct author list);
+%      schoen2025 -> terekhov2025 (ICLR 2026, arXiv:2510.09462);
+%      intro traceability claim -> chan2024; kammeyer2013 issue no.
+%    - drops wachter2017, hendrycks2021, krishnan2025 (28 -> 25 refs)
+%    - Kim et al. range now names the task type at each end
+%    - attribution funnel restated as numbered stages
+%  Fixed on merge: "cannot.Hence,the" spacing; a literal U+2013 en dash
+%  restored to "--"; "in the Section IV and Section V" -> "in Sections IV and V".
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -98,14 +110,13 @@ prompts, product managers file tickets, systems get rolled back. Nothing
 records what was tried, and nothing tests whether it worked. Agents recover
 through informal means or are quietly removed. Beyond the operational cost,
 this is a governance risk: the EU AI Act requires documentation and human
-oversight of deployed AI systems \cite{euaiact}, and Wachter et al.\
-\cite{wachter2017} note that accountability in automated decision-making
-requires traceability, which formalized remediation can provide.
+oversight of deployed AI systems \cite{euaiact}, and Chan et al.\
+\cite{chan2024} argue that accountability for deployed agents requires
+traceability, which formalized remediation can provide.
 
 We recommend the performance improvement plan (PIP) as the model: an
-established HR tool that contains the elements common to accountability
-protocols, namely a trigger, cause identification, a bounded corrective window,
-check-ins, and an explicit definition of recovery or exit. Kirkpatrick's
+established HR tool that already contains the elements common to
+accountability protocols (Section~\ref{sec:pip}). Kirkpatrick's
 four-level model \cite{kirkpatrick1994} complements it by asking whether
 remediation produced lasting change; we return to it in
 Section~\ref{sec:kirkpatrick}.
@@ -126,7 +137,7 @@ We make the following contributions:
   and audit trails.
 
   \item We evaluate the full protocol in two live multi-agent environments
-  against a four-condition baseline family. To our knowledge this is the first
+  against no-action, always-Tier-1, and oracle baselines. To our knowledge this is the first
   attribution accounting reported for a remediation protocol. The evaluation
   also localizes the mesh disruption problem to architectures with a bounded
   shared context, via a null result.
@@ -139,9 +150,9 @@ We make the following contributions:
 Post-deployment monitoring has received far less attention than pre-release
 evaluation. Pan et al.'s production survey \cite{pan2025} is the first at large
 scale, and reports little about how teams manage agents after release.
-AgentCompass \cite{sapra2025} detects degradation but prescribes no
-remediation. Rath \cite{rath2026} projects a 42\% task-success reduction under
-unchecked drift.
+AgentCompass \cite{kartik2025} detects degradation but prescribes no
+remediation, and Rath \cite{rath2026} reports a 42\% task-success reduction
+when drift runs unchecked (their Table~1).
 
 On the diagnosis side, MAST \cite{cemri2025} supplies an empirically derived
 failure taxonomy with an LLM-annotator pipeline. It classifies what went wrong
@@ -155,15 +166,15 @@ Level~1/2 evidence (Section~\ref{sec:kirkpatrick}); it is not durable recovery
 against the contract.
 
 \subsection{The Performance Improvement Plan as a Structural Template}
+\label{sec:pip}
 
 The PIP is a formal document specifying observed deficiencies, root causes,
 required corrective actions, a time window, a check-in schedule, and success
 criteria \cite{shrm2023}.
-The analogy needs one qualification. A human employee can self-direct
-improvement and a deployed agent cannot, so the APIP is imposed entirely by
-operators; the agent is its subject and never its author. This collapses the
-manager--employee dyad into a single operator who both writes the plan and
-implements it.
+The analogy needs one qualification. An employee can self-direct improvement while 
+an agent that has been deployed cannot. Hence, the APIP is imposed entirely by operators;
+the agent is its subject and never its author. This collapses the manager--employee
+dyad into a single operator who both writes the plan and implements it.
 
 \subsection{Kirkpatrick's Four-Level Evaluation Framework}
 \label{sec:kirkpatrick}
@@ -244,8 +255,7 @@ Aggregate metrics mask input brittleness. An agent at 85\% overall success may
 fail catastrophically on the 8\% of requests from one segment, so the trigger
 must monitor disaggregated splits. Behavioral drift is a freshness failure:
 retrieval refresh remediates it and fine-tuning does not. Alignment creep is
-value misalignment, which is distinct from capability failure
-\cite{hendrycks2021}.
+value misalignment, which we treat as distinct from capability failure.
 
 \textbf{Exogenous Disruption} is the category attribution reaches when no
 intrinsic mode explains the degradation and the cause lies in a mesh change,
@@ -268,10 +278,10 @@ scored as an attribution failure, never silently resolved.
 
 A further category, \textbf{Adversarial Subversion}, covers failures whose
 proximate cause is an adaptive attack rather than capability or value drift
-\cite{bhatt2025, schoen2025}. We declare it out of scope: none of the three
+\cite{bhatt2025, terekhov2025}. We declare it out of scope: none of the three
 tiers addresses an adversarial dynamic, and the effective responses belong to
 the AI Control literature \cite{greenblatt2023}, which decides per action under
-a threat model rather than over an aggregated contract window. Control audits
+an explicit threat model. Control audits
 can feed APIP triggers, and the schema reserves the
 \code{adversarial\_subversion} value.
 
@@ -353,16 +363,16 @@ closes that gap.
 
 \subsubsection{A measurable instantiation: the three-stage funnel}
 \label{sec:funnel}
-We instantiate this as a three-stage funnel scoreable against ground truth:
-(1)~every contract metric is split by task category, agent role, and user
-segment, producing a disaggregation signature; (2)~a MAST annotator
-\cite{cemri2025} labels a sample of failing traces, with the judge required to
-differ from the agent's backbone, preferably by model family, to avoid a judge
-sharing the failure modes it must detect; (3)~the frozen mapping
-(Section~\ref{sec:mapping}) combines signature and label distribution into a
-\code{failure\_mode} with a confidence score, returning \code{abstain} below
-threshold. The mapping table is hashed into every run manifest, making post-hoc
-edits detectable. The funnel's discrete output is scored as a confusion matrix
+We instantiate this as a three-stage funnel that can be scored against
+ground truth. Stage~1 splits every contract metric by task category, agent
+role, and user segment; the result is the disaggregation signature of
+Section~\ref{sec:mapping}. Stage~2 has a MAST annotator \cite{cemri2025} label
+a sample of failing traces. The judge must differ from the agent's backbone,
+preferably by model family, so that it does not share the failure modes it is
+asked to detect. Stage~3 applies the frozen mapping to the signature and the
+label distribution and emits a \code{failure\_mode} with a confidence score,
+or \code{abstain} below threshold. The mapping table is hashed into every run
+manifest, so a post-hoc edit changes the hash. The funnel's discrete output is scored as a confusion matrix
 against injected ground truth (Section~\ref{sec:evaluation}), and the
 abstention rate is reported alongside accuracy, never in place of it.
 
@@ -441,8 +451,7 @@ independently of task ground truth. ChatDev \cite{qian2024} supplies a
 role-differentiated mesh (CEO $\rightarrow$ CTO $\rightarrow$ Programmer
 $\rightarrow$ Reviewer $\rightarrow$ Tester), the substrate for creep,
 disaggregated brittleness detection, and mesh insertion. The same machinery
-governs both domains without modification; that is the extent of the
-generality claim we make for the contract abstraction.
+governs both domains without modification.
 
 \subsection{Shared Harness and Experimental Design}
 
@@ -459,17 +468,17 @@ of Fig.~\ref{fig:lifecycle} to one of its five exits.
 \emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
 horizon); \emph{B2 always-Tier-1} (a scripted prompt patch regardless of
 failure mode, the ad-hoc pattern typical of production practice); and
-\emph{B4 oracle} (ground-truth mode revealed at trigger, correct tier applied
-immediately). B1 and B4 bracket the achievable range. B2 is the informative
+\emph{B3 oracle} (ground-truth mode revealed at trigger, correct tier applied
+immediately). B1 and B3 bracket the achievable range. B2 is the informative
 comparison, because it is what organizations actually do. Injected ground truth
 is quarantined from the controller, written into the run record for scoring and
-revealed only to B4, and a test enforces that the APIP condition never branches
+revealed only to B3, and a test enforces that the APIP condition never branches
 on it.
 
 \textbf{Statistical discipline.} Injection schedules, post-calibration
 thresholds, the frozen mapping table, and the analysis plan were fixed before
 the evaluated runs, and judge models are independent of backbone models by
-construction. Each reported condition is a single seed, so we report observed
+construction. Every condition is one seed. We therefore report observed
 trajectories rather than confidence intervals and treat replication as the
 principal limitation.
 
@@ -496,7 +505,7 @@ achieved. B2's four cycles each closed quickly; none held.}
 \textbf{Cond.} & \textbf{Det.} & \textbf{Act} & \textbf{Exit} & \textbf{TTR} &
 \textbf{Cyc.} & \textbf{Outcome} \\
 \midrule
-B4 oracle      & 17 & 17   & 19 & 2  & 1 & resolved \\
+B3 oracle      & 17 & 17   & 19 & 2  & 1 & resolved \\
 APIP           & 17 & 27   & 29 & 12 & 1 & resolved \\
 B2 Tier-1      & 17 & 17   & 39 & -- & 4 & timeout \\
 B1 no-action   & 17 & --   & 39 & -- & 1 & timeout \\
@@ -505,10 +514,10 @@ B1 no-action   & 17 & --   & 39 & -- & 1 & timeout \\
 \end{table}
 
 Detection fired at tick 17 in every condition, a lag of five ticks on the
-judge-scored policy citation error rate. The detection lag reproduced across
-three seeds; the four-condition comparison of Table~\ref{tab:baselines} is
-single-seed (Section~\ref{sec:limitations}). The calibrated detector raised no
-false alarm across twenty clean ticks at any swept operating point.
+judge-scored policy citation error rate, and that lag reproduced across three
+seeds; the four-condition comparison of Table~\ref{tab:baselines} itself is
+single-seed (Section~\ref{sec:limitations}). No false alarm was raised across
+twenty clean ticks at any swept operating point.
 
 Under APIP, attribution returned \code{behavioral\_drift} at confidence 0.65
 and the matched Tier 2 corpus refresh resolved the cycle in 12 ticks against
@@ -580,7 +589,7 @@ ChatDev, at confidence 0.61 and 0.73); one abstained. Accuracy excluding
 abstentions is 3/3 at a 25\% abstention rate. We report the two together, since
 a stage that resolves every case by construction can reach any accuracy asked
 of it. With $n=4$ this is an accounting and not a confusion matrix with
-per-mode recall. Only APIP runs enter it: B2 does not attribute, and B4 would
+per-mode recall. Only APIP runs enter it: B2 does not attribute, and B3 would
 be diagonal by fiat.
 
 \subsection{Limitations}
@@ -618,9 +627,10 @@ performs its own task well, yet peer performance declines; the APIP triggers on
 the peers, but attribution finds no intrinsic failure mode---no drift, fresh
 retrieval, intact alignment. The cause is exogenous, and a single-agent APIP
 cannot represent it. Kim et al.\ \cite{kim2025} report performance change
-against single-agent baselines from $+80.8\%$ to $-70.0\%$ with a
-coordination-saturation effect, the range running from decomposable financial
-reasoning to sequential planning; the phenomenon is analogous to the
+against single-agent baselines from $+80.8\%$ on decomposable financial
+reasoning to $-70.0\%$ on sequential planning, with coordination yielding
+diminishing returns once the single-agent baseline is already strong; the
+phenomenon is analogous to the
 organizational ``new hire problem'' that Event System Theory
 \cite{morgeson2015} frames through novelty, disruptiveness, and criticality.
 
@@ -644,8 +654,7 @@ used to look for it. The mesh machinery and the scoped-context onboarding
 protocol (quarantining a newcomer's output during a probationary window,
 analogous to structured newcomer onboarding \cite{kammeyer2013}) are
 implemented and released; what remains is to run them in such an environment.
-Whether attribution stays tractable at hundreds of agents remains open
-\cite{krishnan2025}.
+Whether attribution stays tractable at hundreds of agents remains open.
 
 \subsection{Open Problems}
 \label{sec:open}
@@ -660,7 +669,7 @@ contract and adapter ship with the harness. It is also the setting in which
 \code{recalibrated} becomes necessary, since the protocol there must separate
 degradation warranting intervention from legitimate environmental change.
 
-Three further problems remain open. \emph{Contract specification}: contracts
+\emph{Contract specification}: contracts
 are architecturally foundational yet absent from most deployments, and
 authoring one requires prospective agreement across ML engineering, product,
 and legal, with no tooling to support it. \emph{Cause attribution at scale}:
@@ -688,6 +697,15 @@ action, while scoring better than the APIP on per-cycle time-to-resolution. Any
 remediation practice that measures speed without durability will prefer that
 responder.
 
+\section*{Declaration on Generative AI}
+
+During the preparation of this work, the authors used Claude (Anthropic) for
+grammar correction and language editing, and for drafting initial prose in
+Sections~IV and~V that the authors substantially revised. No AI
+system was used to generate results, analysis, or references. After using this
+tool, the authors reviewed and edited the content as needed and take full
+responsibility for the content of the publication.
+
 \begin{thebibliography}{99}
 \scriptsize
 
@@ -713,11 +731,6 @@ arXiv:2512.04123, 2025.
 European Parliament and Council, ``Regulation on artificial intelligence (EU AI
 Act),'' \emph{Official Journal of the European Union}, 2024.
 
-\bibitem{wachter2017}
-S. Wachter, B. Mittelstadt, and C. Russell, ``Counterfactual explanations
-without opening the black box: Automated decisions and the GDPR,'' \emph{Harvard
-Journal of Law \& Technology}, vol.~31, no.~2, pp.~841--887, 2018.
-
 \bibitem{kirkpatrick1994}
 D. L. Kirkpatrick, \emph{Evaluating Training Programs: The Four Levels}. San
 Francisco, CA, USA: Berrett-Koehler, 1994.
@@ -726,9 +739,10 @@ Francisco, CA, USA: Berrett-Koehler, 1994.
 M. Cemri, M. Z. Pan, S. Yang \emph{et al.}, ``Why do multi-agent LLM systems
 fail?'' arXiv preprint arXiv:2503.13657, 2025.
 
-\bibitem{sapra2025}
-G. Sapra \emph{et al.}, ``AgentCompass: Towards reliable evaluation of agentic
-workflows in production,'' arXiv preprint arXiv:2509.14647, 2025.
+\bibitem{kartik2025}
+N. V. J. K. Kartik, G. Sapra, R. Hada, and N. Pareek, ``AgentCompass: Towards
+reliable evaluation of agentic workflows in production,'' arXiv preprint
+arXiv:2509.14647, 2025.
 
 \bibitem{rath2026}
 A. Rath, ``Agent drift: Quantifying behavioral degradation in multi-agent LLM
@@ -755,9 +769,10 @@ safety despite intentional subversion,'' arXiv preprint arXiv:2312.06942, 2023.
 A. Bhatt \emph{et al.}, ``Ctrl-Z: Controlling AI agents via resampling,'' arXiv
 preprint arXiv:2504.10374, 2025.
 
-\bibitem{schoen2025}
-B. Schoen \emph{et al.}, ``Stress-testing control protocols with adaptive
-attacks against trusted monitors,'' arXiv preprint arXiv:2510.05367, 2025.
+\bibitem{terekhov2025}
+M. Terekhov \emph{et al.}, ``Adaptive attacks on trusted monitors subvert AI
+control protocols,'' in \emph{Proc. Int. Conf. Learning Representations
+(ICLR)}, 2026, arXiv:2510.09462.
 
 \bibitem{morgeson2015}
 F. P. Morgeson, T. R. Mitchell, and D. Liu, ``Event system theory: An
@@ -767,11 +782,7 @@ Management Review}, vol.~40, no.~4, pp.~515--537, 2015.
 \bibitem{kammeyer2013}
 J. D. Kammeyer-Mueller, C. R. Wanberg, A. Rubenstein, and Z. Song, ``Support,
 undermining, and newcomer socialization: Fitting in during the first 90 days,''
-\emph{Academy of Management Journal}, vol.~56, pp.~1104--1124, 2013.
-
-\bibitem{hendrycks2021}
-D. Hendrycks \emph{et al.}, ``Aligning AI with shared human values,'' arXiv
-preprint arXiv:2008.02275, 2021.
+\emph{Academy of Management Journal}, vol.~56, no.~4, pp.~1104--1124, 2013.
 
 \bibitem{ma2025attribution}
 G. Ma \emph{et al.}, ``Automatic failure attribution and critical step
@@ -804,11 +815,6 @@ heterogeneous multi-agent economies,'' arXiv preprint arXiv:2606.16613, 2026.
 \bibitem{kim2025}
 Y. Kim \emph{et al.}, ``Towards a science of scaling agent systems,'' arXiv
 preprint arXiv:2512.08296, 2025.
-
-\bibitem{krishnan2025}
-N. Krishnan, ``Advancing multi-agent systems through model context protocol:
-Architecture, implementation, and applications,'' arXiv preprint
-arXiv:2504.21030, 2025.
 
 \bibitem{shrm2023}
 A. Smith, ``PIPs: Write, implement and time them precisely,'' Society for Human
