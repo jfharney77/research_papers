@@ -51,6 +51,24 @@
 %  artifacts, ... published" fragment; "always-responding Tier-1 box" ->
 %  "always-Tier-1 responder" (matches the B2 label in Sec. VI); stray double
 %  spaces and trailing whitespace removed.
+%
+%  Conclusion pass (2026-09-13), against CRITIQUE_2026-09-13.md M5/D9/P8:
+%    - D9: "ended up identical to doing nothing" -> "finished
+%      indistinguishable from taking no action" (Table II shows B1 acting
+%      zero times against B2's four, so "identical" contradicts it; the
+%      replacement is the wording Sec. V-B and the abstract already use)
+%    - M5: the mesh null result no longer closes the paper and no longer
+%      asserts "the disruption mechanism". Hedged to "suggests" and moved
+%      ahead of the durability result, so the paper ends on its strongest
+%      finding and Sec. VI-A keeps ownership of the null result
+%    - P8: 128 -> 119 words (header target <=120); "pseudo-improvement" ->
+%      "superficial improvement" and "published" -> "released", matching
+%      Sec. II-C and Sec. V-E; "Any measurement that favors speed without
+%      resilience" regains its scope as "Any remediation scorecard that
+%      rewards speed without durability"
+%  Still open from the critique: C2 (B2's per-cycle TTR is not in Table II,
+%  so "scoring higher on per-cycle time-to-resolution" remains uncheckable)
+%  and the unhedged mesh claim in contribution bullet 4.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -697,18 +715,18 @@ ownership model adoption will stall.
 
 \section{Conclusion}
 
-APIP is a post-deployment remediation program that operationalizes the
-human-focused PIP's lifecycle primitives into actionable functions: trigger,
-cause attribution, tiered intervention, bounded window, and exit evaluation. It
-uses Kirkpatrick's model to discern true recovery from pseudo-improvement. The
-harness, artifacts, version pins, and frozen mapping table are published, so an
-auditor can validate that the analysis was not fitted after the fact. The
-central number in the evaluation is the one that drives the machinery: an
-always-Tier-1 responder patched four times, regressed three times, and ended up
-identical to doing nothing, all while scoring higher than the APIP on per-cycle
-time-to-resolution. Any measurement that favors speed without resilience will
-favor that approach. A null result on mesh insertion localizes the disruption
-mechanism to architectures with a bounded shared context.
+APIP is a post-deployment remediation program that turns the human PIP's
+lifecycle primitives into operational functions: trigger, cause attribution,
+tiered intervention, bounded window, and exit evaluation. It uses Kirkpatrick's
+model to separate durable recovery from superficial improvement. The harness,
+artifacts, version pins, and frozen mapping table are released, so an auditor
+can check the analysis was not fitted after the fact. Inserting a competent
+specialist into a mesh degraded no peer, which suggests mesh disruption requires
+a bounded shared context. One number drives the machinery: an always-Tier-1
+responder patched four times, regressed three times, and finished
+indistinguishable from taking no action, while scoring higher on per-cycle
+time-to-resolution. Any remediation scorecard that rewards speed without
+durability will prefer that responder.
 
 \section*{Declaration on Generative AI}
 
