@@ -69,6 +69,20 @@
 %  Still open from the critique: C2 (B2's per-cycle TTR is not in Table II,
 %  so "scoring higher on per-cycle time-to-resolution" remains uncheckable)
 %  and the unhedged mesh claim in contribution bullet 4.
+%
+%  Deletion sweep (2026-09-13), against CRITIQUE_2026-09-13.md M6/P4:
+%    - M6: the two uncited characterisations of industry practice are gone.
+%      B2 is no longer "the ad-hoc pattern typical of production practice"
+%      nor "what organizations actually do"; it is the informative comparison
+%      because it isolates the cost of patching without diagnosing. The
+%      B2 label itself is unchanged, and Sec. V-B's "reproduced the ad-hoc
+%      pattern the protocol is meant to displace" stands: that refers to the
+%      pattern described in Sec. I, not to a claim about its prevalence.
+%    - P4: the "first attribution accounting" claim was stated twice. Cut
+%      from the contribution list, which now says what was done rather than
+%      that it was first, and downgraded in Sec. V-D to "we are not aware of
+%      a prior such accounting". Pan et al. is "among the largest" rather
+%      than "the first at large scale".
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -167,8 +181,8 @@ We make the following contributions:
   and audit trails.
 
   \item We evaluate the full protocol in two live multi-agent environments
-  against no-action, always-Tier-1, and oracle baselines. To our knowledge this is the first
-  attribution accounting reported for a remediation protocol. The evaluation
+  against no-action, always-Tier-1, and oracle baselines, and report an
+  attribution accounting scored against injected ground truth. The evaluation
   also localizes the mesh disruption problem to architectures with a bounded
   shared context, via a null result.
 \end{itemize}
@@ -178,8 +192,8 @@ We make the following contributions:
 \subsection{Agent Evaluation and the Deployment Gap}
 
 Post-deployment monitoring has received far less attention than pre-release
-evaluation. Pan et al.'s production survey \cite{pan2025} is the first at large
-scale, and reports little about how teams manage agents after release.
+evaluation. Pan et al.'s production survey \cite{pan2025} is among the largest,
+and reports little about how teams manage agents after release.
 AgentCompass \cite{kartik2025} detects degradation but prescribes no
 remediation, and Rath \cite{rath2026} reports a 42\% task-success reduction
 when drift runs unchecked (their Table~1).
@@ -497,10 +511,10 @@ of Fig.~\ref{fig:lifecycle} to one of its five exits.
 \textbf{Baseline family.} The drift cell runs under four conditions:
 \emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
 horizon); \emph{B2 always-Tier-1} (a scripted prompt patch regardless of
-failure mode, the ad-hoc pattern typical of production practice); and
+failure mode); and
 \emph{B3 oracle} (ground-truth mode revealed at trigger, correct tier applied
 immediately). B1 and B3 bracket the achievable range. B2 is the informative
-comparison, because it is what organizations actually do. Injected ground truth
+comparison, isolating the cost of patching without diagnosing. Injected ground truth
 is quarantined from the controller, written into the run record for scoring and
 revealed only to B3, and a test enforces that the APIP condition never branches
 on it.
@@ -610,8 +624,8 @@ abstention instead of a confident misattribution.
 \label{sec:attrquality}
 
 Because every injected cell carries ground truth, the funnel's output is scored
-as injected versus attributed mode with abstention as a scored outcome. To our
-knowledge this is the first such accounting for a remediation protocol. Across
+as injected versus attributed mode with abstention as a scored outcome. We are
+not aware of a prior such accounting for a remediation protocol. Across
 the four cycles opened under the frozen mapping table and final contracts,
 three produced an attribution and all three were correct
 (\code{behavioral\_drift} in $\tau^2$; \code{alignment\_creep} twice in
