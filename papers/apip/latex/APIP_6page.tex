@@ -39,6 +39,18 @@
 %    - attribution funnel restated as numbered stages
 %  Fixed on merge: "cannot.Hence,the" spacing; a literal U+2013 en dash
 %  restored to "--"; "in the Section IV and Section V" -> "in Sections IV and V".
+%
+%  Collaborator pass v4 (APIP_6page_AI_detection_complete.tex, 2026-09-12)
+%  merged in -- conclusion only, rewritten to read less machine-generated:
+%    - active "APIP is a ... program that operationalizes ..." opening
+%    - release sentence reframed around what an auditor can check
+%    - closes on the mesh-insertion null result instead of the speed-vs-
+%      durability warning alone
+%  Fixed on merge: "discern true recover from pseudo improvement" ->
+%  "recovery from pseudo-improvement"; verb restored to the "Harness,
+%  artifacts, ... published" fragment; "always-responding Tier-1 box" ->
+%  "always-Tier-1 responder" (matches the B2 label in Sec. VI); stray double
+%  spaces and trailing whitespace removed.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -685,17 +697,18 @@ ownership model adoption will stall.
 
 \section{Conclusion}
 
-We have introduced the APIP, a post-deployment remediation protocol that adapts
-the human PIP's lifecycle primitives (trigger, cause attribution, tiered
-intervention, bounded window, and exit evaluation) and uses Kirkpatrick's model
-to separate durable recovery from superficial improvement. The harness,
-artifacts, version pins, and frozen mapping table are released so that the
-pre-registration claims are checkable. The evaluation's central number is the
-one that motivates the machinery: an always-Tier-1 responder patched four
-times, regressed three times, and finished indistinguishable from taking no
-action, while scoring better than the APIP on per-cycle time-to-resolution. Any
-remediation practice that measures speed without durability will prefer that
-responder.
+APIP is a post-deployment remediation program that operationalizes the
+human-focused PIP's lifecycle primitives into actionable functions: trigger,
+cause attribution, tiered intervention, bounded window, and exit evaluation. It
+uses Kirkpatrick's model to discern true recovery from pseudo-improvement. The
+harness, artifacts, version pins, and frozen mapping table are published, so an
+auditor can validate that the analysis was not fitted after the fact. The
+central number in the evaluation is the one that drives the machinery: an
+always-Tier-1 responder patched four times, regressed three times, and ended up
+identical to doing nothing, all while scoring higher than the APIP on per-cycle
+time-to-resolution. Any measurement that favors speed without resilience will
+favor that approach. A null result on mesh insertion localizes the disruption
+mechanism to architectures with a bounded shared context.
 
 \section*{Declaration on Generative AI}
 
