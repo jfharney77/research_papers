@@ -99,6 +99,23 @@
 %      its relation to the day-denominated windows of Sec. IV-D.
 %    - The table now names its seed (13), which the run records identify as
 %      the source of every number in it; the seed-10 set is a failed run.
+%
+%  Definition and hedging pass (2026-09-13), against D10(b), D11, M5:
+%    - D10 closed. Sec. V-A now says a run proceeds "in ticks of five task
+%      episodes" -- the figure comes from the run snapshots, which report
+%      n_episodes = 5 at every tick. The tick-to-day relation against the
+%      windows of Sec. IV-D is left alone: the evaluated windows were set in
+%      ticks (12 for both the Tier 1 and Tier 2 interventions) and the day
+%      figures in Sec. IV-D are deployment guidance, not what was run.
+%    - D11: "Versions are pinned in every run manifest" overclaimed. The
+%      manifest content-hashes the contract and mapping table but pins the
+%      backbone as provider plus name (cerebras/gemma-4-31b) with an empty
+%      version_note, because a hosted endpoint exposes nothing finer. Now
+%      reads "Contract, mapping table, and model names are pinned".
+%    - M5 closed. Contribution bullet 4 no longer "localizes the mesh
+%      disruption problem"; a null result "suggests that mesh disruption
+%      requires a bounded shared context", matching Sec. VI-A and the
+%      conclusion.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -198,9 +215,8 @@ We make the following contributions:
 
   \item We evaluate the full protocol in two live multi-agent environments
   against no-action, always-Tier-1, and oracle baselines, and report an
-  attribution accounting scored against injected ground truth. The evaluation
-  also localizes the mesh disruption problem to architectures with a bounded
-  shared context, via a null result.
+  attribution accounting scored against injected ground truth. A null result
+  also suggests that mesh disruption requires a bounded shared context.
 \end{itemize}
 
 \section{Background and Related Work}
@@ -517,7 +533,8 @@ governs both domains without modification.
 
 Both environments plug into a common controller through an adapter interface;
 traces are normalized to a shared span format, so the attribution pipeline is
-written once and reused unmodified. Each run proceeds in ticks: a calibration
+written once and reused unmodified. Each run proceeds in ticks of five
+task episodes: a calibration
 window derives every contract threshold as mean $\pm\,k\sigma$
 (Section~\ref{sec:trigger}); failure modes are injected on a pre-registered
 schedule; both trigger modalities evaluate at every tick; breaches pass through
@@ -675,8 +692,9 @@ remains a bounded unknown. Susceptibility to stale-corpus drift is itself
 model-dependent: policy-fact statement rate varied from 3.3\% to 37.5\% across
 the backbones we tested, so absolute thresholds do not transfer between models.
 Thresholds must therefore be calibrated per deployment, which is what the
-behavioral contract is for. Versions are pinned in every run manifest, and all
-runs, traces, and the frozen mapping table are released.
+behavioral contract is for. Contract, mapping table, and model names are pinned
+in every run manifest, and all runs, traces, and the frozen mapping table are
+released.
 
 \section{Open Problems and Future Directions}
 
