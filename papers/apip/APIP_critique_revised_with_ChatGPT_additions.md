@@ -1,0 +1,1591 @@
+**# APIP 6-page: adversarial critique — 2026-09-13**
+
+**Revision note — ChatGPT additions (2026-09-14).** Five issues were added after an independent read of the paper and this critique: **M9** (taxonomy abstraction/precedence), **M10** (tier locus vs. cost), **M11** (durability horizon), **D14** (tiers used before defined), and **D15** (re-attribution cadence dominates APIP–oracle gap). These are additive critiques; they do not change the status of Claude's existing items.
+
+
+Read against \`papers/apip/latex/APIP\_6page.tex\` at commit \`c29638d\` (6 pages, IEEE
+
+conference format, 25 references). Written from the position of a hostile but fair
+
+reviewer: the goal is to find every objection a program committee could raise, not to be
+
+encouraging. Remedies are collected at the end and keyed by ID.
+
+Verdict in one line: the protocol design is the paper's real contribution and it is good,
+
+but the evaluation is currently structured so that it cannot fail, and a sharp reviewer
+
+will see that before they see the design.
+
+**\*\*Revision status.\*\*** This updates the critique written against \`c185384\`. The only change
+
+to the paper since then is the collaborator's v4 conclusion rewrite (\`c29638d\`). Every
+
+item below was re-verified against the current text. Two moved:
+
+\- **\*\*M5 got worse.\*\*** The rewritten conclusion now closes on the mesh null result and states
+
+  it as established fact, dropping the word "hypothesized." The claim now appears in three
+
+  places (abstract, contribution bullet 4, conclusion) and is the last thing a reviewer
+
+  reads.
+
+\- **\*\*D9 and P8 are new\*\***, both introduced by the v4 wording.
+
+Nothing was resolved by v4. **\*\*C2 in particular survives the rewrite intact\*\*** — the
+
+conclusion still rests on a number that is not in the paper.
+
+A later pass over Table II, asking only what each column means, added **\*\*D10\*\*** and extended
+
+**\*\*C2\*\***. Neither comes from v4; both were latent in the table from the beginning, and the
+
+column-definition problem turns out to be the mechanism behind C2 rather than a separate
+
+oversight.
+
+**\*\*Addressed since this round — 8 of 29 items, none of them needing an experiment:\*\*** **\*\*D9\*\***
+
+and **\*\*P8\*\*** (in \`1c82c15\`); **\*\*M6\*\*** and **\*\*P4\*\*** (in \`fd14b47\`); **\*\*C2\*\*** and half of **\*\*D10\*\*** (in
+
+\`0a0682b\` and \`afbc902\`); and **\*\*D10\*\***'s remainder, **\*\*D11\*\***, and the last of **\*\*M5\*\*** (in
+
+\`4834ad0\`). **\*\*D11\*\*** was itself new, found while reading the run manifests. Items below carry their state at the time of
+
+writing; the paragraph-level status lines say what has since changed. This file stays pinned
+
+to \`c29638d\` as a snapshot — the next dated round re-reads from scratch.
+
+**\*\*C5 was closed in \`5c16b1a\`\*\***, at the cost of a seventh page the author will reclaim by hand. **\*\*D12 was closed in \`9d9f95e\`\*\*** and **\*\*M8 in \`0999127\`\*\***, both the same day they were
+
+found.
+
+**\*\*M7's §V-C half is done in \`543da34\`\*\***; its citation and its Table I half are queued behind P2.
+
+**\*\*A literature pass on 2026-09-13 added M7, M8, D12, D13 and P9.\*\*** Every source cited in
+
+those items is marked verified or unverified; two claims I initially made did not survive
+
+checking and are corrected in place (the catastrophic-forgetting percentage in D13, and the
+
+activation-steering "gap" in P9, which turned out to resolve in the paper's favour). Nothing
+
+here should be cited without reading the paper itself.
+
+**\*\*Hard constraint on every remedy below: the paper has about 22 words of slack.\*\*** Measured
+
+by appending filler to the 6-page build — 22 filler words still renders 6 pages, 25 renders
+
+7\. So no remedy that adds more than a sentence can be applied until space is freed first, and
+
+the space-freeing items are prerequisites rather than cosmetics.
+
+**\*\*And a lesson about how to free it.\*\*** The M6/P4 deletion sweep was projected to free 35--40
+
+words and freed **\*\*13\*\***, because most deletions needed replacement text to keep their
+
+sentences working, and measured slack moved from \~20 to \~22 words — that is, not at all in
+
+any useful sense. **\*\*Word-level deletion does not move a page boundary.\*\*** Prose reflows within
+
+its existing lines; you only gain space by removing a whole block: a figure, a table, table
+
+rows, or bibliography entries. This retires the idea that scattered tightening can fund an
+
+addition, and makes **\*\*P2\*\*** (cut Figure 1) the only unblocked space source now that the
+
+abstract rewrite is tabled.
+
+IDs are stable across revisions, so they are safe to use when iterating ("let's work
+
+C2 and M2").
+
+\| Tier | IDs | Count | Open |
+
+\| --- | --- | --- | --- |
+
+\| Critical | C1–C5 | 5 | 3 |
+
+\| Major | M1–M11 | 11 | 8 |
+
+\| Moderate | D1–D15 | 15 | 11 |
+
+\| Minor | P1–P9 | 9 | 7 |
+
+**---**
+
+**## Critical — these can sink the paper**
+
+**### C1. The headline result is guaranteed by the experimental design**
+
+*\*Status: open, unchanged.\**
+
+This is the most serious problem. The τ²-bench drift cell injects a **\*\*deepening ladder\*\***:
+
+one additional policy clause every five ticks from tick 12. B2's intervention is a prompt
+
+patch that "names the clauses amended at patch time." A patch enumerating the clauses known
+
+at tick *\*t\** is logically incapable of covering a clause introduced at *\*t+5\**. B2 must
+
+re-breach. It cannot do anything else.
+
+So the paper's central finding — "the always-Tier-1 responder patches four times, regresses
+
+three times, and ends indistinguishable from no action" — is not an empirical discovery
+
+about always-Tier-1 remediation. It is a restatement of how the injector and the baseline
+
+were specified. Tier 2 wins because a corpus re-index repairs the *\*mechanism\** (a stale
+
+retrieval index) while a prompt patch addresses only the *\*symptom\** (specific clause text),
+
+and the injected mode was chosen so that exactly one tier is curative.
+
+A reviewer will phrase this as: \*you designed an experiment in which the matched tier
+
+addresses the root cause and the mismatched tier structurally cannot, then reported that
+
+the matched tier won.\*
+
+This does not make the finding wrong. Shallow patching really does lose to root-cause
+
+repair, and the durability-vs-TTR trap (§V-B) is a genuinely useful observation. But as
+
+constructed the experiment demonstrates it rather than tests it, and the paper never
+
+acknowledges the distinction.
+
+**\*\*The run record contains the answer to this objection, and the paper does not use it.\*\*** The
+
+seed-13 B2 cycles breach at ticks 17, 20, 27 and 37, while the injection ladder adds clauses
+
+at 12, 17, 22, 27, 32 and 37. **\*\*Cycle 2's breach at tick 20 is off-ladder\*\***: nothing new had
+
+been injected since 17, and the patch failed one tick after its own cycle closed, against
+
+clause text it had already been given. That is not a scheduling artifact — it is a symptom
+
+patch failing on static material, which is exactly the evidence the by-construction objection
+
+says the experiment cannot produce. Two sentences in §V-B citing the tick-20 re-breach would
+
+convert C1 from a concession into a rebuttal.
+
+**### C2. The conclusion's central number is not in the paper**
+
+\*Status: **\*\*closed in \`0a0682b\`.\*\*** B2's per-cycle TTRs are in Table II: 2, 4, 2, and a fourth
+
+cycle that never closed, against APIP's 12. Recovered from
+
+\`apip\_simulations/runs/tau2-B2-s13-97ba47/records.json\`, whose four records give breach and
+
+exit ticks 17→19, 20→24, 27→29, 37→39 with re-breaches at 20, 27 and 37. §V-B now reads
+
+"outperforms APIP fourfold (Table II)" and the superseded reporting rule is gone; \`afbc902\`
+
+adds "B2's speed is its failure mode" to the caption so the table is not quotable against
+
+the paper when skimmed. **\*\*No experiment was needed — the numbers existed all along.\*\***\*
+
+The conclusion states B2 scored "higher than the APIP on per-cycle time-to-resolution."
+
+Table II reports B2's TTR as \`--\`, because the paper reports TTR only where a durable exit
+
+was achieved. That is a defensible reporting rule, but it means \*\*the single number the
+
+conclusion rests on is never shown\*\*. A reader cannot check the claim that motivates the
+
+entire durability argument.
+
+The v4 rewrite changed the sentence's wording and kept the unpublished number. Worth
+
+noting: the claim also appears in §V-B ("On per-cycle time-to-resolution alone B2
+
+outperforms APIP"), equally unquantified, so fixing the table fixes both sites at once.
+
+**\*\*Why the cell is empty: B2's row describes two different cycles.\*\*** The dash is not
+
+laziness, it is a table schema that cannot represent the condition. For APIP, B1 and B3 the
+
+cycle count is 1, so Det/Act/Exit unambiguously describe a single cycle and TTR is
+
+well-defined as exit minus detection (19−17=2 for the oracle, 29−17=12 for APIP). B2 has
+
+four cycles, and its row mixes them: Det (17) and Act (17) are the *\*first\** cycle, while Exit
+
+(39) is the *\*fourth\**. There is no single TTR that belongs in that row — 39−17=22 would be
+
+the span of all four cycles, not a per-cycle time to resolution.
+
+This has three consequences:
+
+1\. **\*\*The comparison is not well-formed, not merely unsupported.\*\*** "Per-cycle
+
+   time-to-resolution" is never defined for a multi-cycle condition. Is B2's TTR the mean of
+
+   four, the median, the first? A reviewer who notices this gets a stronger objection than
+
+   the missing number: the quantity being compared does not exist as defined.
+
+2\. **\*\*The fix is a row format, not just a number.\*\*** Pulling four values from the run records
+
+   is necessary but insufficient; the table needs somewhere to put a repeating condition.
+
+   This is the argument for splitting the TTR column, or for a small companion table giving
+
+   B2's four cycles with their individual breach, close, and re-breach ticks.
+
+3\. **\*\*\`--\` is doing double duty.\*\*** In B1's Act cell it means "never happened, by design." In
+
+   the TTR cells it means "happened, but withheld under our reporting rule" — the caption
+
+   says B2's four cycles "each closed quickly," so values exist. One glyph for "no value
+
+   exists" and "value not reported" is exactly the ambiguity a reviewer reads as evasion.
+
+See D10: the columns are never defined anywhere in the paper, which is what let this pass
+
+unnoticed.
+
+**\*\*The number probably supports you.\*\*** From what is already printed: B2 detects at 17 and
+
+times out at 39, four cycles in 22 ticks, against an injection ladder that adds a clause
+
+every five ticks. That puts B2's per-cycle TTR in the low single digits against APIP's 12.
+
+The claim is almost certainly true and roughly inferable from the table, so the paper is
+
+taking the reputational cost of an unsupported claim for a number that would have helped it.
+
+This is the most concretely fixable item in this document and also the most embarrassing if
+
+a reviewer catches it.
+
+**### C3. Three of five taxonomy categories have no attribution evidence**
+
+*\*Status: open, unchanged.\**
+
+The abstract sells "measurable cause attribution over a five-category failure-mode
+
+taxonomy." The evaluation opens four cycles and produces three attributions:
+
+\`behavioral\_drift\` once, \`alignment\_creep\` twice.
+
+\- **\*\*Tool misuse\*\*** — never injected, never attributed.
+
+\- **\*\*Exogenous disruption\*\*** — injected, no breach occurred, so no cycle opened.
+
+\- **\*\*Input brittleness\*\*** — injected and detected, but §V-C reports no APIP cycle, only the
+
+  coverage collapse and the power argument.
+
+So 40% of the taxonomy carries attribution evidence and 60% does not. The taxonomy is
+
+presented as validated when two of its five cells were exercised.
+
+**### C4. Attribution accuracy is close to circular**
+
+*\*Status: open, unchanged.\**
+
+The mapping table (authors') converts MAST labels plus disaggregation signature into a
+
+taxonomy category (authors'). Ground truth is the injected mode, drawn from that same
+
+taxonomy, produced by the authors' injector. Each environment injects a mode with a
+
+structurally distinct signature — a stale corpus and a creeping persona do not resemble each
+
+other. 3/3 accuracy under those conditions is close to the minimum publishable outcome, not
+
+evidence of discrimination.
+
+The paper is honest that *\*n\**=4 "is an accounting and not a confusion matrix," which helps.
+
+It does not address the harder point: the funnel was never asked to distinguish between two
+
+modes that could plausibly be confused.
+
+**### C5. A non-reproducing seed sits in the released artifact and not in the paper**
+
+\*Status: **\*\*closed in \`5c16b1a\`.\*\*** §V-B now reports the seed-10 null and drops the
+
+"reproduced across three seeds" claim, which had mixed contracts. \*\*The paper is 7 pages as a
+
+result\*\* — accepted deliberately, with the space to be reclaimed by hand in the final
+
+revision. If tonight's runs land, the counts in that sentence need updating; it is the same
+
+one sentence either way.\*
+
+Under the final frozen artifacts (contract \`138f19c3\`, mapping \`efe349e9\`) there are exactly
+
+three τ²-bench seeds:
+
+\| Seed | Detection | Outcome | In the paper? |
+
+\| --- | --- | --- | --- |
+
+\| 13 | tick 17, all four conditions | Table II | Yes — it *\*is\** Table II |
+
+\| 12 | tick 17, attribution abstained | timeout | Yes — the "one abstained" of §V-D |
+
+\| **\*\*10\*\*** | **\*\*never fired in three of four conditions\*\*** | — | **\*\*No\*\*** |
+
+Seed 12 is reported honestly, which matters: there is no pattern of suppression here.
+
+Seed 10 is a different matter, and it is not a crashed run. All four conditions completed 40
+
+ticks and 200 episodes on the scheduled injection, and \`policy\_citation\_error\_rate\` stayed at
+
+**\*\*exactly 0.0 through every post-injection tick\*\*** in three of them. The degradation never
+
+manifested. The fourth, an APIP re-run, showed it roughly six times weaker than seed 13 and
+
+detected at tick 29 rather than 17. Nothing in \`DEFERRED\_ACTIONS.md\`, the briefing, or the
+
+README documents an exclusion.
+
+**\*\*Why it is critical rather than major:\*\*** §V-E says "all runs, traces, and the frozen mapping
+
+table are released." Seed 10 ships inside the artifact. A reviewer who downloads it finds
+
+three seeds under the final contract and one that shows nothing — and finds it in a paper
+
+whose distinctive claim is pre-registration and auditability. Discovery by a reviewer is far
+
+worse than disclosure by the authors, and here the authors have already published the
+
+evidence.
+
+It also sharpens M1. The limitation is not merely "we ran one seed"; it is "we ran three, one
+
+produced no phenomenon, and the paper reports the lag as reproducing."
+
+**\*\*Check the existing claim while fixing this.\*\*** §V-B says the five-tick lag "reproduced across
+
+three seeds." Under the final contract only seeds 12 and 13 detected at all, so the third must
+
+be a pre-freeze run under contract \`0855428c\` — and those scatter: detection at 13, 16, 17, 22
+
+across seeds 3, 4, 1, 2, with seed 0 never firing. Since the contract defines the thresholds,
+
+mixing artifacts across that boundary is not a clean replication claim. Establish which three
+
+runs the sentence means before defending it.
+
+**\*\*There is real upside in the honest version.\*\*** Under the *\*final\** contract, detection fired at
+
+tick 17 **\*\*every time it fired\*\***, where the old contract scattered from 13 to 22. That is
+
+evidence the revised thresholds produce consistent timing, and the paper does not currently
+
+claim it.
+
+**\*\*Drafted replacement for §V-B\*\*** (measured at +35 words, so it needs P2 first):
+
+\> Detection fired at tick 17 in every condition, a lag of five ticks on the judge-scored policy
+
+\> citation error rate. Under this contract the injection manifested in two of three seeds and
+
+\> fired at tick 17 in both; in the third the citation error rate never left zero, so nothing
+
+\> degraded and no cycle opened. We report that seed as a null manifestation rather than
+
+\> excluding it. The four-condition comparison of Table II is itself single-seed (§V-E).
+
+Update the counts if tonight's runs change them.
+
+**---**
+
+**## Major — expect these in every review**
+
+**### M1. Single seed on the table that carries the argument**
+
+*\*Status: open, unchanged.\**
+
+Detection lag reproduced across three seeds. The four-condition outcome comparison —
+
+Table II, the source of the four-cycles/three-regressions claim — is one seed. The paper
+
+states this plainly (§V-A, §V-B, §V-E), which is to its credit, but stating a limitation
+
+does not discharge it. The patch-then-regress dynamic is the paper's signature result and
+
+it has *\*n\**=1.
+
+**### M2. Missing related work: statistical process control and drift detection**
+
+*\*Status: open, unchanged.\**
+
+The two-gate trigger — an envelope derived as mean ± *\*kσ\** from a calibration window, plus
+
+multiple-comparison correction across a metric family — is a control chart with a
+
+Benjamini–Hochberg correction. Statistical process control has studied exactly this since
+
+Shewhart in the 1920s, including the false-alarm-under-multiple-charts problem the paper
+
+rediscovers at 75%.
+
+Likewise, Phase 1 is a concept-drift detector, and the concept-drift literature (DDM,
+
+ADWIN, Page–Hinkley) is mature and uncited.
+
+A reviewer from either community will treat these omissions as disqualifying on novelty
+
+grounds, and the fix costs two sentences and four citations. The finding survives — the
+
+contribution is applying the discipline to LLM contract metrics — but only if the prior art
+
+is acknowledged rather than appearing to be unknown to the authors.
+
+**### M3. Why PIP rather than incident management?**
+
+*\*Status: open, unchanged.\**
+
+The five phases — trigger, diagnose, intervene, monitor, exit — are the structure of SRE
+
+incident response and ITIL problem management, both of which are already industry practice
+
+for production systems, already tooled, and already owned by an identified organizational
+
+function. That last point matters because §VI names organizational ownership as an open
+
+problem that "will stall adoption" — a problem incident management solved decades ago.
+
+The paper never argues why the HR analogy is the better frame. It should, because there is a
+
+real answer available: the PIP's distinctive contribution is the \*bounded window with formal
+
+exit criteria and a durability test\*, which incident response lacks (incidents close when
+
+service is restored, not when recovery is shown to hold). That is a strong argument and the
+
+paper doesn't make it.
+
+There is also a reputational hazard: PIPs are widely understood in practice as a documented
+
+route to termination rather than genuine remediation. Some reviewers will read the analogy
+
+as importing a discredited instrument. One sentence heading this off would help.
+
+**### M4. The precondition is admitted to be absent**
+
+*\*Status: open, unchanged.\**
+
+The protocol requires a behavioral contract written at deployment time. The paper says such
+
+contracts are "rarely written" (§IV-A) and "absent from most deployments" (§VI-B). No
+
+contract is exhibited, no authoring cost is measured, and the problem is deferred to open
+
+problems.
+
+The paper therefore proposes a protocol that cannot be adopted by the population it
+
+describes, and does not measure the barrier. Showing one real contract — even in
+
+supplementary material — would materially change how this reads.
+
+**### M5. The null result is about ChatDev, not about mesh disruption**
+
+\*Status: **\*\*closed for the overclaim, in \`1c82c15\` and \`4834ad0\`.\*\*** All three sites now hedge
+
+alike: the conclusion says "suggests," contribution bullet 4 says "a null result also suggests
+
+that mesh disruption requires a bounded shared context," and the abstract's "hypothesized
+
+crowding mechanism" was already acceptable. **\*\*The §VI-A reframing (remedy (a)) is still open\*\***
+
+— the section still presents a post-hoc scoping story as though it had been predicted.\*
+
+§VI-A reports that inserting a Documentation Specialist produced no peer degradation, then
+
+explains that ChatDev rebuilds each phase's prompt from templates, so there is no bounded
+
+context pool to crowd and "crowding is structurally unavailable here."
+
+If the environment cannot exhibit the hypothesized mechanism, the experiment provides no
+
+evidence about that mechanism. The honest reading is that the environment was unsuitable,
+
+which was knowable in advance from ChatDev's architecture. Framing it as a result that
+
+localizes the crowding mechanism to architectures with a bounded shared context is post-hoc:
+
+the paper did not predict this before running.
+
+**\*\*What v4 changed.\*\*** The rewritten conclusion adds a closing sentence — "A null result on
+
+mesh insertion localizes the disruption mechanism to architectures with a bounded shared
+
+context" — which makes this the final claim of the paper and strengthens it twice over.
+
+"Hypothesized crowding mechanism" (the abstract's careful phrasing) became "the disruption
+
+mechanism," asserting both that a single mechanism exists and that its scope is now known.
+
+Section VI-A itself says only "plausibly requires." The conclusion is now the least hedged
+
+of the three statements of this claim and the most prominent.
+
+§VI-A is honest; the abstract is nearly honest; the conclusion is not. A reviewer who reads
+
+the conclusion first and §VI-A second will conclude the paper oversells, which is the worst
+
+possible ordering for this item.
+
+**\*\*Fixed in \`1c82c15\`:\*\*** the conclusion now reads "Inserting a competent specialist into a
+
+mesh degraded no peer, which suggests mesh disruption requires a bounded shared context,"
+
+and it no longer occupies the final sentence — the durability result does. §VI-A keeps
+
+ownership of the null result at its own hedging level.
+
+**\*\*Still open, and now the worst site:\*\*** contribution bullet 4 in §I says the evaluation
+
+"localizes the mesh disruption problem to architectures with a bounded shared context, via a
+
+null result." That is unhedged, and with the conclusion repaired it is the boldest statement
+
+of the claim left in the paper. The abstract's "localizes the hypothesized crowding
+
+mechanism" is acceptable. Bullet 4 is a one-word fix and word-neutral, so it fits inside the
+
+current page slack. The §VI-A reframing (remedy (a) below) does not, and needs P1 or P2
+
+first.
+
+Also still true: no breach occurred, so no APIP cycle opened, so the mesh protocol and the
+
+onboarding arm — the actual contributions being tested — were never exercised at all.
+
+**### M6. B2 is a strawman, and the paper says so out loud**
+
+\*Status: **\*\*addressed in \`fd14b47\`.\*\*** Both uncited characterisations are gone; B2 is now "the
+
+informative comparison, isolating the cost of patching without diagnosing." The underlying
+
+design objection is unchanged and lives on in C1 — B2 still cannot succeed by construction;
+
+the paper just no longer claims it represents industry.\*
+
+B2 applies Tier 1 "regardless of failure mode" and is described as "the ad-hoc pattern
+
+typical of production practice" and "what organizations actually do." No citation supports
+
+that characterization. Competent teams do *\*some\** diagnosis; a responder that ignores the
+
+failure mode entirely is not the realistic alternative, it is the worst possible one.
+
+Combined with C1 (B2 cannot succeed by construction), the comparison is a protocol beating
+
+an opponent designed to lose. The oracle bound (B3) is fine and does real work. What is
+
+missing is a *\*credible\** competitor.
+
+**### M7. Alignment creep → Tier 1 is the weakest mapping, and your own data says so**
+
+\*Status: **\*\*partly addressed in \`543da34\`.\*\*** §V-C no longer concedes the failure — "creep has no
+
+escalation tier, so a failed Tier 1 fix has nowhere to go" replaces "correct diagnosis is
+
+necessary, not sufficient." That claim rests on the mapping table alone, which is why it could
+
+go in without a citation. **\*\*Two halves remain, both behind P2:\*\*** the Qi et al. citation for
+
+why prompt-depth fixes are shallow by mechanism, and the question of whether Table I's
+
+creep→Tier 1 row should survive at all. The edit had to be word-neutral, which cost the phrase
+
+"never cleared its exit envelope" — exiting \`timeout\` rather than \`resolved\` implies it, but it
+
+was a forced cut.\*
+
+Table I maps alignment creep to "Tier 1: Prompt constraint injection." The alignment
+
+literature argues that prompt-depth fixes are exactly what does not hold.
+
+Qi et al., *\*Safety Alignment Should Be Made More Than Just a Few Tokens Deep\**
+
+(arXiv:2406.05946, ICLR 2025 — **\*\*verified\*\***), shows that "safety alignment can take shortcuts,
+
+wherein the alignment adapts a model's generative distribution primarily over only its very
+
+first few output tokens," and argues this shallowness is what makes aligned behavior
+
+susceptible to adversarial suffixes, prefilling, decoding changes, and fine-tuning attacks.
+
+A charter re-injection is a first-few-tokens intervention.
+
+**\*\*The evaluation already contains the corroboration, unreported.\*\*** The two ChatDev creep
+
+cells split:
+
+\| Run | Attribution | Tier | Exit |
+
+\| --- | --- | --- | --- |
+
+\| \`chatdev-APIP-s4\` | \`alignment\_creep\` 0.73 | Tier 1 | resolved |
+
+\| \`chatdev-APIP-s3\` | \`alignment\_creep\` 0.61 | Tier 1 | **\*\*timeout\*\*** |
+
+§V-C reports the second as "correct diagnosis is necessary, not sufficient" and stops there —
+
+an unexplained failure sitting next to a success. The shallow-alignment account supplies the
+
+mechanism: the re-injection moved surface expression without moving what produces it. Naming
+
+that converts a 50% tier success rate from an embarrassment into a principled finding, and it
+
+is the most valuable citation available to this paper.
+
+It also implies the mapping may be wrong rather than merely unlucky. If alignment creep needs
+
+more than Tier 1, Table I should say so, and the tier model should say what "more" is.
+
+**\*\*The mapping table makes this concrete.\*\*** \`R5-creep\` and \`R5b-creep-noreview\` are the only
+
+rules in the table with **\*\*no \`escalation\_tier\`\*\*** — every other mode escalates to \`tier\_3\`, and
+
+mesh escalates to \`recalibrate\`. So creep gets a prompt-level intervention and no fallback. In
+
+\`chatdev-APIP-s3\` that is exactly what played out: Tier 1 did not hold, nothing was available
+
+to escalate to, and the cycle exited \`timeout\` with \`escalated\_from\` null. The paper's own
+
+design encodes the assumption the alignment literature disputes, and the one run where the
+
+assumption failed had no recovery path. That is a better sentence than "necessary, not
+
+sufficient," and it costs about the same number of words.
+
+**### M8. Newer work is staking out the same gap**
+
+\*Status: **\*\*closed in \`0999127\`.\*\*** All three leads are now verified against their own abstracts.
+
+One needed citing and was cited; two did not, for recorded reasons. Do not re-litigate without
+
+new evidence.\*
+
+M2 covers the older prior art (SPC, drift detection). This is the current-year version, and
+
+it is more urgent because it is close enough to be mistaken for the same contribution.
+
+\- **\*\*RAIL Guard: Closing the Evaluation-to-Remediation Gap in Responsible AI for LLM Agents\*\***
+
+  (Verma, Prasun, Kumar; arXiv:2607.16215v1, 28 May 2026 — **\*\*verified, abstract read\*\***). A
+
+  closed-loop evaluate–rewrite–reevaluate pipeline reporting "96.9% convergence versus 49.1%
+
+  for block-and-retry," and distinguishing "fixable dimensions that respond to remediation"
+
+  from "structural dimensions that require architectural rather than algorithmic solutions."
+
+  **\*\*It is distinguishable\*\*** — it attributes to eight responsibility *\*dimensions\** rather than a
+
+  root-cause taxonomy, has no tier hierarchy, no behavioral contract, and no bounded window
+
+  with exit criteria. But it owns the phrase "evaluation-to-remediation gap," it is three
+
+  months older than this submission, and its fixable/structural split rhymes with your
+
+  intrinsic/exogenous split. Cite it and state the difference before a reviewer states it for
+
+  you.
+
+  **\*\*Cited in \`0999127\`\*\***, beside AgentDebugX, extending the argument already made there: both
+
+  repair an instance, and a converged rewrite is Level 1/2 evidence exactly as a successful
+
+  rerun is. Their convergence is per-output; the APIP's is against a contract over a window.
+
+\- **\*\*SafeHarness: Lifecycle-Integrated Security Architecture for LLM-based Agent Deployment\*\***
+
+  (Lin et al., arXiv:2604.13630, v1 15 Apr 2026, v2 11 May 2026 — **\*\*verified, abstract read\*\***).
+
+  **\*\*Not prior art. Do not cite on novelty grounds.\*\*** My earlier summary was inferred and
+
+  overstated the overlap, which is largely lexical: both papers say "tiered" and both
+
+  "escalate." Its four layers are "adversarial context filtering at input processing, tiered
+
+  causal verification at decision making, privilege-separated tool control at action execution,
+
+  and safe rollback with adaptive degradation at state update," escalating "verification rigor"
+
+  on sustained anomalies. **\*\*Its tiers are verification rigor; yours are intervention cost\*\*** —
+
+  orthogonal axes, one a gate and the other a fix. Its response is defensive posture, not
+
+  remediation: nothing changes the agent so it stops failing. And it sits squarely in the
+
+  category §III already declares out of scope, next to the AI Control work already cited. The
+
+  only use for it is positive and optional: §III says "Control audits can feed APIP triggers,"
+
+  and this is an example of the control-side system that would do the feeding. A 12-page
+
+  nice-to-have, not a six-page defense.
+
+\- \*\*AgentTether: Graph-Guided Diagnosis and Runtime Intervention for Reliable LLM Agent
+
+  Operation\*\* (Zhao, Zhang, Gu, Sun, Pei, Bansal, Rajmohan, Ma; arXiv:2607.06273, 7 Jul 2026 —
+
+  **\*\*verified, abstract read\*\***). **\*\*Worth citing when space allows; not worth buying space for.\*\***
+
+  A run-time repair framework automating "post-run diagnosis and guided recovery \*\*without
+
+  modifying the underlying agent or environment\*\*" — that clause is the whole distinction, and
+
+  §II-A already draws it. It belongs in the existing trajectory-level attribution bundle
+
+  (\`\cite{zhu2026, ma2025attribution, zhang2025, agenttrace2026}\`), where adding a key costs no
+
+  body words but still needs a \`\bibitem\`. Two things make it more than routine: the author
+
+  list is strong, and it opens with "blind retry adds no diagnosis," which is the same
+
+  rhetorical move as APIP versus B2. Add it to the bundle the moment P2 frees room.
+
+\- Bayesian self-escalation work (arXiv:2608.24087) — **\*\*still unverified, a lead only.\*\*** Lowest
+
+  priority of the four.
+
+The defensible position is unchanged and strong: these are security or content-remediation
+
+loops, while the APIP is a performance-remediation lifecycle with cause attribution and a
+
+durability test. But "we were unaware" is not available once the work is three months old in
+
+your own subfield.
+
+
+**### M9. The taxonomy mixes causal levels and does not state a precedence rule**
+
+*Status: new, open.*
+
+The five in-scope categories are not obviously defined at the same abstraction level.
+`behavioral_drift` is a temporal/root-cause phenomenon; `input_brittleness` is a conditional
+capability characteristic; `alignment_creep` is a behavioral/value change; `tool_misuse` is an
+observed action failure; and `exogenous_disruption` is a causal locus outside the agent.
+
+That creates classification ambiguity even if the attribution funnel is implemented exactly as
+specified. A stale tool schema can manifest as an incorrect invocation (`tool_misuse`), while its
+proximate cause is world/interface change (`behavioral_drift`), and a peer or platform change could
+make the same symptom exogenous. The paper needs to say what the taxonomy classifies: surface
+symptom, proximate cause, actionable root cause, or remediation locus.
+
+This is distinct from C4. C4 says the evaluation does not test confusable pairs; M9 says the
+category definitions themselves do not yet establish how a confusable case should be resolved.
+
+The cleanest repair is to define the taxonomy explicitly as **remediation-oriented and
+root-cause-directed**, then add a precedence rule: classify by the actionable causal locus that
+determines the intervention, not by the surface symptom. If multiple causes remain plausible, the
+correct output is `abstain`, which is already part of the protocol.
+
+**### M10. The tier hierarchy conflates intervention locus with cost/severity**
+
+*Status: new, open.*
+
+§IV-C describes Tier 1, Tier 2, and Tier 3 simultaneously as technical layers
+(prompt → retrieval/context → model) and as an ordering of increasing cost, disruption, and lead
+time. Those two axes are correlated only imperfectly. A small tool-schema repair can be Tier 2 yet
+cheaper than extensive prompt redesign; replacing a hosted model can be operationally simpler than
+rebuilding a production retrieval pipeline; and D13 already shows that Tier 3 itself spans very
+different costs (adapter, fine-tuning, replacement).
+
+A reviewer can therefore ask what the ordinal number actually means. If the answer is *where the
+intervention acts*, then cost is not definitional. If the answer is *cost/severity*, the layer-based
+examples do not produce a stable ordering.
+
+The smallest repair is conceptual rather than experimental: define tiers primarily by
+**intervention locus** — Tier 1 instruction/behavioral layer, Tier 2 context/knowledge/tool layer,
+Tier 3 model layer — and say that cost, disruption, and rollback difficulty **generally** increase
+rather than defining the ordering.
+
+**### M11. “Durable recovery” is central, but the durability horizon is underspecified**
+
+*Status: new, open.*
+
+The strongest contribution is the distinction between fast symptom suppression and durable
+recovery. The B2 argument, the Kirkpatrick framing, the PIP-vs-incident-management defense, and the
+conclusion all depend on it. But the paper does not make the evidentiary horizon behind “durable”
+explicit enough.
+
+A run that does not re-breach before observation ends is not proven durable indefinitely; it is
+right-censored at the experiment horizon. A reviewer can therefore ask: how many post-intervention
+ticks or episodes must remain inside the contract envelope before `resolved` is declared, and is
+that horizon pre-specified?
+
+This does not require abandoning the claim. Define durability operationally as remaining within the
+contract envelope for the pre-specified post-intervention observation window, and avoid wording that
+implies indefinite persistence. “Durable over the evaluation horizon” or “remained within contract
+for the prespecified observation window” is stronger scientifically than an unqualified “durably
+fixed.”
+
+**---**
+
+**## Moderate — will cost you points**
+
+**### D1. The Kirkpatrick level assignments are unjustified and unused**
+
+*\*Status: open, unchanged.\**
+
+Table I assigns a Kirkpatrick level to each failure mode: drift is Level 4, brittleness
+
+Level 2, creep and tool misuse Level 3. No rationale is given for any of these, the
+
+assignments are not obvious, and — more damaging — they do no work in the evaluation. No
+
+result turns on them. A reviewer will ask whether the Kirkpatrick framing is load-bearing or
+
+decorative.
+
+**### D2. The 75% false-positive finding is under-reported**
+
+*\*Status: open, unchanged.\**
+
+"A single-gate rule breached in 75% of clean, zero-injection runs across the 15–25 metrics
+
+and disaggregated splits a realistic contract monitors" is one of the paper's better
+
+empirical findings and it gets a single sentence. How many runs? Which metrics? What *\*k\**?
+
+It deserves a table, and it would strengthen M2 by quantifying the multiple-comparisons
+
+problem in this specific setting.
+
+**### D3. Twenty clean ticks is a thin basis for the corrected detector**
+
+*\*Status: open, unchanged.\**
+
+Having reported a 75% false-alarm rate for the naive design, the paper validates the
+
+corrected design on "twenty clean ticks at any swept operating point." Twenty ticks cannot
+
+establish false-alarm control at the rates that would matter in production. The asymmetry
+
+between the two sample sizes is conspicuous.
+
+**### D4. Confidence scores appear without provenance**
+
+*\*Status: open, unchanged.\**
+
+Attribution returns confidences of 0.65, 0.73, and 0.61, and abstains "below threshold."
+
+How the score is computed is never stated, and neither is the threshold — despite the
+
+threshold determining the 25% abstention rate that the paper reports as a headline number.
+
+**### D5. Two of five exit states are never observed**
+
+*\*Status: open, unchanged.\**
+
+The protocol defines five exits: resolved, timeout, regressed, recalibrated, retired. The
+
+evaluation produces resolved and timeout. \`regressed\` is discussed for B2 but Table II
+
+records its outcome as \`timeout\`. \`recalibrated\` and \`retired\` never occur — and
+
+\`recalibrated\` is given substantial argumentative weight in §IV-E as the state that prevents
+
+re-baselining from masquerading as remediation.
+
+**### D6. The power argument's numbers are asserted, not derived**
+
+*\*Status: open, unchanged.\**
+
+§V-C's scale-free ratio (1/*\*s\**², 25× at *\*s\**=0.2) is sound and nicely made. But "roughly 4
+
+episodes within the group against 104 in the aggregate" depends on "a task-mix-dependent
+
+variance estimate" that is never given. As written the reader can check the ratio but not
+
+the absolute counts.
+
+**### D7. Neither environment is a production deployment**
+
+*\*Status: open, unchanged.\**
+
+The motivating problem is production degradation. The evidence comes from two research
+
+benchmarks with injected faults. "The same machinery governs both domains without
+
+modification" (§V) is a modest generality claim resting on two sandboxes chosen by the
+
+authors, both LLM-agent harnesses. The gap between the motivation and the evidence is never
+
+named.
+
+**### D8. Unsupported appeals to experience**
+
+*\*Status: open, unchanged.\**
+
+"In our experience such contracts are rarely written, and expectations are left to informal
+
+organizational memory" (§IV-A). In a paper that otherwise insists on derived thresholds and
+
+pre-registration, an unsourced appeal to the authors' experience is jarring — and in a
+
+double-blind submission it is also unverifiable.
+
+**### D9. "Identical to doing nothing" overstates what Table II shows**
+
+\*Status: **\*\*addressed in \`1c82c15\`\*\*** — now "finished indistinguishable from taking no
+
+action," matching §V-B and the abstract.\*
+
+The rewritten conclusion says B2 "ended up identical to doing nothing." The abstract and
+
+§V-B both say *\*indistinguishable\**, which is the defensible word: B1 and B2 reach the same
+
+exit tick (39) and the same outcome (\`timeout\`).
+
+They are not identical. B2 acted four times and B1 did not act at all — Table II records
+
+exactly that difference in the Act and Cyc. columns. The distinction is the paper's own
+
+point: four interventions bought nothing, which is a stronger and more interesting claim
+
+than the two runs being the same. "Identical" asserts something the table contradicts, in
+
+the one sentence a reviewer is most likely to quote back.
+
+One word, and it is already the right word two paragraphs earlier.
+
+**### D10. Table II's columns and the tick unit are never defined**
+
+\*Status: **\*\*closed in \`0a0682b\` and \`4834ad0\`.\*\*** §V-A now reads "in ticks of five task
+
+episodes," from the run snapshots' \`n\_episodes\`. The tick-to-day question was answered by
+
+separating the two rather than inventing a conversion: the evaluated windows were set in ticks
+
+(12 for both interventions) and §IV-D's day figures are deployment guidance. If §IV-D should
+
+say so outright, that is one more sentence and there is no room for it. Original text follows.\*
+
+*\*Superseded status: half closed in \`0a0682b\`.\** The caption now defines Det./Act/Exit as ticks and TTR
+
+as Exit−Det, and states that a dash marks a quantity that does not exist rather than one
+
+withheld, which retires the double meaning. **\*\*Still open: what a tick is.\*\*** The run records
+
+answer it — \`snapshots.jsonl\` reports \`n\_episodes\` of 5 at every tick, so a tick is five
+
+episodes — but the paper still does not say so, and the relation to §IV-D's day-denominated
+
+windows (7--14 for Tier 1, 30--60 for Tier 3) is still unreconciled. That second half is a
+
+one-sentence fix once the authors decide how a tick maps to a day.\*
+
+Not one of Table II's seven column headers is expanded anywhere in the paper — not in the
+
+caption, not in §V-A, not in §V-B. \`Det.\`, \`Act\`, \`Exit\`, and \`Cyc.\` are left to the reader,
+
+and the unit they are counted in is left with them.
+
+They are recoverable, which is the only reason this has not already cost the paper
+
+something. \`Det.\` is the tick at which the two-gate trigger fired (line 528 fixes it at 17 in
+
+every condition). \`Act\` is the tick the intervention was applied, which B1's dash and B3's
+
+"immediately" between them establish. \`Exit\` is the tick exit evaluation ran. TTR is exit
+
+minus detection, confirmed twice over by arithmetic (19−17=2, 29−17=12, the latter matching
+
+"resolved the cycle in 12 ticks against the oracle's 2"). \`Cyc.\` is cycles opened. A reader
+
+willing to do this reconstruction gets a consistent picture — the APIP row even decomposes
+
+cleanly into a 10-tick re-attribution cadence plus the oracle's own 2-tick act-to-exit gap.
+
+But asking a reviewer to derive your column semantics from your arithmetic is a poor trade
+
+for the one sentence it would take to state them.
+
+**\*\*The tick is the more serious half.\*\*** Line 472 is the only definition offered — "Each run
+
+proceeds in ticks" — and it says nothing about what a tick contains: episodes,
+
+conversations, a batch, wall-clock time. So TTR = 12 cannot be interpreted. Is the protocol
+
+resolving drift in an afternoon or a quarter? Nothing in the paper answers this, and it
+
+bears directly on whether the APIP-versus-oracle gap of 10 ticks is an acceptable diagnostic
+
+cost or a disqualifying delay.
+
+Worse, the paper runs two time units and never reconciles them. §IV-D specifies remediation
+
+windows in days (7--14 for Tier 1, 30--60 for Tier 3) and cites the human PIP's 30--90 days;
+
+§V reports everything in ticks. A reader cannot tell whether the evaluated windows honor the
+
+protocol's own duration spec, because the two are denominated differently and no conversion
+
+is given. For a paper whose contribution is a *\*bounded window\** protocol, the bound is
+
+currently unitless.
+
+**### D11. Version pinning is weaker than §V-E claims**
+
+\*Status: **\*\*closed in \`4834ad0\`.\*\*** §V-E now reads "Contract, mapping table, and model names are
+
+pinned in every run manifest." True as written, and "model **\*\*names\*\***" makes the limit legible
+
+without spending a clause on it. The practical half stands: capture whatever version metadata
+
+the provider returns, from the next run onward.\*
+
+§V-E says "Versions are pinned in every run manifest," and the schema section builds the
+
+auditability story on \`mapping\_table\_hash\` and \`environment\_provenance\`: an auditor can
+
+recompute the hash and establish which rules and environment versions were in force.
+
+The manifest partly delivers. \`contract\_sha256\` and \`mapping\_table\_sha256\` are real content
+
+hashes and do exactly what the paper claims. The **\*\*models\*\*** do not. The seed-13 manifest
+
+records \`models.backbone.provider = cerebras\`, \`models.backbone.model = gemma-4-31b\`, and
+
+\`models.backbone.version\_note = ""\` — an empty string — with no digest; the judge entry's
+
+\`digest\` is \`None\`. The pin on the component that actually produces the behavior under study
+
+is a **\*\*name against a hosted endpoint\*\***, which the provider can update without notice or
+
+trace.
+
+This matters more here than it would in most papers. Pre-registration and auditability are
+
+the paper's distinctive virtues, and §V-E already concedes that susceptibility to
+
+stale-corpus drift is model-dependent — policy-fact statement rate varying 3.3\\%--37.5\\%
+
+across backbones. So the one quantity the paper says does not transfer between models is
+
+pinned by a string that does not identify a model version. A reviewer who notices will ask
+
+what "pinned" means, and the honest answer is "pinned for everything except the model."
+
+It is also an immediate practical risk rather than only a presentational one: any replication
+
+run after the provider updates that endpoint is silently a different experiment.
+
+**### D12. The paper contradicts itself on which tier fixes tool misuse**
+
+\*Status: **\*\*closed in \`9d9f95e\`.\*\*** §IV-C's clause "and tool misuse arising from stale tool
+
+descriptions" is deleted; the mapping stays frozen. Table I agrees with the mapping table on
+
+all five rows, so that clause was the paper's only outlier and it was the clause that had to
+
+go. Deleting it also bought back slack — 20 filler words render 6 pages again, where 5 had
+
+spilled to 7. **\*\*The substantive question below is untouched and still open.\*\***\*
+
+Table I maps Tool Misuse to "Tier 1 (prompt) or Tier 3 (fine-tune)." §IV-C says the opposite:
+
+\> **\*\*Tier 2 (retrieval and context)\*\*** covers RAG index updates, knowledge-base revisions, and
+
+\> **\*\*tool schema fixes\*\*** … It addresses drift arising from world-state divergence, \*\*and tool
+
+\> misuse arising from stale tool descriptions.\*\*
+
+The frozen mapping table sides with Table I —
+
+\`contracts/mast\_apip\_mapping.yaml\`, rules \`R2-tool\` and \`R2b-tool-nosplit\`, both
+
+\`tier: tier\_1\` with \`escalation\_tier: tier\_3\`. Tier 2 appears nowhere for this mode.
+
+Two sections of the same paper prescribe different remediations for the same failure mode,
+
+and one of them is hashed into every run manifest. A reviewer reading §IV-C against Table I
+
+finds this in under a minute.
+
+**\*\*It also blocked the C3 experiment, and now unblocks it with a defined expectation.\*\*** Under
+
+the frozen mapping a stale-tool-schema injection selects a prompt patch, then escalates to
+
+Tier 3. That is not "Tier 2 repairs the mechanism" — it is the escalation path, which
+
+\`escalated\_from\` shows has never fired in any run. The mapping could not simply have been
+
+edited: \`version: 1.0.0-frozen\` (2026-08-20, build-order step 4), carrying its own tuning
+
+record, with its sha256 as the pre-registration anchor in every manifest. Its header forbids
+
+precisely the convenient edit.
+
+The literature favors §IV-C: a renamed argument or changed schema is a context-layer defect,
+
+and fine-tuning is an absurd instrument for it.
+
+**\*\*What the deletion does not fix.\*\*** Routing a schema defect to a prompt patch remains
+
+questionable on the literature, and \*\*behavioral drift is now visibly the only one of five
+
+modes that reaches Tier 2 at all\*\* — a three-tier hierarchy whose middle tier serves one
+
+failure mode invites the question of whether it is a tier or a special case. §IV-C also still
+
+lists "tool schema fixes" among Tier 2's capabilities, which describes what the tier can do
+
+rather than what routes there; defensible, since a stale tool description can present as
+
+drift, but a sharp reviewer may still ask. Narrowing Tier 2 would be a design change rather
+
+than a correction, so it was left alone.
+
+The experiment worth running is therefore **\*\*escalation\*\***: Tier 1 mis-selects, Tier 3 recovers.
+
+\`escalated\_from\` is null in every record and D5 notes only two of five exit states have been
+
+observed, so "the protocol recovers from its own mis-tiering" is both untested and a stronger
+
+claim than "the right tier works."
+
+**\*\*And a finding that belongs to M7 as much as to this item.\*\*** The creep rows (\`R5-creep\`,
+
+\`R5b-creep-noreview\`) carry **\*\*no escalation tier at all\*\*** — the only mode in the table without
+
+one. So when \`chatdev-APIP-s3\`'s Tier 1 charter re-injection failed, the cycle had nowhere to
+
+go and ran to \`timeout\`, while \`s4\` on the same tier resolved. §V-C reports that as "correct
+
+diagnosis is necessary, not sufficient." The mechanical reading is sharper: the one mode the
+
+alignment literature says prompt-depth fixes cannot durably reach is the one mode given no
+
+escape hatch.
+
+**### D13. Tier 3's regression-risk claim is uncited, and Tier 3 conflates cheap with expensive**
+
+*\*Status:* **\*\*new\*\****, from the 2026 literature check.\**
+
+§IV-C says Tier 3 "carries the highest cost and the highest regression risk" with no citation,
+
+in a paper that otherwise insists on derived numbers. The catastrophic-forgetting literature
+
+supplies it directly — Luo et al., \*An Empirical Study of Catastrophic Forgetting in Large
+
+Language Models During Continual Fine-tuning\* (arXiv:2308.08747) is the established reference.
+
+**\*\*A caution on sourcing.\*\*** A newer result (arXiv:2601.18699) is circulating via vendor blogs
+
+as "15--32% absolute capability degradation" across twenty frontier models. I could not
+
+confirm that figure against the paper itself, which appears to report no single aggregate
+
+degradation metric, and the arXiv entry has other oddities. **\*\*Do not cite the number.\*\*** Use
+
+the established work.
+
+Separately, Tier 3 is defined as "fine-tuning, DPO, or replacement," which lumps a thin LoRA
+
+adapter together with full fine-tuning and model replacement. Current practice treats a small
+
+adapter paired with retrieval as a routine, low-cost intervention, so the tier's framing
+
+overstates the cost of its cheapest member. One clause fixes it.
+
+
+**### D14. The tiers are used operationally before they are defined**
+
+*Status: new, open.*
+
+The abstract previews tiered intervention and the contribution list previews a three-tier hierarchy,
+which is fine. But Table I then assigns Tier 1/2/3 to failure modes before §IV-C tells the reader what
+those tiers mean. The first operational use therefore precedes the definition.
+
+This is easy reviewer friction to remove. Add one compact sentence before Table I or at the opening
+of §III: “APIP organizes remediation by intervention locus into prompt-level (Tier 1),
+context/retrieval/tool-level (Tier 2), and model-level (Tier 3) interventions; §IV-C defines the
+hierarchy in detail.” If M10 is adopted, use that wording so the early definition and the formal
+definition agree.
+
+**### D15. The APIP–oracle gap is dominated by an unswept protocol cadence**
+
+*Status: new, open.*
+
+§V-B reports APIP resolving in 12 ticks versus the oracle in 2 and calls the difference the cost of
+diagnosis, then immediately explains that 10 of the 12 ticks come from the re-attribution cadence
+rather than diagnostic difficulty. That makes the measured gap primarily a controller
+hyperparameter, not an intrinsic cost of attribution.
+
+A reviewer can reasonably ask why that cadence was chosen and what happens at 2, 5, or 20 ticks.
+No sweep is required for the six-page paper if the claim is narrowed. Replace “cost of diagnosis”
+with something like **“observed protocol overhead under the configured re-attribution cadence”** and
+name cadence sensitivity as a limitation or tunable parameter. A cadence sweep is follow-up work.
+
+**---**
+
+**## Minor and presentational**
+
+**### P1. Abstract is 185 words against your own ≤150 target**
+
+*\*Status: open (186 → 185 words; the v4 rewrite did not touch the abstract).\**
+
+The target is recorded in the file header. Currently 35 words over.
+
+**### P2. Figure 1 earns very little**
+
+*\*Status: open, unchanged.\**
+
+Five boxes and four arrows conveying a linear sequence already stated in the adjacent
+
+sentence. The caption carries all the information (the two-gate breach, the 25/50/75%
+
+check-ins, the five exits). In a 6-page paper this is expensive whitespace — and the schema
+
+or a results trajectory would repay the same area far better.
+
+**### P3. The bibliography is at \`\scriptsize\` to make the page limit**
+
+*\*Status: open, and now quantified.\**
+
+Verified: reverting to \`\footnotesize\` renders 7 pages. Some venues explicitly forbid
+
+shrinking the reference list to fit. If yours does, the space must come from body text
+
+instead.
+
+Measured slack at the current build: **\*\*about 22 words\*\*** (22 filler words renders 6 pages, 25
+
+renders 7). So the page budget is not merely tight, it is effectively closed — every remaining
+
+remedy that adds prose is blocked behind P1 or P2.
+
+Re-measured after the M6/P4 sweep, which removed 13 words and moved slack by roughly two.
+
+The conclusion: prose cuts reflow inside their own lines and do not free pages. Only
+
+block-level removal does — Figure 1 (P2), Table I's rows, or bibliography entries. Budget
+
+accordingly.
+
+**\*\*Re-measured again after \`4834ad0\`: the slack is now spent.\*\*** Three short additions — the
+
+tick definition, the §V-E pin, and bullet 4's hedge — rendered **\*\*7 pages\*\*** on first draft, and
+
+only fit after §V-E's sentence went through three revisions down to five words over the
+
+original. Treat the budget as zero: **\*\*nothing additive goes in until Figure 1 comes out.\*\***
+
+**### P4. Two unverifiable "to our knowledge" firsts**
+
+\*Status: **\*\*addressed in \`fd14b47\`.\*\*** The duplicated claim is cut from the contribution list
+
+and downgraded in §V-D to "we are not aware of a prior such accounting"; Pan et al. is now
+
+"among the largest."\*
+
+"First attribution accounting reported for a remediation protocol" (stated twice — the
+
+contribution list and §V-D) and Pan et al. as "the first at large scale." Reviewers dislike
+
+unfalsifiable priority claims; they cost more than they gain.
+
+**### P5. The five-category taxonomy is really six**
+
+*\*Status: open, unchanged.\**
+
+Adversarial subversion is defined, discussed, declared out of scope, and reserved as a
+
+schema value — while the abstract says five. Defensible, but a reviewer may read it as
+
+inconsistent.
+
+**### P6. Check the artifact release for anonymity leaks**
+
+*\*Status: open, and now asserted in two places.\**
+
+§V-E says "all runs, traces, and the frozen mapping table are released"; the v4 conclusion
+
+repeats it as "published." Under double-blind review, confirm the supplementary material
+
+carries no repository URL, author name, or institutional path.
+
+**### P7. The Generative AI declaration is broader than it needs to be**
+
+*\*Status: open, unchanged.\**
+
+It states Claude drafted initial prose in Sections IV and V. That is your factual call to
+
+make, not mine, but be aware some committees weigh drafting disclosure differently from
+
+grammar-and-editing disclosure. Confirm the statement matches what actually happened, and
+
+that its scope is what you intend to assert.
+
+**### P8. v4 conclusion: length, a new term, and one overbroad sentence**
+
+\*Status: **\*\*addressed in \`1c82c15\`\*\*** — 119 words, "superficial improvement" and "released"
+
+now match §II-C and §V-E, and the speed-versus-durability sentence regained its scope as
+
+"Any remediation scorecard that rewards speed without durability."\*
+
+Three small things, all introduced by the rewrite:
+
+\- **\*\*128 words against the header's ≤120 target.\*\*** It still fits in six pages, so this only
+
+  matters if you need the space for C2's TTR numbers or D2's table — which you do.
+
+\- **\*\*"pseudo-improvement" appears nowhere else in the paper.\*\*** §II-C says "suppressed a
+
+  symptom without remediating the agent" and the abstract says "superficial." A new term in
+
+  the conclusion for a concept the paper already named twice reads as drift, not emphasis.
+
+\- **\*\*"Any measurement that favors speed without resilience will favor that approach"\*\*** lost
+
+  the scope the previous wording had ("any remediation practice that measures speed without
+
+  durability"). As written it is a claim about measurement in general. Restore the domain,
+
+  and consider restoring "durability" for the same reason as the bullet above — it is the
+
+  term §V-B and §IV-E use.
+
+**### P9. Be ready for the activation-steering question**
+
+*\*Status:* **\*\*new\*\****, and it resolves in the paper's favour.\**
+
+Someone from interpretability or control will ask why the tier model has nothing between a
+
+prompt edit and a weight update, since activation steering and representation control are an
+
+active class that intervenes on a frozen model at inference.
+
+**\*\*I initially thought this was a gap. Checking the literature, it mostly is not.\*\*** \*Steer Like
+
+the LLM: Activation Steering that Mimics Prompting\* (Heyman and Vandeputte, arXiv:2605.03907,
+
+ICML 2026 — **\*\*verified\*\***) opens by noting that "activation steering methods often underperform
+
+compared to prompt-based approaches," and formulates prompt steering *\*as\** a form of activation
+
+steering rather than as a distinct class. Related theory treats prompting, steering, and PEFT
+
+as low-rank updates on a continuum.
+
+So the omission is defensible and the defense is one sentence: steering is an emerging class
+
+whose advantage over prompt-level intervention is not established, and the three tiers are
+
+chosen for operational distinctness — who does the work, at what cost, with what rollback —
+
+rather than for mechanistic separation. Worth having ready rather than in the paper, given the
+
+page budget.
+
+\*(A separate claim, that steering reaches internal states no prompt can, comes from different
+
+work — arXiv:2604.09839, unverified — and is not needed for this answer.)\*
+
+**---**
+
+**# Ways to address these**
+
+Grouped by what they cost. Nothing in the first group requires new experiments — but with
+
+about 25 words of page slack (P3), "no new runs" no longer means "free." Each row below is
+
+marked with its space cost where it matters: **\*\*(fits)\*\*** inside current slack, \*\*(needs
+
+space)\*\* behind P1 or P2, **\*\*(frees space)\*\*** a prerequisite.
+
+**## Fixable in a revision pass, no new runs**
+
+\| ID | Remedy |
+
+\| --- | --- |
+
+\| **\*\*C2\*\*** | *\*Done in \`0a0682b\` + \`afbc902\`.\** Added a per-cycle TTR column to Table II, or a sentence in §V-B giving B2's four per-cycle TTRs explicitly. If the reporting rule must stand, state the numbers in prose and mark them as non-durable. Do this one first — it is a half-hour fix on the paper's weakest link, and it repairs both the conclusion and §V-B. |
+
+\| **\*\*C5\*\*** | *\*Done in \`5c16b1a\`, uncompressed, at the cost of a seventh page.\** Update the counts if tonight's runs change them. |
+
+\| **\*\*C1\*\*** | **\*\*(needs space)\*\*** Do not hide it — *\*own\** it, and now you can do better than owning it: cite the tick-20 off-ladder re-breach, where B2's patch failed against clause text it already had. That turns the concession into a rebuttal. Add two sentences to §V-B: the deepening ladder is chosen precisely because it separates symptom-patching from mechanism-repair, and B2's failure is therefore expected rather than discovered. Then reframe the contribution as *\*quantifying\** the trap (four cycles, three regressions, indistinguishable from no action) rather than discovering it. A reviewer who sees you name the objection first will not press it. |
+
+\| **\*\*C3\*\*** | **\*\*(frees space — same edit as P1)\*\*** Soften the abstract from "measurable cause attribution over a five-category taxonomy" to language matching what was tested (two categories attributed, one abstention, one uninjected). Add one sentence to §V-D listing which categories carry evidence and which do not. |
+
+\| **\*\*C4\*\*** | Add a sentence to §V-D acknowledging that the injected modes are structurally distinguishable and the funnel was never asked to separate confusable pairs. Name the specific hard case (drift vs. tool misuse arising from stale tool descriptions — your own Tier 2 covers both) as future work. |
+
+\| **\*\*M2\*\*** | **\*\*(needs space, most of any item)\*\*** Two sentences plus four citations in §II-A: control charts and Shewhart for the envelope, DDM/ADWIN/Page–Hinkley for drift detection. Frame your contribution as *\*transferring\** that discipline to LLM contract metrics with a family-wise correction — which is true, defensible, and stronger than appearing unaware of it. |
+
+\| **\*\*M3\*\*** | One paragraph in §II-B: acknowledge SRE/ITIL as the closer operational analogue, then make the argument the paper currently leaves implicit — incidents close on service restoration, PIPs close on a *\*durability test against explicit exit criteria\**, and that difference is the whole point. Add half a sentence acknowledging the PIP's reputation to defuse it. |
+
+\| **\*\*M5\*\*** | *\*Overclaim closed in \`1c82c15\` + \`4834ad0\`; all three sites hedge alike.\** Remaining: (a) **\*\*(needs space)\*\*** rewrite the §VI-A framing as a *\*preregistration failure\** honestly reported: the environment was selected before the architectural precondition was understood, and the result is a constraint on future environment choice, not evidence about the mechanism. (b) **\*\*Fix the conclusion's last sentence or cut it.\*\*** It is currently the least hedged statement of the claim in the paper and the most prominent. At minimum restore "hypothesized" and "plausibly" to match §VI-A; Bullet 4 and the conclusion are done; only the §VI-A reframing is left, and it needs P2 first. |
+
+\| **\*\*M6\*\*** | *\*Done in \`fd14b47\`.\** Kept B2's label and dropped the characterisation: Call it a *\*lower-bound responder\** or *\*undiagnosed-patch baseline\** rather than "what organizations actually do," and drop the unsupported claim about production practice — or cite something for it. |
+
+\| **\*\*D1\*\*** | **\*\*(frees space — block-level, so it actually works)\*\*** Note the remedy's original wording was wrong: Table I has three columns and the levels are sentences *\*inside\** the Description cells, so this is five in-cell deletions rather than a column cut. Either justify the assignments in one sentence each, or delete them and keep the framework where it does real work (the Level 1/2 vs. 3/4 durability distinction in §II-C, which is genuinely load-bearing). Cutting is the better trade in six pages. |
+
+\| **\*\*D4\*\*** | State the confidence computation and the abstention threshold in §IV-B2. Two sentences. Without them the 25% abstention rate is uninterpretable. |
+
+\| **\*\*D5\*\*** | One sentence in §V-E: three of five exit states were exercised; \`recalibrated\` and \`retired\` are specified but unobserved, and \`recalibrated\` awaits the naturally-evolving environment of §VI-B. |
+
+\| **\*\*D6\*\*** | Give the variance estimate, or state the assumption inline so the absolute counts can be reproduced. |
+
+\| **\*\*D7\*\*** | One sentence in §V-E naming the gap: both environments are research harnesses with injected faults, and no claim is made about production deployments. You already make the injected-fault admission — extend it to the sandbox-vs-production gap. |
+
+\| **\*\*D8\*\*** | Either cite something for the contracts-are-rare claim (Pan et al. may already support it) or mark it explicitly as an observation rather than a finding. |
+
+\| **\*\*D11\*\*** | *\*Done in \`4834ad0\`.\** Hedged §V-E: say the contract and mapping table are content-hashed and the model is pinned by provider and name, since hosted endpoints expose no digest. Separately, and more usefully, capture whatever version metadata the API returns into the manifest from the next run onward. |
+
+\| **\*\*D9\*\*** | *\*Done in \`1c82c15\`.\** Changed "identical to doing nothing" back to "indistinguishable from taking no action," and consider adding the four-interventions contrast explicitly — B1 acted zero times, B2 four, and they finished in the same place. That is the sharper sentence anyway. One-word minimum, and it is free. |
+
+\| **\*\*D10\*\*** | *\*Done in \`0a0682b\` + \`4834ad0\`.\** Columns defined, dash disambiguated, and a tick is now five task episodes. The tick-to-day relation was handled by separating the units rather than inventing a conversion. (a) Expand the column headers in Table II's caption and say TTR is exit minus detection, in ticks. (b) Define a tick once in §V-A in whatever unit it actually is. (c) State the tick-to-day relation so the evaluated windows can be checked against §IV-D's 7--14 and 30--60 day spec. Do this in the same editing pass as C2, since both are edits to the same table, and (a) is where you also disambiguate the two meanings of \`--\`. |
+
+\| **\*\*M7\*\*** | *\*§V-C half done in \`543da34\`, word-neutral, from the mapping table alone.\** Remaining, both **\*\*(need space)\*\***: cite Qi et al. (arXiv:2406.05946) for shallow alignment so the sentence says why the missing escalation tier is the wrong default rather than merely an omission; and decide whether Table I's creep→Tier 1 row survives — a design change against a frozen mapping, so realistically a 12-page item. Optionally restore "never cleared its exit envelope". |
+
+\| **\*\*M8\*\*** | *\*Done in \`0999127\`.\** RAIL Guard cited in §II-A. SafeHarness verified and deliberately not cited — security architecture, tiers of verification rigor rather than intervention cost, inside §III's out-of-scope category. AgentTether verified and queued: add its key to §II-A's existing trajectory-level \`\cite\` bundle when P2 frees a \`\bibitem\`'s worth of room. |
+\| **\*\*M9\*\*** | **\*\*(fits if wording is swapped rather than added)\*\*** Define the taxonomy as remediation-oriented/root-cause-directed and state a precedence rule: classify by actionable causal locus, not surface symptom; abstain when the locus is unresolved. This also sharpens C4 by making confusable cases well-defined before they are experimentally tested. |
+
+\| **\*\*M10\*\*** | Define tiers primarily by intervention locus (instruction/behavioral; context/knowledge/tool; model) and say cost/disruption generally increase rather than define the numbering. This subsumes D13's broader tier-cost concern without requiring a new experiment. |
+
+\| **\*\*M11\*\*** | State the exact post-intervention observation requirement for `resolved`, and qualify durability as durability over that pre-specified horizon. If the rule already exists in the harness/schema, surface it in §IV-E or §V-A rather than adding new methodology. |
+
+
+\| **\*\*D12\*\*** | *\*Done in \`9d9f95e\`.\** Decided in favour of Table I and the frozen mapping, by deletion. The literature and common sense favour §IV-C: schema defects are context-layer. If Tier 2 wins, Table I's row changes and the mapping table needs a documented v2 plus a re-run of anything that cites the old hash. If Tier 1/3 wins, delete the tool-misuse clause from §IV-C's Tier 2 sentence — a four-word cut, and the cheapest resolution. Either way, settle it before the C3 experiment. |
+
+\| **\*\*D13\*\*** | **\*\*(fits)\*\*** Cite Luo et al. (arXiv:2308.08747) for the Tier 3 regression claim, and do not cite the 15--32% figure circulating in vendor posts. Add a clause distinguishing a LoRA adapter from full fine-tuning or replacement. |
+
+\| **\*\*D14\*\*** | One sentence before Table I defining Tier 1/2/3 at first operational use; cross-reference §IV-C. Word-neutral if it replaces nearby tier-preview prose. |
+
+\| **\*\*D15\*\*** | Rename the 10-tick APIP–oracle difference from “cost of diagnosis” to “protocol overhead under the configured re-attribution cadence,” and flag cadence sensitivity as future work. No new run is required unless the paper wants a cadence-optimality claim. |
+
+\| **\*\*P9\*\*** | **\*\*(nothing to change)\*\*** Keep the one-sentence answer ready for reviewers: steering's advantage over prompting is unestablished, and the tiers are operationally rather than mechanistically defined. |
+
+\| **\*\*P1\*\*** | **\*\*(frees space)\*\*** Cut 35 words. The two easiest targets: the enumeration of protocol components ("statistically disciplined triggers … governance traceability requirements") compresses to about half its length, and the null-result sentence can lose its final clause — which also serves M5. |
+
+\| **\*\*P2\*\*** | **\*\*(frees space)\*\*** Cut Figure 1, move its caption content into §IV's opening paragraph, and spend the reclaimed space on D2's false-alarm table or a TTR-vs-durability trajectory plot. This also relieves P3 and funds C2. |
+
+\| **\*\*P3\*\*** | Fold into P2 — reclaiming Figure 1's area is likely enough to restore \`\footnotesize\` references. |
+
+\| **\*\*P4\*\*** | *\*Done in \`fd14b47\`.\** Dropped one and downgraded to "we are not aware of a prior …". Costs nothing. The contribution-list instance and the §V-D instance are the same claim stated twice; cutting one is free space. |
+
+\| **\*\*P5\*\*** | Change "five-category" to "five in-scope categories" in the abstract, once. |
+
+\| **\*\*P6\*\*** | Grep the supplementary bundle for URLs, usernames, and absolute paths before upload. |
+
+\| **\*\*P7\*\*** | Re-read against what actually happened and adjust scope to match. |
+
+\| **\*\*P8\*\*** | *\*Done in \`1c82c15\`.\** Trimmed the conclusion to ≤120 words while doing M5 and D9 — those two edits alone get most of the way. Swap "pseudo-improvement" for "superficial improvement" and restore the scope word to the speed-vs-durability sentence. |
+
+**## Needs new runs, but cheap ones**
+
+\- **\*\*M1 (single seed).\*\*** Three to five seeds on the τ²-bench drift cell alone would convert
+
+  the signature result from a trajectory into a rate. You already reproduce detection lag
+
+  across three seeds, so the harness supports it. This is the highest value-per-compute item
+
+  available and it directly answers the objection you have named as your principal
+
+  limitation.
+
+\- **\*\*D2 / D3 (false-alarm characterization).\*\*** Extend the clean-arm runs from twenty ticks to
+
+  a few hundred and report the naive-vs-two-gate false-alarm rates as a table. Clean runs are
+
+  the cheapest thing in the harness — no injection, no remediation, no judge calls on
+
+  breach paths.
+
+\- **\*\*C3 (tool misuse).\*\*** Tool misuse is the missing intrinsic mode and τ²-bench has tool
+
+  calls with deterministic scoring. A stale-tool-description injection would be a small
+
+  addition to an injector you have already built, and it would take taxonomy coverage from
+
+  two categories to three.
+
+**## Structural, for the 12-page version rather than this one**
+
+- **M11 / D15 (durability and cadence sensitivity).** Sweep the post-intervention observation horizon and re-attribution cadence. This would show how resolution latency trades off against confidence that recovery will hold, and would turn two protocol constants into measured design parameters rather than defaults.
+
+
+\- **\*\*C4 (confusability).\*\*** A cell injecting two modes that the mapping could plausibly
+
+  confuse is the experiment that would turn the attribution accounting into a real
+
+  evaluation. Out of scope at six pages.
+
+\- **\*\*M4 (the contract precondition).\*\*** Author one real behavioral contract for a deployed
+
+  agent and report what it cost — which stakeholders, how long, where the disagreements
+
+  were. This addresses the paper's largest adoption objection and is the natural spine of a
+
+  follow-up paper.
+
+\- **\*\*M5 (mesh disruption).\*\*** Run the mesh arm in an architecture with a bounded or evicting
+
+  shared context, as §VI-A itself now specifies. The machinery is already implemented.
+
+\- **\*\*D7 (production evidence).\*\*** One observational deployment, even without intervention,
+
+  would move the paper from "protocol proposed and simulated" to "protocol proposed and
+
+  observed."
+
+**## What to do next, in order**
+
+Before working the list mechanically, re-read the collaborator's next PDF from scratch. This critique is a snapshot against an older commit, and several items are already closed. On the fresh version, group the remaining work around four reviewer questions: (1) is APIP novel relative to drift/SPC and incident management; (2) are taxonomy and tiers coherent; (3) does the evaluation support the durability/remediation claim; and (4) are claims proportional to the evidence.
+
+
+C5 is closed and the paper is 7 pages. Everything below assumes the author reclaims that page
+
+by hand in the final revision — Figure 1 and the abstract are the two block-level candidates,
+
+and either alone covers it.
+
+**\*\*Tonight, before bed — the experiment.\*\*** Measured from the harness's own estimator:
+
+**\*\*$12.02 per run\*\***, 200 episodes, and roughly 6 h for a B2 run against 2 h for an APIP run.
+
+Three new seeds across B2 and APIP is six runs, **\*\*$72\*\***. Two config changes are required first
+
+or the campaign halts part-way: \`max\_usd\_per\_campaign\` is $25 and \`max\_usd\_per\_run\` is $15
+
+against a $12.02 estimate. Raise the campaign ceiling to $120 — below the author's own $200
+
+stop-and-rethink line, so the ceiling enforces it mechanically — and the per-run ceiling to
+
+$18.
+
+**\*\*Tomorrow, in order:\*\***
+
+1\. **\*\*Update C5's counts\*\*** with whatever the new seeds show. One sentence, and it is written
+
+   to take any outcome: more manifestations improve the ratio, more nulls worsen it, and the
+
+   disclosure stands either way.
+
+2\. **\*\*M1\*\*** — if the new seeds manifest, the patch-then-regress dynamic moves from a trajectory
+
+   to a rate, and §V-A's "Every condition is one seed" needs rewriting.
+
+3\. **\*\*P2 or the abstract\*\*** — reclaim the seventh page, then C1 into whatever is left.
+
+4\. **\*\*C1\*\*** — own the by-construction objection, armed with the tick-20 off-ladder re-breach.
+
+   Still the strongest remaining edit.
+
+5\. **\*\*M7's citation, D13, AgentTether\*\*** — the bibliography pass.
+
+**\*\*Thirteen items closed, none of which required an experiment.\*\*** C5, the most urgent of them,
+
+was found by reading the run directory before spending money on it — which is also how the
+
+tonight's-cost numbers above were obtained, from \`apip estimate\` rather than from a guess.
