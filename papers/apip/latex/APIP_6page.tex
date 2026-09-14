@@ -128,6 +128,26 @@
 %  Left standing: Tier 2 still lists "tool schema fixes" among its
 %  capabilities. That describes what Tier 2 can do, not what mode routes
 %  there, and a stale tool description can present as drift.
+%
+%  C5 (2026-09-14): Sec. V-B reported the five-tick detection lag as having
+%  "reproduced across three seeds" and did not mention seed 10, which ships
+%  inside the released artifact. Under the final contract (138f19c3) the
+%  three tau2 seeds are 10, 12 and 13. Seed 13 is Table II; seed 12 is the
+%  abstention Sec. V-D reports; seed 10 completed all 40 ticks and 200
+%  episodes on the scheduled injection with policy_citation_error_rate at
+%  0.0 through every post-injection tick in three of four conditions, the
+%  fourth running ~6x weaker and detecting at tick 29. The old claim also
+%  mixed contracts: only seeds 12 and 13 detected under 138f19c3, so the
+%  third had to be a pre-freeze run under 0855428c, where detection
+%  scattered from tick 13 to 22. Replaced with what the final-contract runs
+%  actually show.
+%
+%  *** THE PAPER IS NOW 7 PAGES. *** This was accepted deliberately: the
+%  disclosure is required because Sec. V-E releases all runs, and the author
+%  will reclaim the space by hand in the final revision. Candidates, in the
+%  order the critique ranks them: Fig. 1 (five boxes restating the adjacent
+%  sentence, a third to half a column), and the abstract (185 words against
+%  its own <=150 target).
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -607,9 +627,13 @@ B1 no-action   & 17 & --   & 39 & -- & 1 & timeout \\
 \end{table}
 
 Detection fired at tick 17 in every condition, a lag of five ticks on the
-judge-scored policy citation error rate, and that lag reproduced across three
-seeds; the four-condition comparison of Table~\ref{tab:baselines} itself is
-single-seed (Section~\ref{sec:limitations}). No false alarm was raised across
+judge-scored policy citation error rate. Under this contract the injection
+manifested in two of three seeds, firing at tick 17 in both. In the third it
+barely manifested at all: the citation error rate stayed at zero in three of the
+four conditions, and the fourth detected at tick 29. We report that seed rather
+than excluding it. The four-condition comparison of
+Table~\ref{tab:baselines} is itself single-seed
+(Section~\ref{sec:limitations}). No false alarm was raised across
 twenty clean ticks at any swept operating point.
 
 Under APIP, attribution returned \code{behavioral\_drift} at confidence 0.65
