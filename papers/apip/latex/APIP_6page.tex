@@ -116,6 +116,18 @@
 %      disruption problem"; a null result "suggests that mesh disruption
 %      requires a bounded shared context", matching Sec. VI-A and the
 %      conclusion.
+%
+%  D12 (2026-09-13): Sec. IV-C claimed Tier 2 "addresses ... tool misuse
+%  arising from stale tool descriptions", contradicting Table I ("Tier 1
+%  (prompt) or Tier 3 (fine-tune)") and the frozen mapping table, whose
+%  R2-tool and R2b-tool-nosplit rules both emit tier_1 escalating to tier_3.
+%  Table I agrees with the mapping on all five rows; this clause was the only
+%  outlier in the paper, so it is cut rather than the mapping changed -- the
+%  mapping is version 1.0.0-frozen (2026-08-20) and its hash is the
+%  pre-registration anchor in every run manifest.
+%  Left standing: Tier 2 still lists "tool schema fixes" among its
+%  capabilities. That describes what Tier 2 can do, not what mode routes
+%  there, and a stale tool description can present as drift.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -461,7 +473,7 @@ to apply and to roll back, and it is the first response to alignment creep and
 to much input brittleness. \textbf{Tier 2 (retrieval and context)} covers RAG
 index updates, knowledge-base revisions, and tool schema fixes, with contract
 validation before re-deployment. It addresses drift arising from world-state
-divergence, and tool misuse arising from stale tool descriptions.
+divergence.
 \textbf{Tier 3 (model-level)} is fine-tuning, DPO, or replacement. It carries
 the highest cost and the highest regression risk, and is warranted only when
 lower tiers are exhausted or the failure mode is embedded in model weights.
