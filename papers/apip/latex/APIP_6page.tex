@@ -142,6 +142,18 @@
 %  scattered from tick 13 to 22. Replaced with what the final-contract runs
 %  actually show.
 %
+%  D11 limitation (2026-09-14): Sec. V-E now reports that the hosted backbone
+%  was deprecated 2026-09-03, one day after the reported cells ran. Evidence,
+%  all measured on 2026-09-14: GET /v1/models still lists the model while
+%  chat/completions returns 404 model_not_found; the successor the provider
+%  named exhausted the step budget on 6/6 episodes with zero completions; and
+%  the same weights served by a different vendor, on the same seed, contract,
+%  mapping table and injection schedule, produced policy_fact_statement_rate
+%  = 0.000 for six consecutive post-injection ticks (partial runs kept at
+%  apip_simulations/runs/tau2-{B2,APIP}-s13-{810532,d0d966}, 14 and 19 ticks).
+%  Framed as a failed replication ATTEMPT -- the precondition was absent, so
+%  the injection never acted -- not as a refutation of Table II.
+%
 %  *** THE PAPER IS NOW 7 PAGES. *** This was accepted deliberately: the
 %  disclosure is required because Sec. V-E releases all runs, and the author
 %  will reclaim the space by hand in the final revision. Candidates, in the
@@ -732,6 +744,23 @@ Thresholds must therefore be calibrated per deployment, which is what the
 behavioral contract is for. Contract, mapping table, and model names are pinned
 in every run manifest, and all runs, traces, and the frozen mapping table are
 released.
+
+A hosted backbone, however, is not a pinnable dependency, and this limitation is
+not hypothetical here. The provider serving our backbone deprecated it on
+2026-09-03, one day after the reported cells ran; the model remains listed by the
+provider's catalogue endpoint but returns \code{model\_not\_found} on inference.
+Re-running these cells on the successor the provider named was not possible
+either: it exhausted the step budget on every episode we attempted, returning no
+completed task. Executing the same seed, contract, mapping table, and injection
+schedule against the same weights served by a different vendor produced no
+degradation at all---the agent stated no policy facts in any post-injection tick,
+so the stale corpus had nothing to corrupt, and no cycle opened, a second
+non-manifestation alongside the one reported in Section~\ref{sec:taubench}. We
+therefore cannot say whether the trajectory in Table~\ref{tab:baselines} would
+reproduce, because the configuration that produced it no longer exists and the
+available substitutes do not exhibit the precondition the injection requires. A
+manifest that pins a model by provider and name records what was asked for, not
+what will answer.
 
 \section{Open Problems and Future Directions}
 
