@@ -249,9 +249,11 @@ trace-labeling stage of cause attribution (Section~\ref{sec:attribution}).
 Run-level toolkits such as AgentDebugX \cite{zhu2026} close a
 detection--attribution--recovery--rerun loop for a single failed execution. The
 APIP operates one level above, deciding whether an aggregate degradation
-warrants intervention, at what tier, and until when. A successful rerun is
-Level~1/2 evidence (Section~\ref{sec:kirkpatrick}); it is not durable recovery
-against the contract.
+warrants intervention, at what tier, and until when. RAIL Guard \cite{verma2026}
+closes a comparable loop on outputs, rewriting until eight responsibility
+dimensions pass. Both repair an instance: a successful rerun or a converged
+rewrite is Level~1/2 evidence (Section~\ref{sec:kirkpatrick}), not durable
+recovery of the agent against its contract.
 
 \subsection{The Performance Improvement Plan as a Structural Template}
 \label{sec:pip}
@@ -845,6 +847,11 @@ systems over extended interactions,'' arXiv preprint arXiv:2601.04170, 2026.
 K. Zhu, X. Ye, Z. Han \emph{et al.}, ``AgentDebugX: An open-source toolkit for
 failure observability, attribution, and recovery in LLM agents,'' arXiv
 preprint arXiv:2607.18754, 2026.
+
+\bibitem{verma2026}
+S. Verma, P. Prasun, and P. Kumar, ``RAIL Guard: Closing the
+evaluation-to-remediation gap in responsible AI for LLM agents,'' arXiv preprint
+arXiv:2607.16215, 2026.
 
 \bibitem{kirkpatrick2016}
 J. D. Kirkpatrick and W. K. Kirkpatrick, \emph{Kirkpatrick's Four Levels of
