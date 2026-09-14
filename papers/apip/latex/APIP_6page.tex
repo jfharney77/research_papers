@@ -154,6 +154,14 @@
 %  Framed as a failed replication ATTEMPT -- the precondition was absent, so
 %  the injection never acted -- not as a refutation of Table II.
 %
+%  C1 (2026-09-14): Sec. V-B now answers the by-construction objection rather
+%  than leaving it open. The ladder adds clauses at 12, 17, 22, 27, 32, 37 and
+%  B2's cycles breach at 17, 20, 27, 37 -- so cycle 2's breach at tick 20 is
+%  off-ladder, two ticks before the next clause was due, against text the
+%  patch issued at 17 already carried. Shallow patching therefore fails on
+%  static material, which is the evidence a reviewer would say this design
+%  cannot produce. From tau2-B2-s13-97ba47/records.json.
+%
 %  *** THE PAPER IS NOW 7 PAGES. *** This was accepted deliberately: the
 %  disclosure is required because Sec. V-E releases all runs, and the author
 %  will reclaim the space by hand in the final revision. Candidates, in the
@@ -663,7 +671,11 @@ B2 reproduced the ad-hoc pattern the protocol is meant to displace. Its Tier 1
 prompt patch names the clauses amended at patch time, recovers, and re-breaches
 as the ladder deepens: four cycles, three regressions, and a final
 \code{timeout} that leaves it indistinguishable from taking no action at all.
-APIP and the oracle were the only conditions to exit durably.
+Part of that failure is structural: a patch naming the clauses known at
+tick~$t$ cannot cover one introduced at $t{+}5$. One re-breach is not. B2's
+second falls at tick~20, two ticks before the next clause arrives, against text
+its own patch already carried---shallow patching fails on static material, not
+only on new. APIP and the oracle were the only conditions to exit durably.
 
 The comparison exposes a trap in how remediation is usually scored. On
 per-cycle time-to-resolution alone B2 outperforms APIP fourfold
