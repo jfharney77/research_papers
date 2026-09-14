@@ -83,6 +83,22 @@
 %      that it was first, and downgraded in Sec. V-D to "we are not aware of
 %      a prior such accounting". Pan et al. is "among the largest" rather
 %      than "the first at large scale".
+%
+%  Table II revision (2026-09-13), against CRITIQUE_2026-09-13.md C2/D10:
+%    - C2 closed. B2's per-cycle TTRs are now in the table: 2, 4, 2, and a
+%      fourth cycle that never closed. Recovered from the seed-13 run record
+%      (apip_simulations/runs/tau2-B2-s13-97ba47/records.json), whose four
+%      APIP records give breach/exit ticks 17->19, 20->24, 27->29, 37->39
+%      with re-breaches at 20, 27, and 37. Sec. V-B now says "outperforms
+%      APIP fourfold" against the table instead of asserting an unpublished
+%      comparison, and the superseded "report TTR only where one was
+%      achieved" rule is dropped.
+%    - D10 half closed. The caption now defines Det./Act/Exit as ticks and
+%      TTR as Exit-Det, and says a dash is a quantity that does not exist
+%      rather than one withheld. What a tick *is* remains undefined, as does
+%      its relation to the day-denominated windows of Sec. IV-D.
+%    - The table now names its seed (13), which the run records identify as
+%      the source of every number in it; the seed-10 set is a failed run.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -538,9 +554,12 @@ because its knowledge base was never re-indexed, with the deterministic
 database scoring every action objectively.
 
 \begin{table}[t]
-\caption{$\tau^2$-bench drift cell, all four conditions on one injection
-schedule and task stream. TTR is reported only where a durable exit was
-achieved. B2's four cycles each closed quickly; none held.}
+\caption{$\tau^2$-bench drift cell (seed 13), all four conditions on one
+injection schedule and task stream. Columns are ticks: Det.\ the two-gate
+breach, Act the intervention, Exit the exit evaluation, TTR${}={}$Exit${}-{}$Det.
+B2's TTR is listed per cycle: three closed in 2, 4, and 2 ticks against APIP's
+12, and each was undone within ten ticks. A dash is a quantity that does not
+exist, not one withheld.}
 \label{tab:baselines}
 \centering
 \footnotesize
@@ -551,7 +570,7 @@ achieved. B2's four cycles each closed quickly; none held.}
 \midrule
 B3 oracle      & 17 & 17   & 19 & 2  & 1 & resolved \\
 APIP           & 17 & 27   & 29 & 12 & 1 & resolved \\
-B2 Tier-1      & 17 & 17   & 39 & -- & 4 & timeout \\
+B2 Tier-1      & 17 & 17   & 39 & 2, 4, 2, -- & 4 & timeout \\
 B1 no-action   & 17 & --   & 39 & -- & 1 & timeout \\
 \bottomrule
 \end{tabular}
@@ -581,11 +600,11 @@ as the ladder deepens: four cycles, three regressions, and a final
 APIP and the oracle were the only conditions to exit durably.
 
 The comparison exposes a trap in how remediation is usually scored. On
-per-cycle time-to-resolution alone B2 outperforms APIP, because each shallow
-patch closed fast, and it never fixed the problem. Any evaluation of
-remediation that reports mean TTR without a durability criterion will
-systematically favor the worst strategy, so we treat durable exit as the
-outcome measure and report TTR only where one was achieved.
+per-cycle time-to-resolution alone B2 outperforms APIP fourfold
+(Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
+never fixed the problem. Any evaluation of remediation that reports mean TTR
+without a durability criterion will systematically favor the worst strategy, so
+we treat durable exit as the outcome measure.
 
 \subsection{ChatDev: Alignment Creep and Input Brittleness}
 \label{sec:chatdev}
