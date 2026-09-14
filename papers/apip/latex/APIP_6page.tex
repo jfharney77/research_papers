@@ -227,12 +227,16 @@ governance, multi-agent systems, performance improvement plan
 
 Organizations increasingly deploy conversational agents as their main customer
 interfaces, handling support tickets, returns, and billing disputes at scale.
-Pre-release evaluation is well served by standardized benchmarks
-\cite{liang2022}, red-teaming \cite{ganguli2022}, and RLHF alignment
-\cite{ouyang2022}. What happens after deployment is not. Pan et al.\
-\cite{pan2025} survey production agents and find that most deployments fail or
-underdeliver, and that little is known about how the organizations running them
-respond.
+Post-deployment reliability is where the difficulty concentrates: in a survey of 413 practitioners in regulated
+industries, 94\% of organizations reported Day~2 operational issues after
+deploying agentic AI \cite{datarobot2026}. Pre-deployment evaluation is well
+served by standardized benchmarks \cite{liang2022}, red-teaming
+\cite{ganguli2022}, and RLHF alignment \cite{ouyang2022}. The response to
+degradation after deployment is not. Pan et al.\ \cite{pan2025} survey 86
+deployed systems and 20 case studies across 26 domains, and find
+reliability---consistent correct behavior over time---to be practitioners' top
+development challenge, addressed through systems-level design rather than any
+standard remediation lifecycle.
 
 Ad-hoc responses to degraded agents are standard: engineers ``fix'' individual
 prompts, product managers file tickets, systems get rolled back. Nothing
@@ -882,6 +886,10 @@ arXiv:2209.07858, 2022.
 L. Ouyang \emph{et al.}, ``Training language models to follow instructions with
 human feedback,'' \emph{Advances in Neural Information Processing Systems},
 vol.~35, 2022.
+
+\bibitem{datarobot2026}
+DataRobot, ``The unmet AI needs survey 2026,'' 2026. [Online]. Available:
+\url{https://www.datarobot.com/resources/unmet-ai-needs-survey-2026/}
 
 \bibitem{pan2025}
 M. Z. Pan \emph{et al.}, ``Measuring agents in production,'' arXiv preprint
