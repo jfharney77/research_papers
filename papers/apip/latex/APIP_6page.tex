@@ -524,8 +524,9 @@ per-cycle time-to-resolution alone undiagnosed outperforms APIP fourfold
 (Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
 never fixed the problem. Any evaluation of remediation that reports mean TTR
 without a durability criterion will systematically favor the worst strategy, so
-we treat durable exit---envelope held across a pre-specified
-post-intervention window, 11 ticks here---as the outcome measure.
+we treat durable exit as the outcome measure: \code{resolved} requires two
+consecutive in-envelope ticks, and a re-breach within the next ten is scored
+as a regression, not a new cycle.
 
 \subsection{ChatDev: Alignment Creep and Input Brittleness}
 \label{sec:chatdev}
