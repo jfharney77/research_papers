@@ -29,10 +29,18 @@
 %   - Sec. V-B's tick-20 sentence is the rebuttal to the by-construction
 %     objection; the re-breach is off-ladder and that is the whole point (C1).
 %     "quantifies a trap", not "exposes" -- the paper measures a known trap.
-%   - Sec. V-B defines durable exit by PROTOCOL PARAMETERS (two consecutive
+%   - Durable exit is defined by PROTOCOL PARAMETERS (two consecutive
 %     in-envelope ticks, then a ten-tick observation window), not by observed
 %     tick counts. Quoting "11 ticks" invites the right-censoring objection
-%     (M11).
+%     (M11). The definition lives in Sec. IV-E with the other exit states, and
+%     Sec. V-B cross-references it -- do not move it back into Sec. V-B, where
+%     it read as an evaluation choice rather than a pre-specified parameter.
+%   - Sec. IV-E must state \emph{Regressed} as "an envelope restored and then
+%     breached again". That is the scored criterion behind Table II's three
+%     regression events; "an apparent recovery that did not hold" is the
+%     interpretation, not the test.
+%   - Sec. IV-C says Tier 1 is the first response to "much input brittleness".
+%     The hedge matters: Table I routes input brittleness to Tier 1 OR Tier 3.
 %   - Sec. II-A says MAST "cluster labels", NOT "14 failure-mode labels". The
 %     released mapping_table keys on four cluster values, and it is hashed into
 %     every run manifest, so the count is checkable in a minute.
@@ -408,10 +416,13 @@ window expiry.
 \label{sec:exit}
 
 At window close a formal exit evaluation records one of five outcomes.
-Three of them do real work. \emph{Regressed}---envelope
-restored, then breached again---records that an apparent recovery did not hold,
-whether through tier mismatch, incomplete remediation, or renewed environmental
-change; giving it a name of its own keeps that from being counted as a success. \emph{Recalibrated} records that
+\emph{Resolved} requires the envelope to hold for two consecutive ticks, after
+which a re-breach inside a ten-tick observation window is scored as a
+regression rather than a new cycle; \emph{timeout} is the window closing
+without that. The remaining three do real work. \emph{Regressed} records an envelope restored and then breached again: an
+apparent recovery that did not hold, whether through tier mismatch, incomplete
+remediation, or renewed environmental change. Giving it a name of its own keeps
+that from being counted as a success. \emph{Recalibrated} records that
 attribution concluded the environment had legitimately moved, so the contract
 is re-baselined and the agent is left alone. We deliberately do not score
 \emph{recalibrated} as a resolution, since conflating the two would let
@@ -553,9 +564,7 @@ per-cycle time-to-resolution alone undiagnosed outperforms APIP fourfold
 (Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
 never fixed the problem. Any evaluation of remediation that reports mean TTR
 without a durability criterion will systematically favor the worst strategy, so
-we treat durable exit as the outcome measure: \code{resolved} requires two
-consecutive in-envelope ticks, and a re-breach within the next ten is scored
-as a regression, not a new cycle.
+we treat durable exit (Section~\ref{sec:exit}) as the outcome measure.
 
 \subsection{ChatDev: Alignment Creep and Input Brittleness}
 \label{sec:chatdev}
