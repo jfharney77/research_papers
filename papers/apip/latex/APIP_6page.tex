@@ -216,7 +216,8 @@ The schema's \code{apip\_id}, \code{agent\_id}, \code{owner}, and
 
 \begin{table}[t]
 \caption{Agent failure mode taxonomy with Kirkpatrick level mapping and
-remediation tier.}
+remediation tier. Tiers name the intervention locus: prompt-level (1),
+context/tool (2), model-level (3); see Section~\ref{sec:tiers}.}
 \label{tab:taxonomy}
 \centering
 \scriptsize
@@ -317,22 +318,21 @@ Both trigger modalities are necessary. Absolute floors catch severe
 degradation; relative drift triggers catch gradual decline that may never
 breach a floor.
 
-\subsubsection{Statistical discipline of the trigger}
-Implementing the trigger phase against live agents exposed a failure mode of
+\textbf{Statistical discipline of the trigger.} Implementing the trigger phase against live agents exposed a failure mode of
 the naive design that we consider a finding in its own right. Thresholds must
 be derived, not hand-picked. Each contract metric's envelope is estimated from
 a calibration window as mean $\pm\,k\sigma$, with $k$ reported, which preempts
 the objection that thresholds were chosen so that triggers would fire where
 desired.
 
-Even then, a single-gate rule---a rolling mean against the derived
-floor---breached in 75\% of clean, zero-injection runs across the 15--25
-metrics and disaggregated splits a realistic contract monitors.
-Two causes: a small calibration sample is treated as exact, and the repeated
-tests are uncorrected. A breach must therefore pass two gates. The degradation
-must be at least the contract's $k\sigma$, so that it matters, and it must
-survive Benjamini--Hochberg adjustment across the metric family, so that it is
-real. Disaggregated groups additionally require a minimum per-group episode
+%Even then, a single-gate rule---a rolling mean against the derived
+%floor---breached in 75\% of clean, zero-injection runs across the 15--25
+%metrics and disaggregated splits a realistic contract monitors.
+Even then, a single-gate rule using a rolling mean against the derived floor breached in 75% of clean, zero-injection runs across the 15--25 metrics and disaggregated splits monitored by a realistic contract.
+There are two causes for this.  First, a small calibration sample is treated as exact, 
+and second, the repeated tests are uncorrected. A breach must therefore pass two gates. The degradation
+must be at least the contract's $k\sigma$, so that it is practically meaningful, and it must survive Benjamini--Hochberg adjustment, which controls the false discovery rate across the family of monitored metrics. 
+Disaggregated groups additionally require a minimum per-group episode
 count; under-powered groups receive no envelope, and the exclusion is recorded
 rather than silent. The detector's significance level is swept on clean-arm
 runs only and frozen before any evaluated window. Clean data carries no
@@ -360,10 +360,8 @@ Trajectory-level outputs are natural evidence inputs. Localizing the failing
 step still does not diagnose the cause, and mandatory taxonomy classification
 closes that gap.
 
-\subsubsection{A measurable instantiation: the three-stage funnel}
-\label{sec:funnel}
-We instantiate this as a three-stage funnel that can be scored against
-ground truth. Stage~1 splits every contract metric by task category, agent
+\textbf{A measurable instantiation.} We instantiate this as a three-stage
+funnel that can be scored against ground truth. Stage~1 splits every contract metric by task category, agent
 role, and user segment; the result is the disaggregation signature of
 Section~\ref{sec:taxonomy}. Stage~2 has a MAST annotator \cite{cemri2025} label
 a sample of failing traces. The judge must differ from the agent's backbone,
@@ -704,7 +702,7 @@ automated step-level attribution remains weak: the best reported accuracy on
 Who\&When is 36.2\% \cite{ma2025attribution}, against 14.2\% for that
 benchmark's original methods \cite{zhang2025}. Both attribute individual
 trajectories where the APIP needs window-level classification, which is the gap
-the funnel of Section~\ref{sec:funnel} is a first attempt to close.
+the funnel of Section~\ref{sec:attribution} is a first attempt to close.
 \emph{Organizational ownership}: in HR the PIP is jointly owned by manager and
 HR function; in AI deployments the equivalent is unresolved, and without an
 ownership model adoption will stall.
