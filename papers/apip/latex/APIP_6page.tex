@@ -225,8 +225,11 @@ We propose a five-category taxonomy for customer-facing agents
 \emph{input brittleness}, \emph{alignment creep}, and \emph{tool misuse}. The
 fifth is exogenous---\emph{mesh disruption}
 (\code{exogenous\_disruption}), in which the failing agent is not
-the cause of its own degradation. Each category maps to a different level
-of the agent's behavioral stack, and so to a different intervention tier.
+the cause of its own degradation. Classification follows the actionable causal locus rather than the surface
+symptom---a stale tool schema invoked incorrectly is world-state
+divergence---and \code{abstain}s when that locus is unresolved. The locus is
+the tier: prompt (1), context/tool (2), model (3), defined in
+Section~\ref{sec:tiers}.
 
 Aggregate metrics mask input brittleness. An agent at 85\% overall success may
 fail catastrophically on the 8\% of requests from one segment, so the trigger
@@ -343,9 +346,10 @@ against injected ground truth (Section~\ref{sec:evaluation}), and the
 abstention rate is reported alongside accuracy, never in place of it.
 
 \subsection{Phase 3: Intervention Planning and the Tier Model}
+\label{sec:tiers}
 
-Interventions are organized into three tiers of increasing cost, disruption,
-and lead time. Cause attribution selects the starting tier; escalation is
+Interventions are organized into three tiers by intervention locus, with cost
+and lead time correlated but not definitional. Cause attribution selects the starting tier; escalation is
 permitted within the window. \textbf{Tier 1 (prompt-level)} covers constraint
 injection, persona adjustment, and example replacement. It is the cheapest tier
 to apply and to roll back, and it is the first response to alignment creep and
@@ -495,9 +499,10 @@ twenty clean ticks at any swept operating point.
 
 Under APIP, attribution returned \code{behavioral\_drift} at confidence 0.65
 and the matched Tier 2 corpus refresh resolved the cycle in 12 ticks against
-the oracle's 2. That gap is the cost of diagnosis. Ten of its twelve ticks are
-the re-attribution cadence---a tunable protocol parameter---and not diagnostic
-difficulty: the diagnosis was correct at first attempt. A recurring pilot
+the oracle's 2. That gap is protocol overhead under the configured
+re-attribution cadence, not the cost of diagnosis: ten of twelve ticks are
+that cadence, tunable and unswept, not diagnostic difficulty: the diagnosis
+was correct at first attempt. A recurring pilot
 failure sharpened the exit test. A Tier 2 refresh that was real but partial
 closed the ticket without fully rebuilding the index, and the contract
 re-breached within four ticks. Because exit evaluation re-measures the envelope
@@ -519,7 +524,8 @@ per-cycle time-to-resolution alone undiagnosed outperforms APIP fourfold
 (Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
 never fixed the problem. Any evaluation of remediation that reports mean TTR
 without a durability criterion will systematically favor the worst strategy, so
-we treat durable exit as the outcome measure.
+we treat durable exit---envelope held across a pre-specified
+post-intervention window, 11 ticks here---as the outcome measure.
 
 \subsection{ChatDev: Alignment Creep and Input Brittleness}
 \label{sec:chatdev}
