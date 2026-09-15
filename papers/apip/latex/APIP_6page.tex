@@ -511,14 +511,14 @@ that was performed but incomplete.
 Undiagnosed reproduced the ad-hoc pattern the protocol is meant to displace. Its Tier 1
 prompt patch names the clauses amended at patch time, recovers, and re-breaches
 as the ladder deepens: four cycles, three regressions, and a final
-\code{timeout} that leaves it indistinguishable from taking no action at all.
-Part of that failure is structural: a patch naming the clauses known at
+\code{timeout} that leaves it indistinguishable from taking no action.
+Part of that failure is structural by design: a patch naming the clauses known at
 tick~$t$ cannot cover one introduced at $t{+}5$. One re-breach is not. Its
 second falls at tick~20, two ticks before the next clause arrives, against text
 its own patch already carried---shallow patching fails on static material, not
 only on new. APIP and the oracle were the only conditions to exit durably.
 
-The comparison exposes a trap in how remediation is usually scored. On
+The comparison quantifies a trap in how remediation is usually scored. On
 per-cycle time-to-resolution alone undiagnosed outperforms APIP fourfold
 (Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
 never fixed the problem. Any evaluation of remediation that reports mean TTR
