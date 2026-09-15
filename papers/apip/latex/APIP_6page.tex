@@ -163,7 +163,7 @@ when drift runs unchecked (their Table~1).
 
 On the diagnosis side, MAST \cite{cemri2025} supplies an empirically derived
 failure taxonomy with an LLM-annotator pipeline. It classifies what went wrong
-in a trace, but does not select a remediation; we use its cluster labels as the
+in a trace, but does not select a remediation; we use its three failure clusters as the
 trace-labeling stage of cause attribution (Section~\ref{sec:attribution}).
 Run-level toolkits such as AgentDebugX \cite{zhu2026} close a
 detection--attribution--recovery--rerun loop for a single failed execution. The
@@ -328,7 +328,7 @@ desired.
 Even then, a single-gate rule---a rolling mean against the derived
 floor---breached in 75\% of clean, zero-injection runs across the 15--25
 metrics and disaggregated splits a realistic contract monitors.
-Two causes: a small calibration sample is treated as exact, and the per-tick
+Two causes: a small calibration sample is treated as exact, and the repeated
 tests are uncorrected. A breach must therefore pass two gates. The degradation
 must be at least the contract's $k\sigma$, so that it matters, and it must
 survive Benjamini--Hochberg adjustment across the metric family, so that it is
