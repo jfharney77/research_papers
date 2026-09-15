@@ -361,9 +361,10 @@ step still does not diagnose the cause, and mandatory taxonomy classification
 closes that gap.
 
 \textbf{A measurable instantiation.} We instantiate this as a three-stage
-funnel that can be scored against ground truth. Stage~1 splits every contract metric by task category, agent
-role, and user segment; the result is the disaggregation signature of
-Section~\ref{sec:taxonomy}. Stage~2 has a MAST annotator \cite{cemri2025} label
+funnel that can be scored against ground truth. Stages~1 and~2 run
+independently and Stage~3 combines them. Stage~1 splits every contract metric
+by task category, agent role, and user segment; the result is the
+disaggregation signature of Section~\ref{sec:taxonomy}. Stage~2 has a MAST annotator \cite{cemri2025} label
 a sample of failing traces. The judge must differ from the agent's backbone,
 preferably by model family, so that it does not share the failure modes it is
 asked to detect. Stage~3 applies the frozen mapping to the signature and the
