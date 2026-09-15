@@ -438,14 +438,14 @@ the attribution funnel; and the selected intervention runs the bounded window
 of Fig.~\ref{fig:lifecycle} to one of its five exits.
 
 \textbf{Baseline family.} The drift cell runs under four conditions:
-\emph{APIP} (the full protocol); \emph{B1 no-action} (degradation runs to
-horizon); \emph{B2 always-Tier-1} (a scripted prompt patch regardless of
-failure mode); and
-\emph{B3 oracle} (ground-truth mode revealed at trigger, correct tier applied
-immediately). B1 and B3 bracket the achievable range. B2 is the informative
-comparison, isolating the cost of patching without diagnosing. Injected ground truth
+\emph{APIP} (the full protocol); \emph{no-action} (degradation runs to
+horizon); \emph{undiagnosed} (a scripted prompt patch applied regardless of
+failure mode: a greedy, cheapest-first responder); and
+\emph{oracle} (ground-truth mode revealed at trigger, correct tier applied
+immediately). No-action and oracle bracket the achievable range. Undiagnosed is
+the informative comparison, isolating the cost of patching without diagnosing. Injected ground truth
 is quarantined from the controller, written into the run record for scoring and
-revealed only to B3, and a test enforces that the APIP condition never branches
+revealed only to oracle, and a test enforces that the APIP condition never branches
 on it.
 
 \textbf{Statistical discipline.} Injection schedules, post-calibration
@@ -470,9 +470,9 @@ database scoring every action objectively.
 \caption{$\tau^2$-bench drift cell (seed 13), all four conditions on one
 injection schedule and task stream. Columns are ticks: Det.\ the two-gate
 breach, Act the intervention, Exit the exit evaluation, TTR${}={}$Exit${}-{}$Det.
-B2's TTR is listed per cycle: three closed in 2, 4, and 2 ticks against APIP's
-12, and each was undone within ten ticks. B2's speed is its failure mode. An
-n/a is a quantity that does not exist, not one withheld.}
+Undiagnosed's TTR is listed per cycle: three closed in 2, 4, and 2 ticks against
+APIP's 12, and each was undone within ten ticks. Its speed is its failure mode. An
+n/a is a quantity that does not exist.}
 \label{tab:baselines}
 \centering
 \scriptsize
@@ -481,10 +481,10 @@ n/a is a quantity that does not exist, not one withheld.}
 \textbf{Cond.} & \textbf{Det.} & \textbf{Act} & \textbf{Exit} & \textbf{TTR} &
 \textbf{Cyc.} & \textbf{Outcome} \\
 \midrule
-B3 oracle      & 17 & 17   & 19 & 2  & 1 & resolved \\
+oracle       & 17 & 17   & 19 & 2  & 1 & resolved \\
 APIP           & 17 & 27   & 29 & 12 & 1 & resolved \\
-B2 Tier-1      & 17 & 17   & 39 & 2, 4, 2, n/a & 4 & timeout \\
-B1 no-action   & 17 & n/a  & 39 & n/a & 1 & timeout \\
+undiagnosed  & 17 & 17   & 39 & 2, 4, 2, n/a & 4 & timeout \\
+no-action    & 17 & n/a  & 39 & n/a & 1 & timeout \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -510,18 +510,18 @@ re-breached within four ticks. Because exit evaluation re-measures the envelope
 instead of trusting the intervention log, the protocol catches an intervention
 that was performed but incomplete.
 
-B2 reproduced the ad-hoc pattern the protocol is meant to displace. Its Tier 1
+Undiagnosed reproduced the ad-hoc pattern the protocol is meant to displace. Its Tier 1
 prompt patch names the clauses amended at patch time, recovers, and re-breaches
 as the ladder deepens: four cycles, three regressions, and a final
 \code{timeout} that leaves it indistinguishable from taking no action at all.
 Part of that failure is structural: a patch naming the clauses known at
-tick~$t$ cannot cover one introduced at $t{+}5$. One re-breach is not. B2's
+tick~$t$ cannot cover one introduced at $t{+}5$. One re-breach is not. Its
 second falls at tick~20, two ticks before the next clause arrives, against text
 its own patch already carried---shallow patching fails on static material, not
 only on new. APIP and the oracle were the only conditions to exit durably.
 
 The comparison exposes a trap in how remediation is usually scored. On
-per-cycle time-to-resolution alone B2 outperforms APIP fourfold
+per-cycle time-to-resolution alone undiagnosed outperforms APIP fourfold
 (Table~\ref{tab:baselines}), because each shallow patch closed fast, and it
 never fixed the problem. Any evaluation of remediation that reports mean TTR
 without a durability criterion will systematically favor the worst strategy, so
@@ -573,7 +573,7 @@ ChatDev, at confidence 0.61 and 0.73); one abstained. Accuracy excluding
 abstentions is 3/3 at a 25\% abstention rate. We report the two together, since
 a stage that resolves every case by construction can reach any accuracy asked
 of it. With $n=4$ this is an accounting and not a confusion matrix with
-per-mode recall. Only APIP runs enter it: B2 does not attribute, and B3 would
+per-mode recall. Only APIP runs enter it: undiagnosed does not attribute, and oracle would
 be diagonal by fiat.
 
 \subsection{Limitations}
