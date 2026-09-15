@@ -59,18 +59,17 @@ The Case for Agent Performance Improvement Plans}
 Agents degrade in production, and unlike pre-release evaluation the response
 has no standard form. We present the Agent Performance Improvement Plan (APIP),
 which adapts the management protocol for underperforming employees into a
-remediation lifecycle for agents: statistically disciplined triggers on a
-behavioral contract, cause attribution over a five-category failure-mode
-taxonomy, tiered interventions, a bounded window with formal exit criteria, and
-a declarative record that meets governance traceability requirements. We
-evaluate it end-to-end in two live multi-agent environments ($\tau^2$-bench and
-ChatDev) by injecting failure modes with known ground truth and scoring against
-no-action, undiagnosed, and oracle baselines. In the primary drift cell, only
+remediation lifecycle: triggers on a behavioral contract, cause attribution
+over five in-scope failure-mode categories, tiered interventions, a bounded
+window with formal exit criteria, and a declarative record for governance. We
+evaluate it in two live multi-agent environments ($\tau^2$-bench and ChatDev),
+injecting failure modes with known ground truth and scoring against no-action,
+undiagnosed, and oracle baselines. In the primary drift cell, only
 APIP and the oracle exit durably; the undiagnosed responder patches four
 times, regresses three times, and ends indistinguishable from no action, so
 time-to-resolution without a durability criterion rewards the worst strategy.
 Attribution is correct in all three non-abstaining cycles. A null result on
-mesh insertion suggests that mesh disruption requires a bounded shared context.
+mesh insertion suggests mesh disruption requires a bounded shared context.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -600,15 +599,16 @@ behavioral contract is for. Contract, mapping table, and model names are pinned
 in every run manifest, and all runs, traces, and the frozen mapping table are
 released.
 
-A hosted backbone, however, is not a pinnable dependency, and the problem is
-not hypothetical here. The provider deprecated our backbone on 2026-09-03, one
-day after the reported cells ran. Its named successor exhausted the step budget
-on every episode attempted, and the same weights served by a different vendor
-at 4-bit quantization, on the same seed, contract, mapping table, and schedule,
-stated no policy facts in any post-injection tick, so the stale corpus had
-nothing to corrupt and no cycle opened: a second non-manifestation alongside
-Section~\ref{sec:taubench}. A manifest that pins a model by provider and name
-records what was asked for, not what will answer.
+A hosted backbone, however, is not a pinnable dependency. The provider
+deprecated our backbone on 2026-09-03, one day after the reported cells ran,
+and its named successor exhausted the step budget on every episode. The same
+weights from another vendor, on the same seed, contract, mapping table and
+schedule, reproduce the drift at 8-bit but not the outcome---detection at lag
+2, one resolution, then three regressions and a \code{timeout} exit---while at
+4-bit the agent stated no policy facts post-injection, so no cycle opened. The
+phenomenon survives the vendor change; the durable exit does not. A manifest
+that pins a model by provider and name records what was asked for, not what
+will answer.
 
 \section{Open Problems and Future Directions}
 
