@@ -614,7 +614,11 @@ abstentions is 3/3 at a 25\% abstention rate. We report the two together, since
 a stage that resolves every case by construction can reach any accuracy asked
 of it. With $n=4$ this is an accounting and not a confusion matrix with
 per-mode recall. Only APIP runs enter it: undiagnosed does not attribute, and oracle would
-be diagonal by fiat.
+be diagonal by fiat. The injected modes are also structurally distinct, so the
+funnel was never asked to separate a confusable pair. The hard case is a stale
+tool schema, which the precedence rule of Section~\ref{sec:taxonomy} routes to
+drift rather than tool misuse; testing that rule against an injector that
+produces it remains future work.
 
 \subsection{Limitations}
 \label{sec:limitations}
