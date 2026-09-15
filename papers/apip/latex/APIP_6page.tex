@@ -603,13 +603,12 @@ released.
 A hosted backbone, however, is not a pinnable dependency, and the problem is
 not hypothetical here. The provider deprecated our backbone on 2026-09-03, one
 day after the reported cells ran. Its named successor exhausted the step budget
-on every episode attempted, and the same weights served by a different vendor,
-on the same seed, contract, mapping table, and schedule, stated no policy facts
-in any post-injection tick, so the stale corpus had nothing to corrupt and no
-cycle opened: a second non-manifestation alongside Section~\ref{sec:taubench}.
-We therefore cannot say whether Table~\ref{tab:baselines} would reproduce; a
-manifest that pins a model by provider and name records what was asked for, not
-what will answer.
+on every episode attempted, and the same weights served by a different vendor
+at 4-bit quantization, on the same seed, contract, mapping table, and schedule,
+stated no policy facts in any post-injection tick, so the stale corpus had
+nothing to corrupt and no cycle opened: a second non-manifestation alongside
+Section~\ref{sec:taubench}. A manifest that pins a model by provider and name
+records what was asked for, not what will answer.
 
 \section{Open Problems and Future Directions}
 
@@ -657,13 +656,13 @@ Whether attribution stays tractable at hundreds of agents remains open.
 
 \emph{Naturally occurring degradation} is the most immediate next step, since
 every result here rests on injected failure. The environment we specified to
-remove that dependence---CoffeeBench \cite{coffeebench2026}, whose
-agent-operated firms inhabit a persistent economy that evolves on its own---was
-not run: its 90-day horizon resists truncation without breaking comparability,
-and one replication exceeded our compute budget by an order of magnitude. Its
-contract and adapter ship with the harness. It is also the setting in which
-\code{recalibrated} becomes necessary, since the protocol there must separate
-degradation warranting intervention from legitimate environmental change.
+remove that dependence is CoffeeBench \cite{coffeebench2026}, whose
+agent-operated firms inhabit a persistent economy that evolves on its own. We
+did not run it: its 90-day horizon resists truncation without breaking
+comparability, and one replication exceeded our compute budget by an order of
+magnitude. It is also the setting in which \code{recalibrated} becomes
+necessary, since the protocol there must separate degradation warranting
+intervention from legitimate environmental change.
 
 \emph{Contract specification}: contracts
 are architecturally foundational yet absent from most deployments, and
