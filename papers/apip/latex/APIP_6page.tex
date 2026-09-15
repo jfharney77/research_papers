@@ -79,47 +79,46 @@ governance, multi-agent systems, performance improvement plan
 
 \section{Introduction}
 
-Organizations increasingly deploy conversational agents as their main customer
-interfaces, handling support tickets, returns, and billing disputes at scale.
-Post-deployment reliability is where the difficulty concentrates: in a survey of 413 practitioners in regulated
-industries, 94\% of organizations reported Day~2 operational issues after
-deploying agentic AI \cite{datarobot2026}. Pre-deployment evaluation is well
-served by standardized benchmarks \cite{liang2022}, red-teaming
-\cite{ganguli2022}, and RLHF alignment \cite{ouyang2022}. The response to
-degradation after deployment is not. Pan et al.\ \cite{pan2025} survey 86
-deployed systems and 20 case studies across 26 domains, and find
-reliability---consistent correct behavior over time---to be practitioners' top
-development challenge, addressed through systems-level design rather than any
-standard remediation lifecycle.
+Organizations increasingly deploy AI agents in production, from customer
+service to software engineering, and post-deployment reliability is where the
+difficulty concentrates. Pre-deployment evaluation is well served by
+standardized benchmarks \cite{liang2022}, red-teaming \cite{ganguli2022}, and
+RLHF alignment \cite{ouyang2022}. The response to degradation after deployment
+is not. In a survey of 413 practitioners in regulated industries, 94\%
+reported Day~2 operational issues after deploying agentic AI
+\cite{datarobot2026}, and Pan et al.\ \cite{pan2025} surveyed 86 deployed
+systems and 20 case studies across 26 domains and found reliability to be
+practitioners' top development challenge, addressed through systems-level
+design rather than any standard remediation lifecycle.
 
-Ad-hoc responses to degraded agents are standard: engineers ``fix'' individual
-prompts, product managers file tickets, systems get rolled back. Nothing
-records what was tried, and nothing tests whether it worked. Agents recover
-through informal means or are quietly removed. Beyond the operational cost,
-this is a governance risk: the EU AI Act requires documentation and human
-oversight of deployed AI systems \cite{euaiact}, and Chan et al.\
-\cite{chan2024} argue that accountability for deployed agents requires
-traceability, which formalized remediation can provide.
+Organizations respond ad hoc: engineers ``fix'' individual prompts, product
+managers file tickets, systems get rolled back, and agents recover informally
+or are quietly removed. Nothing records what was tried, and nothing tests
+whether it worked. Beyond the operational cost this is a governance risk---the
+EU AI Act requires documentation and human oversight of deployed AI systems
+\cite{euaiact}, and Chan et al.\ \cite{chan2024} argue that accountability for
+deployed agents depends on traceability of their actions and operational
+history.
 
-We recommend the performance improvement plan (PIP) as the model: an
-established HR tool that already contains the elements common to
-accountability protocols (Section~\ref{sec:pip}). Kirkpatrick's
-four-level model \cite{kirkpatrick1994} complements it by asking whether
-remediation produced lasting change; we return to it in
-Section~\ref{sec:kirkpatrick}.
+We propose the performance improvement plan (PIP) as a model for structured
+post-deployment remediation: an established HR process already containing the
+elements common to accountability protocols (Section~\ref{sec:pip}).
+Kirkpatrick's four-level model \cite{kirkpatrick1994} complements it by asking
+whether remediation produced lasting change (Section~\ref{sec:kirkpatrick}).
 
-We make four contributions. (1) The APIP, a formalized post-deployment
-remediation lifecycle protocol grounded in organizational management and
-training evaluation research. (2) A five-category failure-mode taxonomy, with
-a published deterministic mapping from trace-level annotations (MAST
-\cite{cemri2025}) and disaggregation signatures onto taxonomy categories and
-intervention tiers. (3) A three-tier intervention hierarchy with escalation
-criteria, evaluated through Kirkpatrick's framework, and a declarative APIP
-schema for tooling and audit trails. (4) An end-to-end evaluation of the
-protocol in two live multi-agent environments against no-action, always-
-Tier-1, and oracle baselines, with an attribution accounting scored against
-injected ground truth; a null result also suggests that mesh disruption
-requires a bounded shared context.
+We make four contributions:
+\begin{list}{\textbf{(\arabic{enumi})}}{%
+  \usecounter{enumi}%
+  \setlength{\leftmargin}{1.3em}\setlength{\labelwidth}{1.1em}%
+  \setlength{\labelsep}{0.2em}\setlength{\itemindent}{0pt}%
+  \setlength{\listparindent}{0pt}\setlength{\rightmargin}{0pt}%
+  \setlength{\topsep}{1pt}\setlength{\partopsep}{0pt}%
+  \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}
+\item \textbf{Remediation lifecycle.} The Agent Performance Improvement Plan (APIP), grounded in organizational management and training-evaluation research.
+\item \textbf{Failure attribution.} A five-category taxonomy with a published deterministic mapping from MAST annotations \cite{cemri2025} and disaggregation signatures to categories and tiers.
+\item \textbf{Intervention and evaluation.} A three-tier hierarchy with escalation criteria, evaluated through Kirkpatrick's framework, and a declarative schema for tooling and audit.
+\item \textbf{End-to-end evaluation.} The protocol run in two live multi-agent environments against no-action, undiagnosed, and oracle baselines, attribution scored against injected ground truth, and a null result identifying bounded shared context as a candidate precondition for mesh disruption.
+\end{list}
 
 \section{Background and Related Work}
 
