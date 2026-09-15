@@ -702,19 +702,19 @@ magnitude. It is also the setting in which \code{recalibrated} becomes
 necessary, since the protocol there must separate degradation warranting
 intervention from legitimate environmental change.
 
-\emph{Contract specification}: contracts
-are architecturally foundational yet absent from most deployments, and
-authoring one requires prospective agreement across ML engineering, product,
-and legal, with no tooling to support it. \emph{Cause attribution at scale}:
-the human adjudication step (Section~\ref{sec:attribution}) does not scale, and
-automated step-level attribution remains weak: the best reported accuracy on
-Who\&When is 36.2\% \cite{ma2025attribution}, against 14.2\% for that
-benchmark's original methods \cite{zhang2025}. Both attribute individual
-trajectories where the APIP needs window-level classification, which is the gap
-the funnel of Section~\ref{sec:attribution} is a first attempt to close.
-\emph{Organizational ownership}: in HR the PIP is jointly owned by manager and
-HR function; in AI deployments the equivalent is unresolved, and without an
-ownership model adoption will stall.
+Three further problems remain open. Contracts are architecturally foundational
+yet absent from most deployments, and authoring one requires prospective
+agreement across ML engineering, product, and legal, with no tooling to support
+it. Cause attribution does not yet scale, since the human adjudication step of
+Section~\ref{sec:attribution} needs expert time and automated step-level
+attribution remains weak. The best reported accuracy on Who\&When is 36.2\%
+\cite{ma2025attribution} against 14.2\% for that benchmark's original methods
+\cite{zhang2025}, and both attribute individual trajectories where the APIP
+needs window-level classification, which is the gap the funnel of
+Section~\ref{sec:attribution} is a first attempt to close. Organizational
+ownership is unresolved, since in HR the PIP is jointly owned by manager and HR
+function and AI deployments have no equivalent, and without an ownership model
+adoption will stall.
 
 \section{Conclusion}
 
