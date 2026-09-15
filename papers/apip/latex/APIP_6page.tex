@@ -221,9 +221,10 @@ Mesh protocol (Sec.~\ref{sec:mesh}), not an agent-level tier \\
 \end{table}
 
 We propose a five-category taxonomy for customer-facing agents
-(Table~\ref{tab:taxonomy}). Four modes are intrinsic: behavioral drift, input
-brittleness, alignment creep, and tool misuse. The fifth is exogenous---mesh
-disruption (\code{exogenous\_disruption}), in which the failing agent is not
+(Table~\ref{tab:taxonomy}). Four modes are intrinsic: \emph{behavioral drift},
+\emph{input brittleness}, \emph{alignment creep}, and \emph{tool misuse}. The
+fifth is exogenous---\emph{mesh disruption}
+(\code{exogenous\_disruption}), in which the failing agent is not
 the cause of its own degradation. Each category maps to a different level
 of the agent's behavioral stack, and so to a different intervention tier.
 
@@ -233,7 +234,7 @@ must monitor disaggregated splits. Behavioral drift is a freshness failure:
 retrieval refresh remediates it and fine-tuning does not. Alignment creep is
 value misalignment, which we treat as distinct from capability failure.
 
-\textbf{Exogenous Disruption} is the category attribution reaches when no
+Exogenous disruption is the category attribution reaches when no
 intrinsic mode explains the degradation and the cause lies in a mesh change,
 most prominently a new and individually competent peer. Its signature is
 structural rather than behavioral. Remediation is therefore a mesh-level
@@ -252,7 +253,7 @@ taxonomy is two-level. The mapping is frozen before any evaluated run.
 Below-confidence combinations \code{abstain}; the abstention is logged and
 scored as an attribution failure, never silently resolved.
 
-A further category, \textbf{Adversarial Subversion}, covers failures whose
+A further category, \emph{adversarial subversion}, covers failures whose
 proximate cause is an adaptive attack rather than capability or value drift
 \cite{bhatt2025, terekhov2025}. We declare it out of scope: none of the three
 tiers addresses an adversarial dynamic, and the effective responses belong to
