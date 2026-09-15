@@ -54,17 +54,23 @@
 %   - Figure 1 was cut (P2). Its caption content lives in Sec. IV's opening
 %     paragraph; re-adding the figure duplicates it.
 %
-%  PAGE STATE (2026-09-15, measured, not estimated): 7 pages.
-%  The overflow is the Sec. II-A adversarial-subversion scope declaration
-%  (+45 words, which keeps greenblatt2023/bhatt2025/terekhov2025 from being
-%  orphaned) plus the restored M9/D14 material (~+25).
-%  Slack when last at 6 pages: 1 word at Sec. V-B, 0 at Sec. V-D and at the
-%  Limitations opening. Word-level cuts DO NOT move the boundary -- measured
-%  repeatedly. Only block removal does.
+%   - Adversarial subversion is OUT of the paper entirely, and so are its three
+%     references (greenblatt2023, bhatt2025, terekhov2025). Nothing else cited
+%     them. Restoring the paragraph without restoring the bibitems orphans
+%     three entries and LaTeX will not warn -- the bibliography is manual.
+%     Restoring both costs 45 words and a page.
+%
+%  PAGE STATE (2026-09-15 evening, measured, not estimated): 6 pages, and the
+%  budget is spent. Getting here from 7 took exactly three cuts: the Sec. II-A
+%  adversarial declaration plus its 3 bibitems, Sec. VI-A's candidate-mechanisms
+%  list, and Sec. VI-A's Kim et al. task detail. About 104 words, bisected.
+%  Word-level cuts DO NOT move the boundary on their own -- measured many times.
 %  Measured and does NOT work: D1 (Table I's Kirkpatrick levels) frees 11 words
-%  and moves nothing; \footnotesize references still render 7 pages.
-%  Untested candidates: dropping \bibitems, cutting Table I rows. Both reflow
-%  the whole document, so re-measure everything afterwards.
+%  and moves nothing; \footnotesize references cost a page; cutting any one of
+%  the three open problems moves nothing (they sit after the spill); dropping
+%  5 bibitems alone moves nothing; the contributions list reverted to inline
+%  numbering no longer moves it either.
+%  ANY addition from here spills to 7. Cut an equal amount in the same edit.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -180,11 +186,7 @@ warrants intervention, at what tier, and until when. RAIL Guard \cite{verma2026}
 closes a comparable loop on outputs, rewriting until eight responsibility
 dimensions pass. Both repair an instance: a successful rerun or a converged
 rewrite is Level~1/2 evidence (Section~\ref{sec:kirkpatrick}), not durable
-recovery of the agent against its contract. Adversarial subversion sits outside this
-scope: no tier addresses an adaptive attacker, and the effective responses
-belong to AI Control \cite{greenblatt2023, bhatt2025, terekhov2025}, which
-decides per action under an explicit threat model. Control audits can feed APIP
-triggers, and the schema reserves the \code{adversarial\_subversion} value.
+recovery of the agent against its contract.
 
 \subsection{The Performance Improvement Plan and Kirkpatrick's Four-Level Model}
 \label{sec:pip}
@@ -659,13 +661,11 @@ to this assumption: \emph{mesh disruption}. A new specialist is introduced and
 performs its own task well, yet peer performance declines; the APIP triggers on
 the peers, but attribution finds no intrinsic failure mode---no drift, fresh
 retrieval, intact alignment. The cause is exogenous, and a single-agent APIP
-cannot represent it. Kim et al.\ \cite{kim2025} report performance change
-against single-agent baselines from $+80.8\%$ on decomposable financial
-reasoning to $-70.0\%$ on sequential planning, with coordination yielding
-diminishing returns once the single-agent baseline is already strong; the
-phenomenon is analogous to the
-organizational ``new hire problem'' that Event System Theory
-\cite{morgeson2015} frames through novelty, disruptiveness, and criticality.
+cannot represent it. Kim et al.\ \cite{kim2025} report performance change against single-agent
+baselines from $+80.8\%$ to $-70.0\%$ depending on task structure. The
+phenomenon is analogous to the organizational ``new hire problem'' that Event
+System Theory \cite{morgeson2015} frames through novelty, disruptiveness, and
+criticality.
 
 \textbf{We tested this and did not reproduce it.} Inserting a Documentation
 Specialist between Programmer and Reviewer executed cleanly: it appeared in
@@ -675,21 +675,18 @@ sides, review engagement 7.64--7.68 before versus 7.63--7.76 after, and tool
 error rate 0.000. No breach occurred, so no cycle opened and the onboarding arm
 could not be evaluated.
 
-We read this as a precondition finding rather than a refutation. Candidate
-mechanisms include shared-context crowding, role boundary erosion,
-distributional shift in shared state, and trust miscalibration. ChatDev builds
+We read this as a precondition finding rather than a refutation. ChatDev builds
 each phase's prompt afresh from templates, so there is no bounded context pool
-to crowd: crowding is structurally unavailable here, and the mechanism this
-environment can test---distributional shift alone---did not degrade peers. Mesh
-disruption therefore plausibly requires an architecture with a bounded or
-evicting shared context, which is a testable requirement on any environment
-used to look for it. The mesh machinery and the scoped-context onboarding
+to crowd, and the mechanism this environment can test, distributional shift
+alone, did not degrade peers. Mesh disruption therefore plausibly requires an
+architecture with a bounded or evicting shared context, a testable requirement
+on any environment used to look for it. The mesh machinery and the scoped-context onboarding
 protocol (quarantining a newcomer's output during a probationary window,
 analogous to structured newcomer onboarding \cite{kammeyer2013}) are
 implemented and released; what remains is to run them in such an environment.
 Whether attribution stays tractable at hundreds of agents remains open.
 
-\subsection{Open Problems}
+\subsection{Other Open Problems}
 \label{sec:open}
 
 \emph{Naturally occurring degradation} is the most immediate next step, since
@@ -791,18 +788,6 @@ Training Evaluation}. Association for Talent Development, 2016.
 \bibitem{chan2024}
 A. Chan \emph{et al.}, ``Visibility into AI agents,'' in \emph{Proc. ACM Conf.
 Fairness, Accountability, and Transparency (FAccT)}, 2024.
-
-\bibitem{greenblatt2023}
-R. Greenblatt, B. Shlegeris, K. Sachan, and F. Roger, ``AI control: Improving
-safety despite intentional subversion,'' arXiv:2312.06942, 2023.
-
-\bibitem{bhatt2025}
-A. Bhatt \emph{et al.}, ``Ctrl-Z: Controlling AI agents via resampling,'' arXiv:2504.10374, 2025.
-
-\bibitem{terekhov2025}
-M. Terekhov \emph{et al.}, ``Adaptive attacks on trusted monitors subvert AI
-control protocols,'' in \emph{Proc. Int. Conf. Learning Representations
-(ICLR)}, 2026, arXiv:2510.09462.
 
 \bibitem{morgeson2015}
 F. P. Morgeson, T. R. Mitchell, and D. Liu, ``Event system theory: An
