@@ -7,26 +7,56 @@
 %  because each fixes a defect a reviewer would otherwise find.
 %
 %  DO NOT RE-ADD / DO NOT UNHEDGE:
-%   - Sec. IV-C must NOT say Tier 2 addresses "tool misuse arising from stale
-%     tool descriptions". Table I and the frozen mapping table both route
-%     tool_misuse to tier_1 escalating to tier_3; that clause was the only
-%     outlier in the paper (critique D12).
+%   - TWO SITES now route tool misuse. Neither may say Tier 2 / "tool-context"
+%     (critique D12). Table I and the frozen mapping table both route
+%     tool_misuse to tier_1 escalating to tier_3.
+%       (a) Sec. IV-C must NOT say Tier 2 addresses "tool misuse arising from
+%           stale tool descriptions".
+%       (b) Sec. III's tool-misuse sentence says "the instruction or model
+%           layer". It briefly said "instruction, tool-context, or model" on
+%           2026-09-15 and that reopened D12.
 %   - The mesh null result is hedged in three places -- abstract, contribution
 %     (4), conclusion. All three say "suggests", never "localizes" (M5).
 %   - Sec. V-B's seed disclosure ("manifested in two of three seeds") reports a
 %     seed that produced no degradation. It ships inside the released artifact,
 %     so omitting it is a discovery risk (C5).
-%   - Sec. V-E's backbone-deprecation paragraph is measured fact, not hedging:
-%     the provider deprecated the reported backbone one day after the cells ran
-%     (D11).
+%   - Sec. V-E reports BOTH serving configurations: the drift reproduces at
+%     8-bit but the durable exit does not (detection lag 2, one resolution,
+%     three regressions, timeout), and does not manifest at 4-bit. Reporting
+%     only the 4-bit null contradicts the released artifact (C6).
 %   - Sec. V-E says "Contract, mapping table, and model names are pinned" --
 %     NOT "versions are pinned", which overclaimed (D11).
 %   - Sec. V-B's tick-20 sentence is the rebuttal to the by-construction
 %     objection; the re-breach is off-ladder and that is the whole point (C1).
+%     "quantifies a trap", not "exposes" -- the paper measures a known trap.
+%   - Sec. V-B defines durable exit by PROTOCOL PARAMETERS (two consecutive
+%     in-envelope ticks, then a ten-tick observation window), not by observed
+%     tick counts. Quoting "11 ticks" invites the right-censoring objection
+%     (M11).
+%   - Sec. II-A says MAST "cluster labels", NOT "14 failure-mode labels". The
+%     released mapping_table keys on four cluster values, and it is hashed into
+%     every run manifest, so the count is checkable in a minute.
+%   - Sec. III's opening carries the M9 precedence rule (classify by actionable
+%     causal locus, not surface symptom; abstain when unresolved) and the D14
+%     tier preview naming Tier 1/2/3 before Table I assigns them. Both were
+%     lost once already in a Sec. III rewrite.
+%   - Contributions are a custom \begin{list}, NOT \begin{enumerate}. IEEEtran
+%     ignores \topsep/\itemsep overrides, and a plain enumerate costs a full
+%     page.
+%   - Figure 1 was cut (P2). Its caption content lives in Sec. IV's opening
+%     paragraph; re-adding the figure duplicates it.
 %
-%  PAGE STATE: 7 pages. The two restored citations (ganguli2022, ouyang2022)
-%  are exactly the overflow -- removing those two bibitems alone returns it to
-%  6. Prose cuts do not move the boundary; the bibliography or a block does.
+%  PAGE STATE (2026-09-15, measured, not estimated): 7 pages.
+%  The overflow is the Sec. II-A adversarial-subversion scope declaration
+%  (+45 words, which keeps greenblatt2023/bhatt2025/terekhov2025 from being
+%  orphaned) plus the restored M9/D14 material (~+25).
+%  Slack when last at 6 pages: 1 word at Sec. V-B, 0 at Sec. V-D and at the
+%  Limitations opening. Word-level cuts DO NOT move the boundary -- measured
+%  repeatedly. Only block removal does.
+%  Measured and does NOT work: D1 (Table I's Kirkpatrick levels) frees 11 words
+%  and moves nothing; \footnotesize references still render 7 pages.
+%  Untested candidates: dropping \bibitems, cutting Table I rows. Both reflow
+%  the whole document, so re-measure everything afterwards.
 % =====================================================================
 
 \documentclass[conference]{IEEEtran}
@@ -142,7 +172,11 @@ warrants intervention, at what tier, and until when. RAIL Guard \cite{verma2026}
 closes a comparable loop on outputs, rewriting until eight responsibility
 dimensions pass. Both repair an instance: a successful rerun or a converged
 rewrite is Level~1/2 evidence (Section~\ref{sec:kirkpatrick}), not durable
-recovery of the agent against its contract.
+recovery of the agent against its contract. Adversarial subversion sits outside this
+scope: no tier addresses an adaptive attacker, and the effective responses
+belong to AI Control \cite{greenblatt2023, bhatt2025, terekhov2025}, which
+decides per action under an explicit threat model. Control audits can feed APIP
+triggers, and the schema reserves the \code{adversarial\_subversion} value.
 
 \subsection{The Performance Improvement Plan and Kirkpatrick's Four-Level Model}
 \label{sec:pip}
@@ -218,50 +252,45 @@ Mesh protocol (Sec.~\ref{sec:mesh}), not an agent-level tier \\
 \end{tabular}
 \end{table}
 
-We propose a five-category taxonomy for customer-facing agents
-(Table~\ref{tab:taxonomy}). Four modes are intrinsic: \emph{behavioral drift},
-\emph{input brittleness}, \emph{alignment creep}, and \emph{tool misuse}. The
-fifth is exogenous---\emph{mesh disruption}
-(\code{exogenous\_disruption}), in which the failing agent is not
-the cause of its own degradation. Classification follows the actionable causal locus rather than the surface
-symptom---a stale tool schema invoked incorrectly is world-state
-divergence---and \code{abstain}s when that locus is unresolved. The locus is
-the tier: prompt (1), context/tool (2), model (3), defined in
+We propose a five-category remediation taxonomy for customer-facing agents
+(Table~\ref{tab:taxonomy}). Unlike trace-level failure taxonomies such as MAST \cite{cemri2025}, 
+these categories represent actionable degradation causes used to select an
+intervention locus. Classification follows that locus, not the surface
+symptom: a stale tool schema invoked incorrectly is world-state divergence,
+and attribution \code{abstain}s when the locus is unresolved. The locus names
+the tier: prompt (1), context/tool (2), model (3); see
 Section~\ref{sec:tiers}.
-
+Four modes are intrinsic: \emph{behavioral drift}, \emph{input brittleness}, \emph{alignment creep}, and \emph{tool misuse}. 
+The fifth is \emph{mesh disruption} (\code{exogenous\_disruption}), which
+differs from the other four in being exogenous: the failing agent is not the
+cause of its own degradation.
+Behavioral drift is a freshness failure:
+retrieval refresh remediates it and fine-tuning does not. 
 Aggregate metrics mask input brittleness. An agent at 85\% overall success may
 fail catastrophically on the 8\% of requests from one segment, so the trigger
-must monitor disaggregated splits. Behavioral drift is a freshness failure:
-retrieval refresh remediates it and fine-tuning does not. Alignment creep is
+must monitor disaggregated splits. Alignment creep is
 value misalignment, which we treat as distinct from capability failure.
-
+Tool misuse occurs when the agent's intent is correct but its tool invocation
+is not, directing remediation toward the instruction or model layer depending
+on the underlying cause.
 Exogenous disruption is the category attribution reaches when no
 intrinsic mode explains the degradation and the cause lies in a mesh change,
 most prominently a new and individually competent peer. Its signature is
 structural rather than behavioral. Remediation is therefore a mesh-level
 protocol (Section~\ref{sec:mesh}), and no agent-level tier applies.
 
-\subsection{From Trace Labels to Taxonomy Categories}
-\label{sec:mapping}
+The taxonomy is operational only if degradation is classified by a 
+reproducible procedure rather than a judgment call. 
+Attribution therefore combines two sources of evidence: 
+(1) the distribution of trace-level MAST labels~\cite{cemri2025}, which characterizes what went wrong, 
+and (2) a disaggregation signature describing where and how the degradation appears across task categories, 
+roles, and time. A deterministic mapping, published in the supplementary material and frozen before evaluation, 
+combines these signals to select an APIP remediation category. 
+MAST evidence alone is not always sufficient: two mapping rules can share the same MAST failure cluster but resolve to different APIP categories because their disaggregation signatures differ. 
+When the combined evidence does not meet the confidence threshold, attribution abstains; 
+abstentions are logged and scored rather than silently assigned a category.
 
-The taxonomy is operational only if a procedure, not a judgment call,
-classifies a degradation window. Attribution combines a trace-level label
-distribution from MAST \cite{cemri2025} with a \emph{disaggregation signature}:
-how degradation distributes across task categories, roles, and time. A
-published deterministic mapping (supplementary material) joins the two. Two
-mapping rows share a MAST cluster but differ on signature, which is why the
-taxonomy is two-level. The mapping is frozen before any evaluated run.
-Below-confidence combinations \code{abstain}; the abstention is logged and
-scored as an attribution failure, never silently resolved.
 
-A further category, \emph{adversarial subversion}, covers failures whose
-proximate cause is an adaptive attack rather than capability or value drift
-\cite{bhatt2025, terekhov2025}. We declare it out of scope: none of the three
-tiers addresses an adversarial dynamic, and the effective responses belong to
-the AI Control literature \cite{greenblatt2023}, which decides per action under
-an explicit threat model. Control audits
-can feed APIP triggers, and the schema reserves the
-\code{adversarial\_subversion} value.
 
 \section{The APIP Framework}
 \label{sec:framework}
@@ -333,7 +362,7 @@ closes that gap.
 We instantiate this as a three-stage funnel that can be scored against
 ground truth. Stage~1 splits every contract metric by task category, agent
 role, and user segment; the result is the disaggregation signature of
-Section~\ref{sec:mapping}. Stage~2 has a MAST annotator \cite{cemri2025} label
+Section~\ref{sec:taxonomy}. Stage~2 has a MAST annotator \cite{cemri2025} label
 a sample of failing traces. The judge must differ from the agent's backbone,
 preferably by model family, so that it does not share the failure modes it is
 asked to detect. Stage~3 applies the frozen mapping to the signature and the
