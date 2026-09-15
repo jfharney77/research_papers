@@ -65,8 +65,8 @@ taxonomy, tiered interventions, a bounded window with formal exit criteria, and
 a declarative record that meets governance traceability requirements. We
 evaluate it end-to-end in two live multi-agent environments ($\tau^2$-bench and
 ChatDev) by injecting failure modes with known ground truth and scoring against
-no-action, always-Tier-1, and oracle baselines. Under stale-corpus drift, only
-APIP and the oracle exit durably; the always-Tier-1 responder patches four
+no-action, undiagnosed, and oracle baselines. In the primary drift cell, only
+APIP and the oracle exit durably; the undiagnosed responder patches four
 times, regresses three times, and ends indistinguishable from no action, so
 time-to-resolution without a durability criterion rewards the worst strategy.
 Attribution is correct in all three non-abstaining cycles. A null result on
@@ -166,7 +166,7 @@ ask of each intervention whether it changed immediate output patterns
 (Level 1/2), produced durable change on the failure-mode class (Level 3), and
 improved the contract's business metrics (Level 4). An intervention that
 improves Level 1/2 without Level 3/4 has suppressed a symptom without
-remediating the agent. Our always-Tier-1 baseline reproduces exactly that case,
+remediating the agent. Our undiagnosed baseline reproduces exactly that case,
 and Section~\ref{sec:taubench} measures it.
 
 \subsection{AI Governance and Documentation Requirements}
@@ -382,9 +382,9 @@ window expiry.
 
 At window close a formal exit evaluation records one of the five outcomes of
 Fig.~\ref{fig:lifecycle}. Three of them do real work. \emph{Regressed}---envelope
-restored, then breached again---is the signature of a tier-mismatched
-intervention that suppressed symptoms; giving it a name of its own keeps that
-failure from being counted as a success. \emph{Recalibrated} records that
+restored, then breached again---records that an apparent recovery did not hold,
+whether through tier mismatch, incomplete remediation, or renewed environmental
+change; giving it a name of its own keeps that from being counted as a success. \emph{Recalibrated} records that
 attribution concluded the environment had legitimately moved, so the contract
 is re-baselined and the agent is left alone. We deliberately do not score
 \emph{recalibrated} as a resolution, since conflating the two would let
@@ -581,8 +581,7 @@ be diagonal by fiat.
 
 Replication is the main limitation. Each reported condition is a single seed on
 one injection schedule, so we report observed trajectories rather than rates or
-confidence intervals, and whether the patch-then-regress dynamic reproduces is
-untested.
+confidence intervals.
 
 Every degradation reported here is injected, so the objection that injected
 drift merely mirrors its own schedule stands unanswered. Answering it requires
@@ -687,7 +686,7 @@ model to separate durable recovery from superficial improvement. The harness,
 artifacts, version pins, and frozen mapping table are released, so an auditor
 can check the analysis was not fitted after the fact. Inserting a competent
 specialist into a mesh degraded no peer, which suggests mesh disruption requires
-a bounded shared context. One number drives the machinery: an always-Tier-1
+a bounded shared context. One number drives the machinery: the undiagnosed
 responder patched four times, regressed three times, and finished
 indistinguishable from taking no action, while scoring higher on per-cycle
 time-to-resolution. Any remediation scorecard that rewards speed without
