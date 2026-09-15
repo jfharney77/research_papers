@@ -265,18 +265,11 @@ can feed APIP triggers, and the schema reserves the
 \section{The APIP Framework}
 \label{sec:framework}
 
-The APIP is a lifecycle protocol of five phases (Fig.~\ref{fig:lifecycle}):
-Trigger, Cause Attribution, Intervention Planning, Remediation Window, and
-Exit Evaluation.
-
-\begin{figure}[t]
-  \centering
-  \scriptsize
-  \setlength{\fboxsep}{2pt}
-  \fbox{1. Trigger}\,$\rightarrow$\,\fbox{2. Attribution}\,$\rightarrow$\,\fbox{3. Plan}\,$\rightarrow$\,\fbox{4. Window}\,$\rightarrow$\,\fbox{5. Exit}
-  \caption{The five-phase APIP lifecycle. A two-gate breach opens a cycle; attribution returns a mode or abstains; the matched tier runs in a bounded window; exit is one of five states, and a re-breach reopens Phase~1.}
-  \label{fig:lifecycle}
-\end{figure}
+The APIP is a lifecycle protocol of five phases: Trigger, Cause Attribution,
+Intervention Planning, Remediation Window, and Exit Evaluation. A two-gate
+breach opens a cycle; attribution returns a failure mode or abstains; the
+matched tier runs in a bounded window; and exit is one of five states, a
+re-breach reopening Phase~1.
 
 \subsection{Phase 1: Trigger}
 \label{sec:trigger}
@@ -381,8 +374,8 @@ window expiry.
 \subsection{Phase 5: Exit Evaluation}
 \label{sec:exit}
 
-At window close a formal exit evaluation records one of the five outcomes of
-Fig.~\ref{fig:lifecycle}. Three of them do real work. \emph{Regressed}---envelope
+At window close a formal exit evaluation records one of five outcomes.
+Three of them do real work. \emph{Regressed}---envelope
 restored, then breached again---records that an apparent recovery did not hold,
 whether through tier mismatch, incomplete remediation, or renewed environmental
 change; giving it a name of its own keeps that from being counted as a success. \emph{Recalibrated} records that
@@ -436,7 +429,7 @@ window derives every contract threshold as mean $\pm\,k\sigma$
 (Section~\ref{sec:trigger}); failure modes are injected on a pre-registered
 schedule; both trigger modalities evaluate at every tick; breaches pass through
 the attribution funnel; and the selected intervention runs the bounded window
-of Fig.~\ref{fig:lifecycle} to one of its five exits.
+to one of its five exits.
 
 \textbf{Baseline family.} The drift cell runs under four conditions:
 \emph{APIP} (the full protocol); \emph{no-action} (degradation runs to
