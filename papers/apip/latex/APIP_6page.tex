@@ -115,7 +115,7 @@ We make four contributions:
   \setlength{\topsep}{1pt}\setlength{\partopsep}{0pt}%
   \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}}
 \item \textbf{Remediation lifecycle.} The Agent Performance Improvement Plan (APIP), grounded in organizational management and training-evaluation research.
-\item \textbf{Failure attribution.} A five-category taxonomy with a published deterministic mapping from MAST annotations \cite{cemri2025} and disaggregation signatures to categories and tiers.
+\item \textbf{Remediation-oriented attribution.} A five-category taxonomy with a published deterministic mapping from MAST annotations~\cite{cemri2025} and disaggregation signatures to actionable categories and intervention tiers.
 \item \textbf{Intervention and evaluation.} A three-tier hierarchy with escalation criteria, evaluated through Kirkpatrick's framework, and a declarative schema for tooling and audit.
 \item \textbf{End-to-end evaluation.} The protocol run in two live multi-agent environments against no-action, undiagnosed, and oracle baselines, attribution scored against injected ground truth, and a null result identifying bounded shared context as a candidate precondition for mesh disruption.
 \end{list}
@@ -133,7 +133,7 @@ when drift runs unchecked (their Table~1).
 
 On the diagnosis side, MAST \cite{cemri2025} supplies an empirically derived
 failure taxonomy with an LLM-annotator pipeline. It classifies what went wrong
-in a trace, and stops short of selecting a remediation; we adopt it as the
+in a trace, but does not select a remediation; we use its cluster labels as the
 trace-labeling stage of cause attribution (Section~\ref{sec:attribution}).
 Run-level toolkits such as AgentDebugX \cite{zhu2026} close a
 detection--attribution--recovery--rerun loop for a single failed execution. The
@@ -144,7 +144,7 @@ dimensions pass. Both repair an instance: a successful rerun or a converged
 rewrite is Level~1/2 evidence (Section~\ref{sec:kirkpatrick}), not durable
 recovery of the agent against its contract.
 
-\subsection{Two Management-Science Templates: the PIP and Kirkpatrick}
+\subsection{The Performance Improvement Plan and Kirkpatrick's Four-Level Model}
 \label{sec:pip}
 
 The PIP is a formal document specifying observed deficiencies, root causes,
@@ -174,8 +174,8 @@ Regulation increasingly requires documentation, oversight, and traceability.
 The EU AI Act \cite{euaiact} mandates post-market monitoring and record-keeping to support ongoing compliance, incident investigation, and corrective action,
 while Chan et al.\ \cite{chan2024} argue that accountability for AI agents depends on
 visibility mechanisms including agent identifiers, real-time monitoring, and activity logging that can link actions to specific agents and responsible actors.
-The schema's \code{apip\_id}, \code{agent\_id}, \code{owner}, and \code{exit\_evaluated\_at}
-fields operationalize that linkage.
+The schema's \code{apip\_id}, \code{agent\_id}, \code{owner}, and
+\code{exit\_evaluated\_at} fields operationalize that linkage.
 
 \section{A Taxonomy of Agent Failure Modes}
 \label{sec:taxonomy}
