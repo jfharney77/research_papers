@@ -704,10 +704,10 @@ yet absent from most deployments, and authoring one requires prospective
 agreement across ML engineering, product, and legal, with no tooling to support
 it. Cause attribution does not yet scale, since the human adjudication step of
 Section~\ref{sec:attribution} needs expert time and automated step-level
-attribution remains weak. The best reported accuracy on Who\&When is 36.2\%
-\cite{ma2025attribution} against 14.2\% for that benchmark's original methods
-\cite{zhang2025}, and both attribute individual trajectories where the APIP
-needs window-level classification, which is the gap the funnel of
+attribution remains weak. Ma et al.\ report up to 36.2\% step-level attribution accuracy on
+Who\&When \cite{ma2025attribution}, illustrating the difficulty of automated
+failure localization. Such methods attribute individual trajectories where the
+APIP needs window-level classification, which is the gap the funnel of
 Section~\ref{sec:attribution} is a first attempt to close. Organizational
 ownership is unresolved, since in HR the PIP is jointly owned by manager and HR
 function and AI deployments have no equivalent, and without an ownership model
@@ -717,8 +717,9 @@ adoption will stall.
 
 APIP is a post-deployment remediation program that turns the human PIP's
 lifecycle primitives into operational functions: trigger, cause attribution,
-tiered intervention, bounded window, and exit evaluation. It uses Kirkpatrick's
-model to separate durable recovery from superficial improvement. The harness,
+tiered intervention, bounded window, and exit evaluation. It adapts Kirkpatrick's
+model to distinguish durable recovery from superficial improvement, and scores
+exit against the contract envelope rather than the intervention log. The harness,
 artifacts, version pins, and frozen mapping table are released, so an auditor
 can check the analysis was not fitted after the fact. Inserting a competent
 specialist into a mesh degraded no peer, which suggests mesh disruption requires
