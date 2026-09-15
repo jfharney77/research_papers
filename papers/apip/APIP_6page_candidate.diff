@@ -1,0 +1,502 @@
+--- apip.tex	2026-09-15 01:21:14.240642585 +0000
++++ final6.tex	2026-09-15 01:42:31.750578511 +0000
+@@ -1,179 +1,8 @@
+-% =====================================================================
+-%  Your Agent is Underperforming: The Case for Agent Performance
+-%  Improvement Plans  ---  6-page ICA 2026 version
+-%
+-%  Cuts applied on top of the 11-page revision:
+-%    - VI-B1 pilot vignettes compressed to one paragraph (judge/baseline
+-%      points folded into Limitations)
+-%    - Table III + Section V replaced by one schema paragraph inside
+-%      Section IV (full schema -> supplementary material)
+-%    - Section II-E merged into the adversarial-subversion paragraph
+-%    - Tier-mismatch / mesh-disruption duplication pass
+-%    - Abstract <=150 words, 4 tight contribution bullets,
+-%      conclusion <=120 words
+-%    - Section III mode paragraphs compressed (Table I is canonical)
+-%    - Table II -> supplementary material (pointer sentence kept)
+-%    - II-A / II-B / IV-A / IV-D paragraph-level tightening; Fig. 1 cut
+-%    - References 34 -> 28
+-%
+-%  Collaborator editing pass (APIP_6page_SUBMIT.tex, 2026-09-10) merged in:
+-%    - em-dash asides converted to colons/semicolons/sentences throughout
+-%    - citation corrections: PIP claims -> shrm2023 (was kirkpatrick2016);
+-%      kolt2024 -> chan2024; wachter2017 pagination + year; ma2025 initial;
+-%      CoffeeBench TODO resolved to Sugiura et al. arXiv:2606.16613
+-%    - false-alarm claim moved from IV-A to VI-B and made specific
+-%    - VI-B gains an inline single-seed caveat; VI-D attribution numbers
+-%      split correctly across ma2025attribution (36.2%) / zhang2025 (14.2%)
+-%    - conclusion swaps the call-to-action for the B2 result
+-%    - \ph{} draft macro removed (no remaining uses)
+-%    - bibliography at \scriptsize: load-bearing, \footnotesize -> 7 pages
+-%
+-%  Collaborator pass v3 (APIP_6page_SUBMIT_v3.tex, 2026-09-11) merged in:
+-%    - oracle baseline renamed B4 -> B3 throughout (only three baselines)
+-%    - adds a Declaration on Generative AI ahead of the references
+-%    - citations: AgentCompass -> kartik2025 (correct author list);
+-%      schoen2025 -> terekhov2025 (ICLR 2026, arXiv:2510.09462);
+-%      intro traceability claim -> chan2024; kammeyer2013 issue no.
+-%    - drops wachter2017, hendrycks2021, krishnan2025 (28 -> 25 refs)
+-%    - Kim et al. range now names the task type at each end
+-%    - attribution funnel restated as numbered stages
+-%  Fixed on merge: "cannot.Hence,the" spacing; a literal U+2013 en dash
+-%  restored to "--"; "in the Section IV and Section V" -> "in Sections IV and V".
+-%
+-%  Collaborator pass v4 (APIP_6page_AI_detection_complete.tex, 2026-09-12)
+-%  merged in -- conclusion only, rewritten to read less machine-generated:
+-%    - active "APIP is a ... program that operationalizes ..." opening
+-%    - release sentence reframed around what an auditor can check
+-%    - closes on the mesh-insertion null result instead of the speed-vs-
+-%      durability warning alone
+-%  Fixed on merge: "discern true recover from pseudo improvement" ->
+-%  "recovery from pseudo-improvement"; verb restored to the "Harness,
+-%  artifacts, ... published" fragment; "always-responding Tier-1 box" ->
+-%  "always-Tier-1 responder" (matches the B2 label in Sec. VI); stray double
+-%  spaces and trailing whitespace removed.
+-%
+-%  Conclusion pass (2026-09-13), against CRITIQUE_2026-09-13.md M5/D9/P8:
+-%    - D9: "ended up identical to doing nothing" -> "finished
+-%      indistinguishable from taking no action" (Table II shows B1 acting
+-%      zero times against B2's four, so "identical" contradicts it; the
+-%      replacement is the wording Sec. V-B and the abstract already use)
+-%    - M5: the mesh null result no longer closes the paper and no longer
+-%      asserts "the disruption mechanism". Hedged to "suggests" and moved
+-%      ahead of the durability result, so the paper ends on its strongest
+-%      finding and Sec. VI-A keeps ownership of the null result
+-%    - P8: 128 -> 119 words (header target <=120); "pseudo-improvement" ->
+-%      "superficial improvement" and "published" -> "released", matching
+-%      Sec. II-C and Sec. V-E; "Any measurement that favors speed without
+-%      resilience" regains its scope as "Any remediation scorecard that
+-%      rewards speed without durability"
+-%  Still open from the critique: C2 (B2's per-cycle TTR is not in Table II,
+-%  so "scoring higher on per-cycle time-to-resolution" remains uncheckable)
+-%  and the unhedged mesh claim in contribution bullet 4.
+-%
+-%  Deletion sweep (2026-09-13), against CRITIQUE_2026-09-13.md M6/P4:
+-%    - M6: the two uncited characterisations of industry practice are gone.
+-%      B2 is no longer "the ad-hoc pattern typical of production practice"
+-%      nor "what organizations actually do"; it is the informative comparison
+-%      because it isolates the cost of patching without diagnosing. The
+-%      B2 label itself is unchanged, and Sec. V-B's "reproduced the ad-hoc
+-%      pattern the protocol is meant to displace" stands: that refers to the
+-%      pattern described in Sec. I, not to a claim about its prevalence.
+-%    - P4: the "first attribution accounting" claim was stated twice. Cut
+-%      from the contribution list, which now says what was done rather than
+-%      that it was first, and downgraded in Sec. V-D to "we are not aware of
+-%      a prior such accounting". Pan et al. is "among the largest" rather
+-%      than "the first at large scale".
+-%
+-%  Table II revision (2026-09-13), against CRITIQUE_2026-09-13.md C2/D10:
+-%    - C2 closed. B2's per-cycle TTRs are now in the table: 2, 4, 2, and a
+-%      fourth cycle that never closed. Recovered from the seed-13 run record
+-%      (apip_simulations/runs/tau2-B2-s13-97ba47/records.json), whose four
+-%      APIP records give breach/exit ticks 17->19, 20->24, 27->29, 37->39
+-%      with re-breaches at 20, 27, and 37. Sec. V-B now says "outperforms
+-%      APIP fourfold" against the table instead of asserting an unpublished
+-%      comparison, and the superseded "report TTR only where one was
+-%      achieved" rule is dropped.
+-%    - D10 half closed. The caption now defines Det./Act/Exit as ticks and
+-%      TTR as Exit-Det, and says a dash is a quantity that does not exist
+-%      rather than one withheld. What a tick *is* remains undefined, as does
+-%      its relation to the day-denominated windows of Sec. IV-D.
+-%    - The table now names its seed (13), which the run records identify as
+-%      the source of every number in it; the seed-10 set is a failed run.
+-%
+-%  Definition and hedging pass (2026-09-13), against D10(b), D11, M5:
+-%    - D10 closed. Sec. V-A now says a run proceeds "in ticks of five task
+-%      episodes" -- the figure comes from the run snapshots, which report
+-%      n_episodes = 5 at every tick. The tick-to-day relation against the
+-%      windows of Sec. IV-D is left alone: the evaluated windows were set in
+-%      ticks (12 for both the Tier 1 and Tier 2 interventions) and the day
+-%      figures in Sec. IV-D are deployment guidance, not what was run.
+-%    - D11: "Versions are pinned in every run manifest" overclaimed. The
+-%      manifest content-hashes the contract and mapping table but pins the
+-%      backbone as provider plus name (cerebras/gemma-4-31b) with an empty
+-%      version_note, because a hosted endpoint exposes nothing finer. Now
+-%      reads "Contract, mapping table, and model names are pinned".
+-%    - M5 closed. Contribution bullet 4 no longer "localizes the mesh
+-%      disruption problem"; a null result "suggests that mesh disruption
+-%      requires a bounded shared context", matching Sec. VI-A and the
+-%      conclusion.
+-%
+-%  D12 (2026-09-13): Sec. IV-C claimed Tier 2 "addresses ... tool misuse
+-%  arising from stale tool descriptions", contradicting Table I ("Tier 1
+-%  (prompt) or Tier 3 (fine-tune)") and the frozen mapping table, whose
+-%  R2-tool and R2b-tool-nosplit rules both emit tier_1 escalating to tier_3.
+-%  Table I agrees with the mapping on all five rows; this clause was the only
+-%  outlier in the paper, so it is cut rather than the mapping changed -- the
+-%  mapping is version 1.0.0-frozen (2026-08-20) and its hash is the
+-%  pre-registration anchor in every run manifest.
+-%  Left standing: Tier 2 still lists "tool schema fixes" among its
+-%  capabilities. That describes what Tier 2 can do, not what mode routes
+-%  there, and a stale tool description can present as drift.
+-%
+-%  C5 (2026-09-14): Sec. V-B reported the five-tick detection lag as having
+-%  "reproduced across three seeds" and did not mention seed 10, which ships
+-%  inside the released artifact. Under the final contract (138f19c3) the
+-%  three tau2 seeds are 10, 12 and 13. Seed 13 is Table II; seed 12 is the
+-%  abstention Sec. V-D reports; seed 10 completed all 40 ticks and 200
+-%  episodes on the scheduled injection with policy_citation_error_rate at
+-%  0.0 through every post-injection tick in three of four conditions, the
+-%  fourth running ~6x weaker and detecting at tick 29. The old claim also
+-%  mixed contracts: only seeds 12 and 13 detected under 138f19c3, so the
+-%  third had to be a pre-freeze run under 0855428c, where detection
+-%  scattered from tick 13 to 22. Replaced with what the final-contract runs
+-%  actually show.
+-%
+-%  D11 limitation (2026-09-14): Sec. V-E now reports that the hosted backbone
+-%  was deprecated 2026-09-03, one day after the reported cells ran. Evidence,
+-%  all measured on 2026-09-14: GET /v1/models still lists the model while
+-%  chat/completions returns 404 model_not_found; the successor the provider
+-%  named exhausted the step budget on 6/6 episodes with zero completions; and
+-%  the same weights served by a different vendor, on the same seed, contract,
+-%  mapping table and injection schedule, produced policy_fact_statement_rate
+-%  = 0.000 for six consecutive post-injection ticks (partial runs kept at
+-%  apip_simulations/runs/tau2-{B2,APIP}-s13-{810532,d0d966}, 14 and 19 ticks).
+-%  Framed as a failed replication ATTEMPT -- the precondition was absent, so
+-%  the injection never acted -- not as a refutation of Table II.
+-%
+-%  C1 (2026-09-14): Sec. V-B now answers the by-construction objection rather
+-%  than leaving it open. The ladder adds clauses at 12, 17, 22, 27, 32, 37 and
+-%  B2's cycles breach at 17, 20, 27, 37 -- so cycle 2's breach at tick 20 is
+-%  off-ladder, two ticks before the next clause was due, against text the
+-%  patch issued at 17 already carried. Shallow patching therefore fails on
+-%  static material, which is the evidence a reviewer would say this design
+-%  cannot produce. From tau2-B2-s13-97ba47/records.json.
+-%
+-%  *** THE PAPER IS NOW 7 PAGES. *** This was accepted deliberately: the
+-%  disclosure is required because Sec. V-E releases all runs, and the author
+-%  will reclaim the space by hand in the final revision. Candidates, in the
+-%  order the critique ranks them: Fig. 1 (five boxes restating the adjacent
+-%  sentence, a third to half a column), and the abstract (185 words against
+-%  its own <=150 target).
+-% =====================================================================
+-
+ \documentclass[conference]{IEEEtran}
+ \IEEEoverridecommandlockouts
+ 
+ \usepackage{cite}
++\usepackage{microtype}
+ \usepackage{amsmath,amssymb,amsfonts}
+ \usepackage{graphicx}
+ \usepackage{textcomp}
+@@ -196,26 +25,21 @@
+ \maketitle
+ 
+ \begin{abstract}
+-Agents degrade in production. Unlike pre-release evaluation, the response to
+-that degradation has no standard form. This paper presents the Agent Performance
+-Improvement Plan (APIP), which adapts a management protocol for
+-underperforming employees into a remediation lifecycle for agents. It combines
+-statistically
+-disciplined triggers on a behavioral contract, measurable cause attribution
+-over a five-category failure-mode taxonomy, tiered interventions, a bounded
+-window with formal exit criteria, and a declarative record that meets
+-governance traceability requirements. We evaluate it end-to-end in two live
+-multi-agent environments, customer service ($\tau^2$-bench) and software
+-engineering (ChatDev), by injecting failure modes with known ground truth and
+-scoring against no-action, always-Tier-1, and oracle baselines. Under a
+-stale-corpus drift injection, only APIP and the oracle exit durably. The
+-always-Tier-1 responder patches four times, regresses three times, and ends
+-indistinguishable from no action, which shows that time-to-resolution without
+-a durability criterion rewards the worst strategy. Attribution is correct in
+-all three non-abstaining cycles. We also report a null result: inserting a
+-competent specialist into a role-differentiated mesh produced no peer
+-degradation, which localizes the hypothesized crowding mechanism to
+-architectures with a bounded shared context.
++Agents degrade in production, and unlike pre-release evaluation the response
++has no standard form. We present the Agent Performance Improvement Plan (APIP),
++which adapts the management protocol for underperforming employees into a
++remediation lifecycle for agents: statistically disciplined triggers on a
++behavioral contract, cause attribution over a five-category failure-mode
++taxonomy, tiered interventions, a bounded window with formal exit criteria, and
++a declarative record that meets governance traceability requirements. We
++evaluate it end-to-end in two live multi-agent environments ($\tau^2$-bench and
++ChatDev) by injecting failure modes with known ground truth and scoring against
++no-action, always-Tier-1, and oracle baselines. Under stale-corpus drift, only
++APIP and the oracle exit durably; the always-Tier-1 responder patches four
++times, regresses three times, and ends indistinguishable from no action, so
++time-to-resolution without a durability criterion rewards the worst strategy.
++Attribution is correct in all three non-abstaining cycles. A null result on
++mesh insertion suggests that mesh disruption requires a bounded shared context.
+ \end{abstract}
+ 
+ \begin{IEEEkeywords}
+@@ -230,8 +54,8 @@
+ Post-deployment reliability is where the difficulty concentrates: in a survey of 413 practitioners in regulated
+ industries, 94\% of organizations reported Day~2 operational issues after
+ deploying agentic AI \cite{datarobot2026}. Pre-deployment evaluation is well
+-served by standardized benchmarks \cite{liang2022}, red-teaming
+-\cite{ganguli2022}, and RLHF alignment \cite{ouyang2022}. The response to
++served by standardized benchmarks \cite{liang2022}, red-teaming, and
++alignment training. The response to
+ degradation after deployment is not. Pan et al.\ \cite{pan2025} survey 86
+ deployed systems and 20 case studies across 26 domains, and find
+ reliability---consistent correct behavior over time---to be practitioners' top
+@@ -254,26 +78,18 @@
+ remediation produced lasting change; we return to it in
+ Section~\ref{sec:kirkpatrick}.
+ 
+-We make the following contributions:
+-
+-\begin{itemize}
+-  \item We introduce the APIP, a formalized post-deployment remediation
+-  lifecycle protocol grounded in organizational management and training
+-  evaluation research.
+-
+-  \item A five-category failure-mode taxonomy, with a published deterministic
+-  mapping from trace-level annotations (MAST \cite{cemri2025}) and
+-  disaggregation signatures onto taxonomy categories and intervention tiers.
+-
+-  \item A three-tier intervention hierarchy with escalation criteria, evaluated
+-  through Kirkpatrick's framework, and a declarative APIP schema for tooling
+-  and audit trails.
+-
+-  \item We evaluate the full protocol in two live multi-agent environments
+-  against no-action, always-Tier-1, and oracle baselines, and report an
+-  attribution accounting scored against injected ground truth. A null result
+-  also suggests that mesh disruption requires a bounded shared context.
+-\end{itemize}
++We make four contributions. (1) The APIP, a formalized post-deployment
++remediation lifecycle protocol grounded in organizational management and
++training evaluation research. (2) A five-category failure-mode taxonomy, with
++a published deterministic mapping from trace-level annotations (MAST
++\cite{cemri2025}) and disaggregation signatures onto taxonomy categories and
++intervention tiers. (3) A three-tier intervention hierarchy with escalation
++criteria, evaluated through Kirkpatrick's framework, and a declarative APIP
++schema for tooling and audit trails. (4) An end-to-end evaluation of the
++protocol in two live multi-agent environments against no-action, always-
++Tier-1, and oracle baselines, with an attribution accounting scored against
++injected ground truth; a null result also suggests that mesh disruption
++requires a bounded shared context.
+ 
+ \section{Background and Related Work}
+ 
+@@ -299,7 +115,7 @@
+ rewrite is Level~1/2 evidence (Section~\ref{sec:kirkpatrick}), not durable
+ recovery of the agent against its contract.
+ 
+-\subsection{The Performance Improvement Plan as a Structural Template}
++\subsection{Two Management-Science Templates: the PIP and Kirkpatrick}
+ \label{sec:pip}
+ 
+ The PIP is a formal document specifying observed deficiencies, root causes,
+@@ -310,7 +126,6 @@
+ the agent is its subject and never its author. This collapses the manager--employee
+ dyad into a single operator who both writes the plan and implements it.
+ 
+-\subsection{Kirkpatrick's Four-Level Evaluation Framework}
+ \label{sec:kirkpatrick}
+ 
+ Kirkpatrick's four-level model \cite{kirkpatrick1994, kirkpatrick2016}
+@@ -342,7 +157,8 @@
+ \label{tab:taxonomy}
+ \centering
+ \scriptsize
+-\begin{tabular}{@{}p{1.4cm}p{4.1cm}p{1.7cm}@{}}
++\setlength{\tabcolsep}{4pt}
++\begin{tabular}{@{}p{1.5cm}p{5.0cm}p{1.7cm}@{}}
+ \toprule
+ \textbf{Failure Mode} & \textbf{Description \& Signals} & \textbf{Remediation
+ Tier} \\
+@@ -352,22 +168,18 @@
+ Signals: rising hallucination rate on new entities, outdated policy citations.
+ Kirkpatrick Level 4 (Results). &
+ Tier 2: Retrieval / RAG update \\
+-\addlinespace
+ Input Brittleness &
+ Strong on modal inputs, catastrophic on a specific subclass. Signals: bimodal
+ CSAT, failure clustering by segment or topic. Level 2 (Learning/Capability). &
+ Tier 1 (examples) or Tier 3 (fine-tune) \\
+-\addlinespace
+ Alignment Creep &
+ Subtle drift in tone, value expression, or policy compliance. Signals: rising
+ review flags, brand guideline violations. Level 3 (Behavior). &
+ Tier 1: Prompt constraint injection \\
+-\addlinespace
+ Tool Misuse &
+ Correct intent, incorrect tool invocation. Signals: action errors, silent
+ downstream failures. Level 3 (Behavior). &
+ Tier 1 (prompt) or Tier 3 (fine-tune) \\
+-\addlinespace
+ Exogenous Disruption &
+ Peer agents degrade after a mesh change event; no intrinsic mode found in them.
+ Signals: degradation concentrated in peer roles, onset at a mesh-composition
+@@ -430,11 +242,7 @@
+   \scriptsize
+   \setlength{\fboxsep}{2pt}
+   \fbox{1. Trigger}\,$\rightarrow$\,\fbox{2. Attribution}\,$\rightarrow$\,\fbox{3. Plan}\,$\rightarrow$\,\fbox{4. Window}\,$\rightarrow$\,\fbox{5. Exit}
+-  \caption{The five-phase APIP lifecycle. A two-gate contract breach opens a
+-  cycle; attribution returns a failure mode or abstains rather than guess a
+-  tier; the matched tier runs in a bounded window with check-ins at 25/50/75\%;
+-  exit is \code{resolved}, \code{timeout}, \code{regressed},
+-  \code{recalibrated}, or \code{retired}, and a re-breach reopens Phase~1.}
++  \caption{The five-phase APIP lifecycle. A two-gate breach opens a cycle; attribution returns a mode or abstains; the matched tier runs in a bounded window; exit is one of five states, and a re-breach reopens Phase~1.}
+   \label{fig:lifecycle}
+ \end{figure}
+ 
+@@ -636,7 +444,7 @@
+ dash is a quantity that does not exist, not one withheld.}
+ \label{tab:baselines}
+ \centering
+-\footnotesize
++\scriptsize
+ \begin{tabular}{@{}lcccccl@{}}
+ \toprule
+ \textbf{Cond.} & \textbf{Det.} & \textbf{Act} & \textbf{Exit} & \textbf{TTR} &
+@@ -761,20 +569,14 @@
+ in every run manifest, and all runs, traces, and the frozen mapping table are
+ released.
+ 
+-A hosted backbone, however, is not a pinnable dependency, and this limitation is
+-not hypothetical here. The provider serving our backbone deprecated it on
+-2026-09-03, one day after the reported cells ran; the model remains listed by the
+-provider's catalogue endpoint but returns \code{model\_not\_found} on inference.
+-Re-running these cells on the successor the provider named was not possible
+-either: it exhausted the step budget on every episode we attempted, returning no
+-completed task. Executing the same seed, contract, mapping table, and injection
+-schedule against the same weights served by a different vendor produced no
+-degradation at all---the agent stated no policy facts in any post-injection tick,
+-so the stale corpus had nothing to corrupt, and no cycle opened, a second
+-non-manifestation alongside the one reported in Section~\ref{sec:taubench}. We
+-therefore cannot say whether the trajectory in Table~\ref{tab:baselines} would
+-reproduce, because the configuration that produced it no longer exists and the
+-available substitutes do not exhibit the precondition the injection requires. A
++A hosted backbone, however, is not a pinnable dependency, and the problem is
++not hypothetical here. The provider deprecated our backbone on 2026-09-03, one
++day after the reported cells ran. Its named successor exhausted the step budget
++on every episode attempted, and the same weights served by a different vendor,
++on the same seed, contract, mapping table, and schedule, stated no policy facts
++in any post-injection tick, so the stale corpus had nothing to corrupt and no
++cycle opened: a second non-manifestation alongside Section~\ref{sec:taubench}.
++We therefore cannot say whether Table~\ref{tab:baselines} would reproduce; a
+ manifest that pins a model by provider and name records what was asked for, not
+ what will answer.
+ 
+@@ -863,37 +665,20 @@
+ 
+ \section*{Declaration on Generative AI}
+ 
+-During the preparation of this work, the authors used Claude (Anthropic) for
+-grammar correction and language editing, and for drafting initial prose in
+-Sections~IV and~V that the authors substantially revised. No AI
+-system was used to generate results, analysis, or references. After using this
+-tool, the authors reviewed and edited the content as needed and take full
+-responsibility for the content of the publication.
++The authors used Claude (Anthropic) for language editing and for drafting initial prose in Sections~IV and~V, which they substantially revised. No AI system generated results, analysis, or references; the authors take full responsibility for the content.
+ 
+ \begin{thebibliography}{99}
+ \scriptsize
+ 
+ \bibitem{liang2022}
+-P. Liang \emph{et al.}, ``Holistic evaluation of language models,'' arXiv
+-preprint arXiv:2211.09110, 2022.
+-
+-\bibitem{ganguli2022}
+-D. Ganguli \emph{et al.}, ``Red teaming language models to reduce harms:
+-Methods, scaling behaviors, and lessons learned,'' arXiv preprint
+-arXiv:2209.07858, 2022.
+-
+-\bibitem{ouyang2022}
+-L. Ouyang \emph{et al.}, ``Training language models to follow instructions with
+-human feedback,'' \emph{Advances in Neural Information Processing Systems},
+-vol.~35, 2022.
++P. Liang \emph{et al.}, ``Holistic evaluation of language models,'' arXiv:2211.09110, 2022.
+ 
+ \bibitem{datarobot2026}
+ DataRobot, ``The unmet AI needs survey 2026,'' 2026. [Online]. Available:
+ \url{https://www.datarobot.com/resources/unmet-ai-needs-survey-2026/}
+ 
+ \bibitem{pan2025}
+-M. Z. Pan \emph{et al.}, ``Measuring agents in production,'' arXiv preprint
+-arXiv:2512.04123, 2025.
++M. Z. Pan \emph{et al.}, ``Measuring agents in production,'' arXiv:2512.04123, 2025.
+ 
+ \bibitem{euaiact}
+ European Parliament and Council, ``Regulation on artificial intelligence (EU AI
+@@ -905,26 +690,23 @@
+ 
+ \bibitem{cemri2025}
+ M. Cemri, M. Z. Pan, S. Yang \emph{et al.}, ``Why do multi-agent LLM systems
+-fail?'' arXiv preprint arXiv:2503.13657, 2025.
++fail?'' arXiv:2503.13657, 2025.
+ 
+ \bibitem{kartik2025}
+ N. V. J. K. Kartik, G. Sapra, R. Hada, and N. Pareek, ``AgentCompass: Towards
+-reliable evaluation of agentic workflows in production,'' arXiv preprint
+-arXiv:2509.14647, 2025.
++reliable evaluation of agentic workflows in production,'' arXiv:2509.14647, 2025.
+ 
+ \bibitem{rath2026}
+ A. Rath, ``Agent drift: Quantifying behavioral degradation in multi-agent LLM
+-systems over extended interactions,'' arXiv preprint arXiv:2601.04170, 2026.
++systems over extended interactions,'' arXiv:2601.04170, 2026.
+ 
+ \bibitem{zhu2026}
+ K. Zhu, X. Ye, Z. Han \emph{et al.}, ``AgentDebugX: An open-source toolkit for
+-failure observability, attribution, and recovery in LLM agents,'' arXiv
+-preprint arXiv:2607.18754, 2026.
++failure observability, attribution, and recovery in LLM agents,'' arXiv:2607.18754, 2026.
+ 
+ \bibitem{verma2026}
+ S. Verma, P. Prasun, and P. Kumar, ``RAIL Guard: Closing the
+-evaluation-to-remediation gap in responsible AI for LLM agents,'' arXiv preprint
+-arXiv:2607.16215, 2026.
++evaluation-to-remediation gap in responsible AI for LLM agents,'' arXiv:2607.16215, 2026.
+ 
+ \bibitem{kirkpatrick2016}
+ J. D. Kirkpatrick and W. K. Kirkpatrick, \emph{Kirkpatrick's Four Levels of
+@@ -936,11 +718,10 @@
+ 
+ \bibitem{greenblatt2023}
+ R. Greenblatt, B. Shlegeris, K. Sachan, and F. Roger, ``AI control: Improving
+-safety despite intentional subversion,'' arXiv preprint arXiv:2312.06942, 2023.
++safety despite intentional subversion,'' arXiv:2312.06942, 2023.
+ 
+ \bibitem{bhatt2025}
+-A. Bhatt \emph{et al.}, ``Ctrl-Z: Controlling AI agents via resampling,'' arXiv
+-preprint arXiv:2504.10374, 2025.
++A. Bhatt \emph{et al.}, ``Ctrl-Z: Controlling AI agents via resampling,'' arXiv:2504.10374, 2025.
+ 
+ \bibitem{terekhov2025}
+ M. Terekhov \emph{et al.}, ``Adaptive attacks on trusted monitors subvert AI
+@@ -959,8 +740,7 @@
+ 
+ \bibitem{ma2025attribution}
+ G. Ma \emph{et al.}, ``Automatic failure attribution and critical step
+-prediction method for multi-agent systems based on causal inference,'' arXiv
+-preprint arXiv:2509.08682, 2025.
++prediction method for multi-agent systems based on causal inference,'' arXiv:2509.08682, 2025.
+ 
+ \bibitem{zhang2025}
+ S. Zhang \emph{et al.}, ``Which agent causes task failures and when? on
+@@ -969,12 +749,11 @@
+ 
+ \bibitem{agenttrace2026}
+ Z. G. Wang, ``AgentTrace: Causal graph tracing for root cause analysis in
+-deployed multi-agent systems,'' arXiv preprint arXiv:2603.14688, 2026.
++deployed multi-agent systems,'' arXiv:2603.14688, 2026.
+ 
+ \bibitem{barres2025}
+ V. Barres, H. Dong, S. Ray, X. Si, and K. Narasimhan, ``$\tau^2$-bench:
+-Evaluating conversational agents in a dual-control environment,'' arXiv
+-preprint arXiv:2506.07982, 2025.
++Evaluating conversational agents in a dual-control environment,'' arXiv:2506.07982, 2025.
+ 
+ \bibitem{qian2024}
+ C. Qian, W. Liu, H. Liu \emph{et al.}, ``ChatDev: Communicative agents for
+@@ -983,11 +762,10 @@
+ 
+ \bibitem{coffeebench2026}
+ I. Sugiura \emph{et al.}, ``CoffeeBench: Benchmarking long-horizon LLM agents in
+-heterogeneous multi-agent economies,'' arXiv preprint arXiv:2606.16613, 2026.
++heterogeneous multi-agent economies,'' arXiv:2606.16613, 2026.
+ 
+ \bibitem{kim2025}
+-Y. Kim \emph{et al.}, ``Towards a science of scaling agent systems,'' arXiv
+-preprint arXiv:2512.08296, 2025.
++Y. Kim \emph{et al.}, ``Towards a science of scaling agent systems,'' arXiv:2512.08296, 2025.
+ 
+ \bibitem{shrm2023}
+ A. Smith, ``PIPs: Write, implement and time them precisely,'' Society for Human
