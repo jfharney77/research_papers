@@ -216,8 +216,8 @@ Regulation increasingly requires documentation, oversight, and traceability.
 The EU AI Act \cite{euaiact} mandates post-market monitoring and record-keeping to support ongoing compliance, incident investigation, and corrective action,
 while Chan et al.\ \cite{chan2024} argue that accountability for AI agents depends on
 visibility mechanisms including agent identifiers, real-time monitoring, and activity logging that can link actions to specific agents and responsible actors.
-The schema's \code{apip\_id}, \code{agent\_id}, \code{owner}, and
-\code{exit\_evaluated\_at} fields operationalize that linkage.
+The record's \code{record\_id}, \code{agent\_id}, \code{contract\_id}, and
+\code{exit\_outcome} fields operationalize that linkage.
 
 \section{A Taxonomy of Agent Failure Modes}
 \label{sec:taxonomy}
@@ -435,18 +435,17 @@ organizational audit trail.
 \subsection{The APIP Record as a Declarative Schema}
 \label{sec:schema}
 
-Each APIP is recorded as an instance of a declarative schema (full
-specification in supplementary material). Four field groups carry design
-weight. \code{behavioral\_contract\_ref} forces a contract to exist at
-deployment time; without one, trigger and exit cannot be operationalized at
-all. \code{kirkpatrick\_levels} captures check-in data at every level, so
-superficial and durable improvement can be separated after the fact.
-\code{mapping\_table\_hash} and \code{environment\_provenance} extend the
-visibility mechanisms of Chan et al.\ \cite{chan2024} from agents and operators
-to decision rules: an auditor can recompute the hash, compare it against the
-run manifest, and establish which attribution rules and environment versions
-were in force. Pre-registration then becomes a property an auditor can check.
-\code{mesh\_context} (Section~\ref{sec:mesh}) supports multi-agent attribution.
+Each APIP is recorded as an instance of a declarative schema, released with
+the runs. Three field groups carry design weight. \code{contract\_id} forces a
+contract to exist at deployment time; without one, trigger and exit cannot be
+operationalized at all. \code{regression\_ticks} and \code{exit\_outcome}
+record whether an apparent recovery held, so superficial and durable
+improvement can be separated after the fact. \code{mapping\_table\_sha256}
+and \code{contract\_sha256} extend the visibility mechanisms of Chan et al.\
+\cite{chan2024} from agents and operators to decision rules: an auditor can
+recompute the hash, compare it against the run manifest, and establish which
+attribution rules and environment versions were in force. Pre-registration then
+becomes a property an auditor can check.
 
 \section{Evaluation in Two Live Multi-Agent Environments}
 \label{sec:evaluation}
