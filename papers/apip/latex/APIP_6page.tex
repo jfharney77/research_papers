@@ -295,18 +295,20 @@ abstentions are logged and scored rather than silently assigned a category.
 \section{The APIP Framework}
 \label{sec:framework}
 
-The APIP is a lifecycle protocol of five phases: Trigger, Cause Attribution,
-Intervention Planning, Remediation Window, and Exit Evaluation. A two-gate
-breach opens a cycle; attribution returns a failure mode or abstains; the
-matched tier runs in a bounded window; and exit is one of five states, a
-re-breach reopening Phase~1.
+The APIP is a lifecycle protocol of five phases: Trigger, Cause Attribution, Intervention Planning, 
+Remediation Window, and Exit Evaluation. 
+A cycle opens only when degradation clears both an effect-size threshold and a
+multiplicity-corrected significance test. Attribution then returns a failure
+mode or abstains, the matched intervention tier runs within a bounded window,
+and exit is one of five states, with a subsequent re-breach reopening
+Phase~1.
 
 \subsection{Phase 1: Trigger}
 \label{sec:trigger}
 
 An APIP initiates when performance crosses a trigger threshold on monitored
-metrics. This presupposes a \emph{behavioral contract}: a formal specification,
-written at deployment time, of task surface, success metrics and measurement
+metrics. This presupposes a \emph{behavioral contract}. The contract is a formal specification
+written at deployment time. It describes the task surface, success metrics, measurement
 methodology, acceptable ranges, escalation policy, and human review points. In
 our experience such contracts are rarely written, and expectations are left to
 informal organizational memory.
