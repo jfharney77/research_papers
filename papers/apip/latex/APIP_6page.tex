@@ -392,9 +392,8 @@ to much input brittleness. \textbf{Tier 2 (retrieval and context)} covers RAG
 index updates, knowledge-base revisions, and tool schema fixes, with contract
 validation before re-deployment. It addresses drift arising from world-state
 divergence.
-\textbf{Tier 3 (model-level)} is fine-tuning, DPO, or replacement. It carries
-the highest cost and the highest regression risk, and is warranted only when
-lower tiers are exhausted or the failure mode is embedded in model weights.
+\textbf{Tier 3 (model-level)} covers fine-tuning, DPO, or replacement when
+lower tiers are exhausted or failure is embedded in model weights.
 
 \subsection{Phase 4: Remediation Window and Check-In Cadence}
 
