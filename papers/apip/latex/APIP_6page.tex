@@ -266,9 +266,7 @@ We propose a five-category remediation taxonomy for deployed AI agents
 these categories represent actionable degradation causes used to select an
 intervention locus. Classification follows that locus, not the surface
 symptom: a stale tool schema invoked incorrectly is world-state divergence,
-and attribution \code{abstain}s when the locus is unresolved. The locus names
-the tier: prompt (1), context/tool (2), model (3); see
-Section~\ref{sec:tiers}.
+and attribution \code{abstain}s when the locus is unresolved.
 Four modes are intrinsic: \emph{behavioral drift}, \emph{input brittleness}, \emph{alignment creep}, and \emph{tool misuse}. 
 The fifth is \emph{mesh disruption} (\code{exogenous\_disruption}), which
 differs from the other four in being exogenous: the failing agent is not the
@@ -501,12 +499,11 @@ because its knowledge base was never re-indexed, with the deterministic
 database scoring every action objectively.
 
 \begin{table}[t]
-\caption{$\tau^2$-bench drift cell (seed 13), all four conditions on one
-injection schedule and task stream. Columns are ticks: Det.\ the two-gate
-breach, Act the intervention, Exit the exit evaluation, TTR${}={}$Exit${}-{}$Det.
-Undiagnosed's TTR is listed per cycle: three closed in 2, 4, and 2 ticks against
-APIP's 12, and each was undone within ten ticks. Its speed is its failure mode. An
-n/a is a quantity that does not exist.}
+\caption{$\tau^2$-bench drift cell, seed 13. All four conditions run on one
+injection schedule and task stream. Columns are ticks. Det.\ is the two-gate
+breach, Act the intervention, Exit the exit evaluation, and
+TTR${}={}$Exit${}-{}$Det. Undiagnosed's TTR is listed per cycle. An n/a marks a
+quantity that does not exist.}
 \label{tab:baselines}
 \centering
 \scriptsize
