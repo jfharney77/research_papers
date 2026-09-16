@@ -100,20 +100,22 @@ The Case for Agent Performance Improvement Plans}
 \maketitle
 
 \begin{abstract}
-Agents degrade in production, and unlike pre-release evaluation the response
-has no standard form. We present the Agent Performance Improvement Plan (APIP),
-which adapts the management protocol for underperforming employees into a
-remediation lifecycle: triggers on a behavioral contract, cause attribution
-over five in-scope failure-mode categories, tiered interventions, a bounded
-window with formal exit criteria, and a declarative record for governance. We
-evaluate it in two live multi-agent environments ($\tau^2$-bench and ChatDev),
-injecting failure modes with known ground truth and scoring against no-action,
-undiagnosed, and oracle baselines. In the primary drift cell, only
-APIP and the oracle exit durably; the undiagnosed responder patches four
-times, regresses three times, and ends indistinguishable from no action, so
-time-to-resolution without a durability criterion rewards the worst strategy.
-Attribution is correct in all three non-abstaining cycles. A null result on
-mesh insertion suggests mesh disruption requires a bounded shared context.
+AI agents degrade after deployment, yet unlike pre-release evaluation the
+response has no standard form. We present the Agent Performance Improvement
+Plan (APIP), a post-deployment remediation lifecycle adapting the management
+protocol for underperforming employees. APIP combines behavioral-contract
+triggers, remediation-oriented attribution, tiered interventions, bounded
+windows with formal exit criteria, and a declarative governance record. We
+evaluate APIP in two live multi-agent environments, $\tau^2$-bench and ChatDev,
+injecting failure modes with known ground truth. In the primary drift cell only
+APIP and an oracle exited durably; an undiagnosed responder patched four times,
+regressed three times, and timed out despite appearing superior under
+per-cycle time-to-resolution. Of four APIP cycles, three attributed and all
+three matched injected ground truth. Mesh insertion produced no peer
+degradation, suggesting bounded shared context may be a precondition for mesh
+disruption. Post-deployment remediation should therefore be a governed
+lifecycle where recovery requires durable return to contract, not intervention
+completion or speed.
 \end{abstract}
 
 \begin{IEEEkeywords}
