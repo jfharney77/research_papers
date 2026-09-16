@@ -263,7 +263,7 @@ Mesh protocol (Sec.~\ref{sec:mesh}), not an agent-level tier \\
 \end{tabular}
 \end{table}
 
-We propose a five-category remediation taxonomy for customer-facing agents
+We propose a five-category remediation taxonomy for deployed AI agents
 (Table~\ref{tab:taxonomy}). Unlike trace-level failure taxonomies such as MAST \cite{cemri2025}, 
 these categories represent actionable degradation causes used to select an
 intervention locus. Classification follows that locus, not the surface
@@ -335,10 +335,9 @@ a calibration window as mean $\pm\,k\sigma$, with $k$ reported, which preempts
 the objection that thresholds were chosen so that triggers would fire where
 desired.
 
-%Even then, a single-gate rule---a rolling mean against the derived
-%floor---breached in 75\% of clean, zero-injection runs across the 15--25
-%metrics and disaggregated splits a realistic contract monitors.
-Even then, a single-gate rule using a rolling mean against the derived floor breached in 75% of clean, zero-injection runs across the 15--25 metrics and disaggregated splits monitored by a realistic contract.
+Even then, a single-gate rule compares a rolling mean against the derived
+floor. It breached in 75\% of clean, zero-injection runs across the 15--25
+metrics and disaggregated splits monitored by a realistic contract.
 There are two causes for this.  First, a small calibration sample is treated as exact, 
 and second, the repeated tests are uncorrected. A breach must therefore pass two gates. The degradation
 must be at least the contract's $k\sigma$, so that it is practically meaningful, and it must survive Benjamini--Hochberg adjustment, which controls the false discovery rate across the family of monitored metrics. 
