@@ -27,4 +27,6 @@ papers/**/*.pdf
 # ...except the vendored author kits, which ship reference PDFs
 !templates/latex/_vendor/**
 !templates/bibtex/**
+# ...and the as-submitted / camera-ready PDFs, which are the record of what went to the venue
+!papers/*/submissions/*.pdf
 papers/apip/latex/APIP_6page.pdf

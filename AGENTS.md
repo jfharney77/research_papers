@@ -1,20 +1,73 @@
 # AGENTS.md — Research Paper Workspace (handoff)
 
-Context doc for the next agent/session. For day-to-day working guidance see `CLAUDE.md`;
-for end-user docs see `docs/guides/MANUAL.md`, `README.md`, and `docs/guides/DEPLOY-AWS.md`.
+Context doc for the next agent or session, whichever tool runs it (Claude Code, Devin, Codex,
+Cursor, a human). `CLAUDE.md` is the Claude Code copy of the day-to-day working guidance and
+is kept in sync with this file; if you are not Claude Code, read `CLAUDE.md` too, it has the
+build commands and layout rules. End-user docs: `docs/guides/MANUAL.md`, `README.md`,
+`docs/guides/DEPLOY-AWS.md`.
+
+Ground rules for any agent:
+- Work on **`devel-apip-6page`** unless told otherwise. Do not push to or merge into `main`
+  without being asked.
+- Run `uv run --group dev pytest` and `npm run build` (in `web/`) before claiming product code works.
+- Commit with a one-line subject in the existing style (`APIP 6-page: …` for paper edits).
+- The repo has two remotes: `origin` (GitHub) and `gitlab`. Push to `origin` unless told otherwise.
 
 ## What this project is
 A **Word → LaTeX product**: upload a `.docx`, convert it to per-section LaTeX, build a
 conference PDF (IEEE / NeurIPS / ACM / AAAI), edit + recompile, export, and **critique** the
-writing. Web UI + CLI + REST API. The unrelated **APIP research** paper and simulation live under
-`research/` and are not part of the product.
+writing. Web UI + CLI + REST API. The **APIP research** paper lives under `papers/apip/` and its
+simulation under `sims/apip_sim/`; they are research content, not part of the product, and since
+2026-09 they are where the active work is.
 
-## Current status (2026-06-28)
-- **Branch:** `devel-apip-fullfeatures` (this is where all the work lives; never merged to `main`).
-  There are **unpushed commits** on it — push when ready.
-- **Working tree:** `docs/specs/CRITIQUE_SPEC_5.md` is a design note added outside a session.
-- **Health:** Python test suite (`uv run --group dev pytest`) and the web build (`npm run build`)
-  were green as of the last feature work; both container images build and run under Podman.
+## Current status (2026-10-22)
+- **Branch:** `devel-apip-6page`. It contains `main`, `devel-apip-fullfeatures`, and
+  `devel-apip-testbeds`; the `devel-reorg` restructuring is folded in (that local branch is gone;
+  `origin/devel-reorg` still exists). `main` holds only the initial commit. There were **5
+  unpushed commits** on `devel-apip-6page` at the time of writing, including the ICA 2026 note.
+- **Working tree:** `IMPROVEMENT_SPEC_2026-09-11.md` at the repo root is untracked; it is a
+  repo-wide improvement list (merge the devel branches, sandbox-escape tests, …). Decide whether
+  to commit it or move it under `docs/specs/`.
+- **Other branches:** `devel-apip-6page-seeds` (seed experiments), `devel-mesh-disruption`
+  (a worktree, see `git worktree list`), `devel`, and on `origin` also `devel-apip` and
+  `devel-apip-word2l`. None are merged.
+- **Health:** Python test suite and web build were green as of the last product work (2026-08);
+  no product code has changed since. Re-run both before touching `src/` or `web/`.
+
+## The APIP paper (current focus)
+The paper is "APIP" (an agent performance improvement protocol for agentic AI failure modes),
+targeted at IEEE conference format. Two LaTeX versions exist under `papers/apip/latex/`:
+
+| File | What it is | How to build |
+| --- | --- | --- |
+| `APIP_6page.tex` → `APIP_6page.pdf` | **The current version.** 6 pages, single self-contained file with an inline `thebibliography` (23 `\bibitem`s). Last edited 2026-09-15 (`bf572bd`). | `cd papers/apip/latex && pdflatex APIP_6page.tex && pdflatex APIP_6page.tex` |
+| `main.tex` + `sections/` → `main.pdf` | The older 11-page per-section conversion of the Word manuscript. | `bash scripts/papers/apip/build.sh` |
+| `APIP_full.tex`, `APIP_6page_SUBMIT*.tex` | Frozen snapshots (2026-09-03 and 2026-09-11). Do not edit. | same as 6-page |
+
+Tag `apip-6page-singleseed-2026-09-13` (`49db339`) freezes the single-seed state of the paper
+before the replication campaign.
+
+Companion documents, read these before editing the paper:
+- `papers/apip/CRITIQUE_2026-09-13.md` — adversarial review with keyed remedies
+  (C1–C6 critical, M1–M11 major, D/P moderate). The 6-page commit log references these IDs
+  ("closes D13", "C3's abstract half"), so check which are still open before re-raising one.
+- `papers/apip/PREREGISTRATION_2026-09-14.md` — pre-registered seeds (21, 22, 23 for drift;
+  13 for tool misuse) for the τ²-bench replication. All three drift seeds must be reported.
+- `papers/apip/APIP_critique_revised_with_ChatGPT_additions.md` — earlier critique round.
+- `papers/apip/manuscript/` — the Word sources; `papers/apip/deck/` — the slide deck.
+- Run records referenced by the paper live outside this repo (sibling `../apip_simulations`
+  and a Windows backup path named in the pre-registration).
+
+Last run of edits (2026-09-10 to 09-15): abstract rewrite, Tier 3 compression to get back to
+6 pages, and a widened generative-AI disclosure that now names ideation, compression, and the
+model used.
+
+**Venue: IEEE ICA 2026** (International Conference on Agentic AI, Kumamoto, Dec 14-17).
+The paper was **submitted and accepted** as paper #238. The as-submitted PDF is archived at
+`papers/apip/submissions/ICA2026_paper_238_submitted.pdf` (double-blind author block; built
+from `APIP_6page.tex` at or near `bf572bd`). **Camera-ready is due 2026-11-01**; see
+`docs/research/conferences2026/ICA.md`. Keep every submitted or camera-ready PDF in
+`papers/apip/submissions/` (the `.gitignore` exempts that folder from the paper-PDF rule).
 
 ## What's been built (session arc, newest concepts last)
 1. **Dynamic template selection** — backend registry (`src/docbuilder/templates.py`) discovers
@@ -71,11 +124,20 @@ Deploy: follow `docs/guides/DEPLOY-AWS.md` (ECR + two ECS roles + OIDC role → 
   `LATEX_AUTO_INSTALL`, `CRITIC_PROVIDER`, `ANTHROPIC_API_KEY` (see `docs/guides/MANUAL.md` §7).
 
 ## Open items / suggested next steps
-- **Push** the unpushed commits on `devel-apip-fullfeatures`; consider a PR → `main`.
+- **Paper (now):** camera-ready for ICA 2026 by 2026-11-01. Replace the double-blind author
+  block with real `\IEEEauthorblockN`/`\IEEEauthorblockA` entries, apply the reviewer-driven
+  edits (the iteration in progress), re-check the IEEE camera-ready checklist (copyright
+  notice, page limit, PDF eXpress if required), and save the final PDF to
+  `papers/apip/submissions/`.
+- **Paper:** add a `scripts/papers/apip/build_6page.sh` wrapper (or teach `build.sh` a `--src`
+  for the single-file version) so the 6-page build is not a manual `pdflatex` invocation.
+- **Repo:** push `devel-apip-6page`; act on `IMPROVEMENT_SPEC_2026-09-11.md` item 1 (merge or
+  retire the devel branches so `main` matches the documented layout).
 - Review/triage the `docs/specs/CRITIQUE_SPEC*.md` notes (1–5) and reconcile with the implemented Critic.
 - Smoke-test the real `docker build` + a live **Claude** critique end-to-end on AWS (only the
   offline `stub` provider was exercised locally).
 - Reference extraction (`refextract.py`) is recent — confirm it's covered by tests.
+- Sandbox-escape tests for `src/docbuilder/sandbox.py` (spec item 2 in the improvement spec).
 
 ## Cross-project note (this session, outside research_papers)
 - A tailored `POWERPOINT_SPEC.md` (now `docs/specs/POWERPOINT_SPEC.md`) was created in **16 top-level `fable5` projects** (create-only,

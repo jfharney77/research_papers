@@ -2,14 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Status & session summary (2026-08-14)
+## Status & session summary (2026-10-22)
 
-> Full handoff: see **`AGENTS.md`**. User docs: `docs/guides/MANUAL.md`, `README.md`,
-> `docs/guides/DEPLOY-AWS.md`.
+> Full handoff: see **`AGENTS.md`** (written for any coding agent: Claude Code, Devin, Codex, etc.).
+> User docs: `docs/guides/MANUAL.md`, `README.md`, `docs/guides/DEPLOY-AWS.md`.
 
-Work lives on **`devel-apip-fullfeatures`** and **`devel-reorg`** (neither merged to `main`).
-`devel-reorg` restructured the repo into the four content areas described below. The product
-(Word → LaTeX workspace) is feature-complete and tested.
+Current work lives on **`devel-apip-6page`** (contains `main`, `devel-apip-fullfeatures`, and
+`devel-apip-testbeds`; `devel-reorg` was folded in and its local branch deleted). Nothing is
+merged to `main`, which still holds only the initial commit. The product (Word → LaTeX
+workspace) is feature-complete and tested; since 2026-09 the active work is the **APIP paper**
+itself, not the product.
+
+**The APIP paper was accepted at IEEE ICA 2026** (paper #238). The as-submitted PDF is
+`papers/apip/submissions/ICA2026_paper_238_submitted.pdf`. **Next step: camera-ready, due
+2026-11-01** (de-anonymize the author block, apply reviewer-driven edits).
+
+**Latest paper version:** `papers/apip/latex/APIP_6page.tex` → `APIP_6page.pdf` (6 pages, IEEE
+conference format, last edited 2026-09-15; the source of the submitted PDF). It is a self-contained single `.tex` file with an
+inline `thebibliography`; compile it with `pdflatex` run twice from inside `papers/apip/latex/`.
+The `build.sh` wrapper builds the older 11-page `main.tex`, not the 6-page version.
+Supporting docs sit beside it: `papers/apip/CRITIQUE_2026-09-13.md` (adversarial review, keyed
+remedies C1–C6, M1–M11, …), `papers/apip/PREREGISTRATION_2026-09-14.md` (seed pre-registration
+for the τ²-bench replication), and `IMPROVEMENT_SPEC_2026-09-11.md` at the repo root (untracked
+repo-wide improvement list).
 
 Built so far: **dynamic template selection** · **section editing + recompile + build-log** ·
 **LaTeX `.zip` export** · **sandboxed LaTeX build + API-key auth + scoped CORS** · **the Critic**
@@ -149,3 +164,5 @@ Submission info and deadlines are tracked in `docs/research/conferences2026/`. K
 - **ICDM 2026:** Paper deadline 2026-06-06
 - **ICKG 2025:** Submission 2025-07-04
 - **IEEE Big Data 2026:** Submission 2026-08-21
+- **IEEE ICA 2026** (International Conference on Agentic AI, Kumamoto, Dec 14-17): APIP paper
+  **accepted** (#238); camera-ready due 2026-11-01. See `docs/research/conferences2026/ICA.md`.

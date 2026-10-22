@@ -5,9 +5,11 @@ conference style.
 
 ```
 manuscript/   the .docx versions and the New_Hire_Paradox.md draft
-latex/        main.tex + sections/ + vendored IEEE style files  ← the build target
+latex/        main.tex + sections/ + vendored IEEE style files, plus the
+              single-file APIP_6page.tex (the current version)
 figures/      figures for this paper (referenced by bare filename)
 deck/         APIP_Deck_v1.pptx
+submissions/  PDFs as sent to venues (ICA 2026 paper #238, accepted)
 ```
 
 The simulation behind the case study lives in `sims/apip_sim/`; start it with
