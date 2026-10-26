@@ -29,6 +29,8 @@ papers/**/*.pdf
 !templates/bibtex/**
 # ...and the as-submitted / camera-ready PDFs, which are the record of what went to the venue
 !papers/*/submissions/*.pdf
+# ...and figure PDFs built from their TikZ sources
+!papers/*/figures/*.pdf
 papers/apip/latex/APIP_6page.pdf
 
 # Reviewer comments are private to the authors; never commit them
