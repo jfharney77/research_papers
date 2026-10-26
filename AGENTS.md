@@ -7,8 +7,8 @@ build commands and layout rules. End-user docs: `docs/guides/MANUAL.md`, `README
 `docs/guides/DEPLOY-AWS.md`.
 
 Ground rules for any agent:
-- Work on **`devel-apip-6page`** unless told otherwise. Do not push to or merge into `main`
-  without being asked.
+- Work on **`devel-apip-camera-ready`** unless told otherwise. `devel-apip-6page` is frozen at
+  the submitted version; do not edit it. Do not push to or merge into `main` without being asked.
 - Run `uv run --group dev pytest` and `npm run build` (in `web/`) before claiming product code works.
 - Commit with a one-line subject in the existing style (`APIP 6-page: …` for paper edits).
 - The repo has two remotes: `origin` (GitHub) and `gitlab`. Push to `origin` unless told otherwise.
@@ -20,11 +20,12 @@ writing. Web UI + CLI + REST API. The **APIP research** paper lives under `paper
 simulation under `sims/apip_sim/`; they are research content, not part of the product, and since
 2026-09 they are where the active work is.
 
-## Current status (2026-10-22)
-- **Branch:** `devel-apip-6page`. It contains `main`, `devel-apip-fullfeatures`, and
+## Current status (2026-10-25)
+- **Branch:** `devel-apip-camera-ready`, created 2026-10-25 from `devel-apip-6page` (`08e26f7`)
+  for the ICA 2026 camera-ready revision. `devel-apip-6page` is the submission branch and is
+  frozen; it is pushed to `origin`. Both contain `main`, `devel-apip-fullfeatures`, and
   `devel-apip-testbeds`; the `devel-reorg` restructuring is folded in (that local branch is gone;
-  `origin/devel-reorg` still exists). `main` holds only the initial commit. There were **5
-  unpushed commits** on `devel-apip-6page` at the time of writing, including the ICA 2026 note.
+  `origin/devel-reorg` still exists). `main` holds only the initial commit.
 - **Working tree:** `IMPROVEMENT_SPEC_2026-09-11.md` at the repo root is untracked; it is a
   repo-wide improvement list (merge the devel branches, sandbox-escape tests, …). Decide whether
   to commit it or move it under `docs/specs/`.
@@ -63,11 +64,18 @@ Last run of edits (2026-09-10 to 09-15): abstract rewrite, Tier 3 compression to
 model used.
 
 **Venue: IEEE ICA 2026** (International Conference on Agentic AI, Kumamoto, Dec 14-17).
-The paper was **submitted and accepted** as paper #238. The as-submitted PDF is archived at
-`papers/apip/submissions/ICA2026_paper_238_submitted.pdf` (double-blind author block; built
-from `APIP_6page.tex` at or near `bf572bd`). **Camera-ready is due 2026-11-01**; see
-`docs/research/conferences2026/ICA.md`. Keep every submitted or camera-ready PDF in
-`papers/apip/submissions/` (the `.gitignore` exempts that folder from the paper-PDF rule).
+
+| Milestone | Date | State in this repo |
+| --- | --- | --- |
+| Abstract deadline | 2026-09-08 | done |
+| Paper submitted | 2026-09-15 (the deadline) | `papers/apip/submissions/ICA2026_paper_238_submitted.pdf`; source `APIP_6page.tex` @ `bf572bd` on `devel-apip-6page` |
+| Accepted | notified by 2026-10-15 | paper #238 |
+| **Camera-ready due** | **2026-11-01** | in progress on `devel-apip-camera-ready`; final PDF goes to `papers/apip/submissions/ICA2026_paper_238_camera_ready.pdf` |
+| Conference | 2026-12-14 to 17 | one-slide summary at `papers/apip/deck/APIP_ICA2026_summary.pptx` |
+
+The submitted PDF carries the double-blind author block. Keep every submitted or camera-ready
+PDF in `papers/apip/submissions/` (the `.gitignore` exempts that folder from the paper-PDF
+rule). To see what changed since submission: `git diff bf572bd -- papers/apip/latex/APIP_6page.tex`.
 
 ## What's been built (session arc, newest concepts last)
 1. **Dynamic template selection** — backend registry (`src/docbuilder/templates.py`) discovers
@@ -131,8 +139,8 @@ Deploy: follow `docs/guides/DEPLOY-AWS.md` (ECR + two ECS roles + OIDC role → 
   `papers/apip/submissions/`.
 - **Paper:** add a `scripts/papers/apip/build_6page.sh` wrapper (or teach `build.sh` a `--src`
   for the single-file version) so the 6-page build is not a manual `pdflatex` invocation.
-- **Repo:** push `devel-apip-6page`; act on `IMPROVEMENT_SPEC_2026-09-11.md` item 1 (merge or
-  retire the devel branches so `main` matches the documented layout).
+- **Repo:** push `devel-apip-camera-ready` as work lands; act on `IMPROVEMENT_SPEC_2026-09-11.md`
+  item 1 (merge or retire the devel branches so `main` matches the documented layout).
 - Review/triage the `docs/specs/CRITIQUE_SPEC*.md` notes (1–5) and reconcile with the implemented Critic.
 - Smoke-test the real `docker build` + a live **Claude** critique end-to-end on AWS (only the
   offline `stub` provider was exercised locally).
