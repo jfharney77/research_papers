@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 545" width="1800" height="545" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F2F4D"/>
+    </marker>
+    <marker id="arrDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+  <rect width="1800" height="545" fill="#FFFFFF"/>
+
+  <!-- Contract banner + bracket -->
+  <rect x="60" y="8" width="1680" height="30" fill="#EEF1F5" stroke="#1F2F4D" stroke-width="1.5"/>
+  <text x="900" y="29" font-size="17" font-weight="bold" text-anchor="middle" fill="#1F2F4D">Behavioral contract (written at deployment)</text>
+  <path d="M900,38 V52 M60,62 V52 H1740 V62" fill="none" stroke="#1F2F4D" stroke-width="1.5"/>
+
+  <!-- Feedback loop (dashed) -->
+  <path d="M1600,160 V100 H200 V158" fill="none" stroke="#444" stroke-width="1.8" stroke-dasharray="8,5" marker-end="url(#arrDash)"/>
+  <text x="900" y="92" font-size="15" font-style="italic" text-anchor="middle" fill="#333">re-breach reopens Phase 1</text>
+
+  <!-- Escalate arc (box 4 -> box 3) -->
+  <path d="M1250,158 C1250,118 900,118 900,158" fill="none" stroke="#1F2F4D" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="1075" y="122" font-size="15" font-style="italic" text-anchor="middle" fill="#1F2F4D">escalate tier</text>
+
+  <!-- Phase boxes -->
+  <rect x="60"   y="160" width="280" height="80" fill="#1F2F4D"/>
+  <rect x="410"  y="160" width="280" height="80" fill="#2D4F78"/>
+  <rect x="760"  y="160" width="280" height="80" fill="#35708F"/>
+  <rect x="1110" y="160" width="280" height="80" fill="#3A8EA3"/>
+  <rect x="1460" y="160" width="280" height="80" fill="#3FA3B8"/>
+  <g font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    <text x="200"  y="209">1. Trigger</text>
+    <text x="550"  y="195">2. Cause</text><text x="550" y="222">Attribution</text>
+    <text x="900"  y="195">3. Intervention</text><text x="900" y="222">Plan</text>
+    <text x="1250" y="195">4. Remediation</text><text x="1250" y="222">Window</text>
+    <text x="1600" y="195">5. Exit</text><text x="1600" y="222">Evaluation</text>
+  </g>
+
+  <!-- Forward arrows -->
+  <g stroke="#1F2F4D" stroke-width="1.8" marker-end="url(#arr)">
+    <line x1="342" y1="200" x2="406" y2="200"/>
+    <line x1="692" y1="200" x2="756" y2="200"/>
+    <line x1="1042" y1="200" x2="1106" y2="200"/>
+    <line x1="1392" y1="200" x2="1456" y2="200"/>
+  </g>
+
+  <!-- Captions -->
+  <g font-size="15" font-style="italic" fill="#222" text-anchor="middle">
+    <text x="200" y="266">Two gates: effect size ≥ kσ</text>
+    <text x="200" y="286">AND Benjamini–Hochberg</text>
+    <text x="200" y="306">significance; absolute floor</text>
+    <text x="200" y="326">+ relative drift</text>
+
+    <text x="550" y="266">Disaggregation signature +</text>
+    <text x="550" y="286">MAST labels, frozen mapping;</text>
+    <text x="550" y="306">returns failure mode or</text>
+    <text x="550" y="326">abstains</text>
+
+    <text x="900" y="266">Tier 1 prompt,</text>
+    <text x="900" y="286">Tier 2 retrieval/context,</text>
+    <text x="900" y="306">Tier 3 model-level</text>
+
+    <text x="1250" y="266">Bounded window; check-ins</text>
+    <text x="1250" y="286">at 25%, 50%, 75%; early</text>
+    <text x="1250" y="306">escalation if no improvement</text>
+
+    <text x="1600" y="266">Envelope re-measured,</text>
+    <text x="1600" y="286">not intervention log</text>
+  </g>
+
+  <!-- Exit outcome branching -->
+  <path d="M1720,240 V355 H895" fill="none" stroke="#1F2F4D" stroke-width="1.8"/>
+  <g stroke="#1F2F4D" stroke-width="1.8" marker-end="url(#arr)">
+    <line x1="895"  y1="355" x2="895"  y2="372"/>
+    <line x1="1085" y1="355" x2="1085" y2="372"/>
+    <line x1="1275" y1="355" x2="1275" y2="372"/>
+    <line x1="1465" y1="355" x2="1465" y2="372"/>
+    <line x1="1655" y1="355" x2="1655" y2="372"/>
+  </g>
+  <text x="790" y="400" font-size="15" font-style="italic" text-anchor="end" fill="#222">Exit outcomes:</text>
+  <g font-size="17" font-weight="bold" text-anchor="middle">
+    <rect x="810"  y="375" width="170" height="40" rx="20" fill="#2E7D32"/>
+    <text x="895"  y="401" fill="#FFFFFF">Resolved</text>
+    <rect x="1000" y="375" width="170" height="40" rx="20" fill="#F9A825" stroke="#8A5A00" stroke-width="1"/>
+    <text x="1085" y="401" fill="#1A1A1A">Regressed</text>
+    <rect x="1190" y="375" width="170" height="40" rx="20" fill="#6B7280"/>
+    <text x="1275" y="401" fill="#FFFFFF">Recalibrated</text>
+    <rect x="1380" y="375" width="170" height="40" rx="20" fill="#6B7280"/>
+    <text x="1465" y="401" fill="#FFFFFF">Retired</text>
+    <rect x="1570" y="375" width="170" height="40" rx="20" fill="#F9A825" stroke="#8A5A00" stroke-width="1"/>
+    <text x="1655" y="401" fill="#1A1A1A">Timeout</text>
+  </g>
+
+  <!-- Record banner -->
+  <rect x="60" y="445" width="1680" height="32" fill="#EEF1F5" stroke="#1F2F4D" stroke-width="1.5"/>
+  <text x="900" y="467" font-size="16" text-anchor="middle" fill="#1F2F4D">APIP record: declarative schema (contract_id, mapping_table_sha256, exit_outcome)</text>
+
+  <!-- Figure caption -->
+  <text x="900" y="518" font-size="18" font-style="italic" text-anchor="middle" fill="#222">Figure 1: The five-phase APIP lifecycle.</text>
+</svg>
