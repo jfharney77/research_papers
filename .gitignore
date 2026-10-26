@@ -30,3 +30,6 @@ papers/**/*.pdf
 # ...and the as-submitted / camera-ready PDFs, which are the record of what went to the venue
 !papers/*/submissions/*.pdf
 papers/apip/latex/APIP_6page.pdf
+
+# Reviewer comments are private to the authors; never commit them
+papers/apip/reviews/
